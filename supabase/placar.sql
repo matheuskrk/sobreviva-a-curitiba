@@ -12,6 +12,8 @@ create table if not exists public.placar (
 create index if not exists placar_km on public.placar (km desc);
 
 -- qualquer pessoa pode ler e inserir, mas ninguém pode editar ou apagar pelo site
+grant select, insert on public.placar to anon;
+grant usage on sequence public.placar_id_seq to anon;
 alter table public.placar enable row level security;
 drop policy if exists "ler placar" on public.placar;
 create policy "ler placar" on public.placar for select to anon using (true);

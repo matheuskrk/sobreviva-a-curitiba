@@ -3435,14 +3435,14 @@ function abreLoja() { lojaRender(); $('loja').hidden = false; }
 
 // ---------- placar geral (Supabase) ----------
 // para ligar: crie um projeto no Supabase, rode supabase/placar.sql e cole aqui a Project URL e a chave "anon public"
-const PLACAR = {url: '', key: ''};
+const PLACAR = {url: 'https://cuwnpzokroxgsdgqglsj.supabase.co', key: 'sb_publishable_IbsawVnc9cf_LlRCLd7YzA_FPXovGE9'}; // chave publicável: feita para ficar no site
 const placarOk = () => !!(PLACAR.url && PLACAR.key);
 async function placarTop(n = 30) {
-  const r = await fetch(`${PLACAR.url}/rest/v1/placar?select=nome,km,pontos&order=km.desc,pontos.desc&limit=${n}`, {headers: {apikey: PLACAR.key, Authorization: 'Bearer ' + PLACAR.key}});
+  const r = await fetch(`${PLACAR.url}/rest/v1/placar?select=nome,km,pontos&order=km.desc,pontos.desc&limit=${n}`, {headers: {apikey: PLACAR.key}});
   if (!r.ok) throw new Error('placar ' + r.status); return r.json();
 }
 async function placarEnvia(nome, km, pontos) {
-  const r = await fetch(`${PLACAR.url}/rest/v1/placar`, {method: 'POST', headers: {apikey: PLACAR.key, Authorization: 'Bearer ' + PLACAR.key, 'Content-Type': 'application/json', Prefer: 'return=minimal'}, body: JSON.stringify({nome, km: Math.round(km * 100) / 100, pontos})});
+  const r = await fetch(`${PLACAR.url}/rest/v1/placar`, {method: 'POST', headers: {apikey: PLACAR.key, 'Content-Type': 'application/json', Prefer: 'return=minimal'}, body: JSON.stringify({nome, km: Math.round(km * 100) / 100, pontos})});
   if (!r.ok) throw new Error('placar ' + r.status);
 }
 const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
