@@ -1054,6 +1054,40 @@ for x in (-2.6, 3.0, 5.4):
     p.append(box(LARANJA, (x, -0.6, 0.03), (0.5, 0.5, 0.06)))
 asset('equipe_poda', p)
 
+# ---------------- loja: chapéus (origem = topo da cabeça da capivara no jet ski; frente +Y) ----------------
+p = [sphere(0xc23b3b, (0, 0, 0.08), 0.24, (1, 1.05, 0.75), seg=10, rings=6)]            # touca de lã com pompom
+p.append(cyl(0xf4f4ec, (0, 0, 0.0), 0.25, 0.1, 10))
+p.append(sphere(0xf4f4ec, (0, 0, 0.27), 0.08, seg=6, rings=4))
+asset('chapeu_touca', p)
+p = [sphere(AMARELO, (0, 0, 0.05), 0.25, (1, 1.1, 0.72), seg=10, rings=6), cyl(AMARELO, (0, 0.03, -0.02), 0.31, 0.04, 12)]  # capacete de obra
+p.append(box(0xe0a820, (0, 0, 0.2), (0.06, 0.4, 0.06)))
+asset('chapeu_capacete', p)
+p = [sphere(JEANS, (0, -0.02, 0.04), 0.23, (1, 1.05, 0.7), seg=10, rings=6), box(JEANS, (0, 0.27, -0.02), (0.34, 0.3, 0.035), rot=(0.12, 0, 0))]  # boné
+p.append(sphere(BRANCO, (0, -0.02, 0.2), 0.04, seg=6, rings=4))
+asset('chapeu_bone', p)
+p = [cyl(0xe7c77a, (0, 0, -0.01), 0.42, 0.04, 14), cyl(0xe7c77a, (0, 0, 0.12), 0.2, 0.26, 12, r2=0.17), cyl(VERMELHO, (0, 0, 0.04), 0.205, 0.06, 12)]  # chapéu de palha
+asset('chapeu_palha', p)
+p = [cyl(0xf2c230, (0, 0, 0.07), 0.22, 0.14, 10)]                                       # coroa
+for k in range(5):
+    a = k / 5 * math.tau
+    p.append(cyl(0xf2c230, (math.cos(a) * 0.19, math.sin(a) * 0.19, 0.2), 0.06, 0.16, 4, r2=0.0))
+    p.append(sphere([VERMELHO, JEANS, LIMA][k % 3], (math.cos(a) * 0.22, math.sin(a) * 0.22, 0.08), 0.035, seg=6, rings=4))
+asset('chapeu_coroa', p)
+
+# ---------------- moradores boiando numa boia, acenando (frente +Y) ----------------
+for nome, boia, camisa in [('pessoa_boia', VERMELHO, JEANS), ('pessoa_boia2', AMARELO, ROSA)]:
+    p = [prim('torus', boia, (0, 0, 0.12), major_radius=0.55, minor_radius=0.2, major_segments=12, minor_segments=6)]
+    for k in range(4):
+        a = k / 4 * math.tau + 0.4
+        p.append(box(BRANCO, (math.cos(a) * 0.55, math.sin(a) * 0.55, 0.14), (0.14, 0.14, 0.42), rot=(0, 0, a)))
+    p.append(box(camisa, (0, 0, 0.45), (0.42, 0.26, 0.5)))
+    p.append(sphere(PELE, (0, 0, 0.86), 0.16, seg=8, rings=6))
+    p.append(sphere(0x3a2618, (0, -0.03, 0.93), 0.155, (1, 1, 0.7), seg=8, rings=5))
+    p.append(between(camisa, (-0.24, 0, 0.62), (-0.5, 0.05, 1.15), 0.06, 5))      # braço acenando
+    p.append(sphere(PELE, (-0.52, 0.05, 1.2), 0.06, seg=6, rings=4))
+    p.append(between(camisa, (0.24, 0, 0.62), (0.45, 0.1, 0.3), 0.06, 5))
+    asset(nome, p)
+
 mat = bpy.data.materials.new('VC'); mat.use_nodes = True
 nt = mat.node_tree; bsdf = nt.nodes.get('Principled BSDF')
 attr = nt.nodes.new('ShaderNodeVertexColor'); attr.layer_name = 'Col'
@@ -1113,7 +1147,7 @@ def render(path, names, spacing, cam_loc, cam_rot, ortho, target=None):
 
 if '--preview' in sys.argv:
     render(os.path.join(OUT, 'preview_piloto.png'), ['jetski', 'capivara'], {'jetski': 0, 'capivara': 0}, (4.5, 5.5, 3.2), (0, 0, 0), 4.6, target=(0, 0.1, 1.1))
-    render(os.path.join(OUT, 'preview_poda.png'), ['equipe_poda'], {'equipe_poda': 4}, (2.5, -11, 6), (math.radians(65), 0, 0), 12, target=(2.5, 0.8, 0.8))
+    render(os.path.join(OUT, 'preview_poda.png'), ['chapeu_touca', 'chapeu_capacete', 'chapeu_bone', 'chapeu_palha', 'chapeu_coroa', 'pessoa_boia', 'pessoa_boia2'], {'chapeu_touca': 1.2, 'chapeu_capacete': 1.2, 'chapeu_bone': 1.2, 'chapeu_palha': 1.3, 'chapeu_coroa': 1.5, 'pessoa_boia': 1.8, 'pessoa_boia2': 1.8}, (0, -8, 3), (math.radians(70), 0, 0), 9, target=(4.3, 0, 0.4))
     render(os.path.join(OUT, 'preview_parque.png'), ['capivara_heroi', 'baloes', 'cerca', 'barraca', 'bilheteria', 'palmeira', 'portal_parque', 'rg_base', 'pend_base'], {'capivara_heroi': 4, 'baloes': 4, 'cerca': 6, 'barraca': 7, 'bilheteria': 8, 'palmeira': 10, 'portal_parque': 18, 'rg_base': 22, 'pend_base': 4}, (0, -110, 14), (math.radians(82), 0, 0), 105)
     render(os.path.join(OUT, 'preview_bi.png'), ['bi_frente', 'bi_meio', 'bi_tras'], {'bi_frente': 3.1, 'bi_meio': 3.1, 'bi_tras': 3.1}, (-12, -14, 5), (0, 0, 0), 16, target=(3.1, 0, 0))
     render(os.path.join(OUT, 'preview_v2_a.png'), ['relogio_flores', 'farol_saber', 'memorial_ucraniano', 'rua_24h', 'paco_liberdade', 'catedral'], {'relogio_flores': 14, 'farol_saber': 16, 'memorial_ucraniano': 26, 'rua_24h': 34, 'paco_liberdade': 30, 'catedral': 4}, (0, -130, 22), (math.radians(80), 0, 0), 150)

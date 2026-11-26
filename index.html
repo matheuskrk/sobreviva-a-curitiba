@@ -69,7 +69,7 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-a
   color:#dff3e2;background:rgba(10,28,22,.82);padding:7px 9px;border-radius:7px;pointer-events:none;letter-spacing:.2px}
 #skip{bottom:calc(env(safe-area-inset-bottom,0px) + 22px);left:50%;transform:translateX(-50%);font-weight:800;font-size:13px;color:#fff;background:rgba(30,94,52,.55);padding:6px 14px;border-radius:999px}
 #toast.mid{top:58%;font-size:46px;padding:2px 8px} /* contagem regressiva no meio da tela */
-#overlay,#result,#pausa,#creditos,#cardView{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:rgba(244,246,234,.55);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow:auto}
+#overlay,#result,#pausa,#creditos,#cardView,#loja,#placar{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:rgba(244,246,234,.55);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow:auto}
 .card{max-width:540px;display:grid;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 12px 40px rgba(30,94,52,.25)}
 .card header{background:var(--lime);padding:22px 26px 18px}
 .card h1{font-family:var(--f-display);font-weight:900;font-size:clamp(34px,8vw,56px);line-height:.95;margin:0;color:#fff;text-wrap:balance}
@@ -83,6 +83,21 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-a
 .pw b{display:block;font-weight:900;color:var(--ink);font-size:15px}
 .pw span{font-size:13px;color:var(--dim);font-weight:700;line-height:1.3}
 .acoes{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#loja,#placar{z-index:11}
+.lojatopo{display:flex;align-items:center;gap:14px}
+#lojaPrev{width:110px;height:110px;border-radius:18px;background:#eef3dc}
+.moedas{font-family:var(--f-display);font-weight:800}.moedas b{font-size:30px;color:var(--ink)}.moedas small{font-weight:600;font-size:12px;opacity:.7}
+.abas{display:flex;gap:6px;flex-wrap:wrap}.abas button{font:800 14px var(--f-display);padding:8px 14px;border-radius:999px;border:2px solid var(--leaf);background:#fff;color:var(--ink);cursor:pointer}.abas button.on{background:var(--leaf);color:#fff}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.grade .item{display:grid;justify-items:center;gap:4px;padding:10px 6px;border-radius:14px;border:2px solid #dfe6cf;background:#fff;cursor:pointer;font-family:var(--f-display);color:var(--ink)}
+.grade .item b{font-size:14px}.grade .item small{font-size:12px;font-weight:700;opacity:.75}
+.grade .item.usa{border-color:var(--leaf);background:#f1f7df}.grade .item.caro{opacity:.55}
+.grade .sw{width:34px;height:34px;border-radius:50%;border:2px solid rgba(0,0,0,.15)}
+.envio{display:flex;gap:8px;flex-wrap:wrap}.envio input{flex:1;min-width:140px;font:700 15px var(--f-display);padding:11px 14px;border-radius:999px;border:2px solid var(--leaf);color:var(--ink)}
+ol.placar{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:60vh;overflow:auto}
+ol.placar li{display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:8px 10px;border-radius:10px;background:#f4f7ea;font-family:var(--f-display);font-weight:800;color:var(--ink)}
+ol.placar li.eu{background:var(--lime);color:#fff}ol.placar li.vazio{display:block;background:none;font-weight:600}
+ol.placar .pos{opacity:.6}
 button.sec{font-family:var(--f-display);font-weight:800;font-size:15px;padding:12px 18px;border-radius:999px;border:2px solid var(--leaf);background:#fff;color:var(--ink);cursor:pointer}
 button.sec:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 .cred{display:grid;gap:4px;font-size:14px;color:var(--ink);font-weight:600;line-height:1.45}
@@ -167,7 +182,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
     <p>O Parque Barigui está inundado e você precisa encontrar um lugar seco para curtir o fim de semana. Só cuidado para a onda não te levar!</p>
     <div class="pw" id="pw" role="list"></div>
     <div id="loading">Esperando o Ligeirinho (pode demorar)…</div>
-    <div class="acoes"><button class="go" id="start" hidden>Salve-se quem puder!</button><button class="sec" id="credBtn">Créditos</button></div>
+    <div class="acoes"><button class="go" id="start" hidden>Salve-se quem puder!</button><button class="sec" id="lojaBtn">Loja</button><button class="sec" id="placarBtn">Placar</button><button class="sec" id="credBtn">Créditos</button></div>
     <div class="meta" id="best"></div>
     </div>
   </div>
@@ -200,6 +215,22 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
     <div class="acoes"><button class="sec" id="copyLink">Copiar link do jogo</button><button class="go" id="cardClose">Fechar</button></div>
   </div>
 </div>
+<div id="loja" class="screen" hidden>
+  <div class="card">
+    <header class="hx"><h1>Loja</h1><button class="x" id="lojaFecha" aria-label="Fechar loja"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke-width="2.4" stroke-linecap="round"/></svg></button></header>
+    <div class="body">
+      <div class="lojatopo"><img id="lojaPrev" alt="Sua capivara com a roupa escolhida"><p class="moedas"><b id="lojaMoedas">0</b> pinhões<br><small>3 por km e 10 por pinhão pego</small></p></div>
+      <div class="abas" id="lojaAbas" role="tablist"></div>
+      <div class="grade" id="lojaGrade"></div>
+    </div>
+  </div>
+</div>
+<div id="placar" class="screen" hidden>
+  <div class="card">
+    <header class="hx"><h1>Placar</h1><button class="x" id="placarFecha" aria-label="Fechar placar"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke-width="2.4" stroke-linecap="round"/></svg></button></header>
+    <div class="body"><ol class="placar" id="placarLista"></ol></div>
+  </div>
+</div>
 <div id="result" class="screen" hidden>
   <div class="card">
     <header><h1 id="resTitle">Fim da linha</h1></header>
@@ -207,8 +238,10 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
       <p id="resHit" class="hit"></p>
       <p id="resText"></p>
       <p class="meta" id="resScore"></p>
+      <p class="meta" id="resGanho"></p>
       <img id="resCard" alt="Card com a sua distância e pontuação">
-      <div class="acoes"><button class="go" id="retry">Jogar de novo</button><button class="sec" id="shareBtn">Compartilhar nos stories</button></div>
+      <div class="envio" id="placarEnvio" hidden><input id="apelido" maxlength="16" placeholder="Seu apelido" autocomplete="nickname" aria-label="Apelido para o placar"><button class="sec" id="enviaBtn">Enviar pro placar</button></div>
+      <div class="acoes"><button class="go" id="retry">Jogar de novo</button><button class="sec" id="shareBtn">Compartilhar nos stories</button><button class="sec" id="lojaRes">Loja</button></div>
     </div>
   </div>
 </div>
@@ -1223,6 +1256,31 @@ for (const l of LMK) {
 const checkpoints = TRK.legs.filter(l => l.kind === 'praca').map(l => { const [x, z] = trackAt(l.s); return {x, z, s: l.s, name: l.name}; });
 // placas com o nome real da rua, onde a rua muda
 if (!window.__glowTex) { const gc = document.createElement('canvas'); gc.width = gc.height = 64; const gx = gc.getContext('2d'); const gr = gx.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); gx.fillStyle = gr; gx.fillRect(0, 0, 64, 64); window.__glowTex = new THREE.CanvasTexture(gc); }
+const ANIM = new Set(); // objetos animados dos trechos (gente nas boias)
+// ---------- placas de curva: seta amarela uns 70 m antes de cada virada forte ----------
+const CURVAS = [];
+{
+  let ult = -1e9;
+  for (let i = 20; i < TRK.n - 25; i += 2) {
+    const a = i, b = i + 20, c = TRK.DX[a] * TRK.DX[b] + TRK.DZ[a] * TRK.DZ[b];
+    if (c > 0.82) continue; // menos de ~35°
+    const s = a * TRK.step; if (s - ult < 120) continue; ult = s;
+    const lado = TRK.DX[a] * TRK.DZ[b] - TRK.DZ[a] * TRK.DX[b] > 0 ? 1 : -1;
+    CURVAS.push({s: Math.max(30, s - 70), lado});
+  }
+}
+function setaTex(lado) {
+  const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+  g.translate(64, 64); g.rotate(Math.PI / 4); g.fillStyle = '#1e5e34'; g.fillRect(-46, -46, 92, 92); g.fillStyle = '#f2c230'; g.fillRect(-40, -40, 80, 80); g.setTransform(1, 0, 0, 1, 0, 0);
+  g.translate(64, 64); if (lado < 0) g.scale(-1, 1);
+  g.strokeStyle = '#1e5e34'; g.lineWidth = 12; g.lineCap = 'round'; g.lineJoin = 'round';
+  g.beginPath(); g.moveTo(-14, 30); g.lineTo(-14, -2); g.quadraticCurveTo(-14, -14, 0, -14); g.lineTo(20, -14); g.stroke();
+  g.fillStyle = '#1e5e34'; g.beginPath(); g.moveTo(34, -14); g.lineTo(14, -30); g.lineTo(14, 2); g.closePath(); g.fill();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const SETA_MAT = {}; for (const l of [-1, 1]) SETA_MAT[l] = new THREE.MeshBasicMaterial({map: setaTex(l), transparent: true, alphaTest: 0.5, side: THREE.DoubleSide});
+const SETA_G = new THREE.PlaneGeometry(2.4, 2.4), POSTE_SETA_G = new THREE.CylinderGeometry(0.08, 0.08, 3.4, 6), POSTE_SETA_M = new THREE.MeshLambertMaterial({color: 0x9a9c92});
+
 // ---------- o mundo do percurso é montado em trechos de 200 m, só perto da capivara ----------
 const CHUNK = 200;
 const chunks = new Map();
@@ -1358,6 +1416,22 @@ function buildChunk(k) {
     const side = hash(s * 0.37) < .5 ? 1 : -1;
     for (const off of [8.6, 7.4, 6.6]) if (add('equipe_poda', s, side * off, (side > 0 ? 0 : Math.PI) - Math.PI / 2, -0.3)) break;
   }
+  // placas de curva
+  for (const cv of CURVAS) {
+    if (cv.s < s0 || cv.s >= s1) continue;
+    const g = new THREE.Group(), post = new THREE.Mesh(POSTE_SETA_G, POSTE_SETA_M); post.position.y = 1.4; g.add(post);
+    const pl = new THREE.Mesh(SETA_G, SETA_MAT[cv.lado]); pl.position.y = 3.6; pl.rotation.y = Math.PI; g.add(pl);
+    keep(placeOnTrack(g, cv.s, 6.2));
+  }
+  // moradores boiando nas boias, acenando
+  for (let s = s0 + rnd(30, 90); s < s1; s += rnd(70, 140)) {
+    if (nearCp(s)) continue;
+    const side = Math.random() < .5 ? 1 : -1, [x, z] = trackAt(s, side * 7.2);
+    if (insideAny(x, z, 0.6) || nearLandmark(x, z) || routeNear(x, z) < VIA_LIVRE) continue;
+    const m = new THREE.Mesh(GEO[Math.random() < .5 ? 'pessoa_boia' : 'pessoa_boia2'], VC);
+    placeOnTrack(m, s, side * 7.2, -0.05, side > 0 ? -Math.PI / 2 : Math.PI / 2); m.userData = {y0: -0.05, ph: Math.random() * 6};
+    keep(m); ANIM.add(m);
+  }
   // floreiras da Rua das Flores (Rua XV de Novembro), dos dois lados
   for (let s = Math.ceil(s0 / 6.5) * 6.5; s < s1; s += 6.5) {
     const [fx, fz] = trackAt(s); if (!streetAt(fx, fz).includes('XV de Novembro')) continue;
@@ -1406,6 +1480,7 @@ const LAMP_GLOW = new THREE.SpriteMaterial({map: window.__glowTex, color: 0xffd9
 const BED_MAT = new THREE.MeshBasicMaterial({color: 0x1f5f52, transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide});
 function disposeChunk(k) {
   const ch = chunks.get(k); if (!ch) return;
+  for (const o of ch.objs) ANIM.delete(o);
   for (const m of ch.slots) POLE_MESH.delete(m);
   for (const reg of ch.fios) for (const pm of reg.postes) {
     const arr = FIOS.get(pm); if (!arr) continue;
@@ -1559,6 +1634,7 @@ const WEATHER = [
   {id: 'sol', name: 'Sol', dur: 35, fog: 0xe4edd2, top: 0x8ec5e6, near: 120, far: 1100, rain: 0, light: 1, amp: 1, sun: 2.2, hemi: 1.3, night: 0, msg: 'Abriu o sol'},
   {id: 'garoa', name: 'Garoa', dur: 25, fog: 0xc9d3cc, top: 0xa7b6bf, near: 90, far: 700, rain: 800, light: .86, amp: 1.1, sun: 1.3, hemi: 1.1, night: .2, msg: 'Garoa chegando'},
   {id: 'temporal', name: 'Temporal', dur: 30, fog: 0x8d9a99, top: 0x5f6d73, near: 50, far: 480, rain: 2600, light: .62, amp: 1.35, sun: .5, hemi: .8, night: .75, msg: 'Temporal! Cuidado com os galhos'},
+  {id: 'granizo', name: 'Granizo', dur: 18, fog: 0xb3bec2, top: 0x7d8b91, near: 60, far: 520, rain: 400, light: .74, amp: 1.25, sun: .7, hemi: 1, night: .5, hail: 1, msg: 'Granizo! Os galhos caem mais rápido'},
   {id: 'neblina', name: 'Neblina', dur: 25, fog: 0xdfe3df, top: 0xdfe3df, near: 15, far: 230, rain: 0, light: .9, amp: .8, sun: 1, hemi: 1.2, night: .3, msg: 'Neblina no centro'},
 ];
 WEATHER.forEach(w => { w.fogC = new THREE.Color(w.fog); w.topC = new THREE.Color(w.top); });
@@ -2157,7 +2233,7 @@ function genUntil(limit) {
     const bus = busLanesStreet(s), r = Math.random(), one = () => [Math.floor(Math.random() * 3) - 1];
     let type, lanes;
     if (bus && r < .3) { type = 'onibus'; lanes = one(); }
-    else if (r < .2) { type = 'galho_cai'; lanes = one(); }
+    else if (r < (WX.id === 'granizo' ? .4 : .2)) { type = 'galho_cai'; lanes = one(); }
     else if (r < .32) { type = 'galho'; lanes = one(); }
     else if (r < .45) { type = 'cratera'; lanes = one(); }
     else if (r < .58) { type = 'cones'; lanes = one(); }
@@ -2399,7 +2475,7 @@ function shockSound() {
 function startRun() {
   Object.assign(G, {state: 'count', count: 3, lvl: 0, lastN: null, s: 0, speed: 24, waveVis: 13, lane: 0, off: 0, wave: 45, inv: 0, score: 0, pin: 0, lixo: 0, star: 0, boost: 0, umb: 0, ride: 0, lift: 0, umbN: 0, ligN: 0, cp: 0, cps: 0, t: 0, slow: 0, galhoT: 6, dist: 0, lastSwitch: -9, paused: false, hint: 10});
   umbOnSki.visible = false; rideBus.visible = false; G.zap = 0; setZapLook(false); G.riv = 0; G.rioIn = false; DAY.t = 0; DAY.night = false; BO.t = 0; BO.cool = 6; BO.k = 0; BO.head = 0; BO.warned = false; BO.alertT = 0; $('alerta').classList.remove('on');
-  WX.i = WX.prev = 0; WX.t = 0;
+  WX.i = WX.prev = 0; WX.t = 0; resetVida(); try { speechSynthesis.cancel(); } catch (e) {}
   LM_PASS.forEach(l => l.done = false);
   resetGen(); GEN.bag = []; GEN.s = 170; resetChunks(); startMusic(); setStarLook(false); // na contagem a capivara já anda ~75 m: os obstáculos começam depois disso
   { const [x, z, dx, dz] = trackAt(0); camPos.set(x - dx * 12, 7, z - dz * 12); camDir.set(dx, 0, dz); }
@@ -2421,10 +2497,10 @@ function destinoPara(km) {
 }
 function destinoNome(km) { let d = null; for (const x of DESTINOS) if (km >= x[0]) d = x; return d ? d[1] : 'a outra margem do lago'; }
 // capivara no jet ski desenhada pelo próprio renderizador do jogo, com fundo transparente
-function heroShot(S = 640) {
+function heroShot(S = 640, capiGeo = null) {
   const rt = new THREE.WebGLRenderTarget(S, S); rt.texture.colorSpace = THREE.SRGBColorSpace;
   const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x99aa88, 1.6)); const dl = new THREE.DirectionalLight(0xffffff, 2); dl.position.set(3, 5, 4); sc.add(dl);
-  const g = new THREE.Group(); g.add(new THREE.Mesh(GEO.jetski, VC), new THREE.Mesh(GEO.capivara, VC)); g.rotation.set(0.1, 2.5, 0); sc.add(g);
+  const g = new THREE.Group(), rider = new THREE.Mesh(capiGeo || SKIN.capi, VC); g.add(new THREE.Mesh(SKIN.jet, VC), rider); setHat(rider, SKIN.hat); g.rotation.set(0.1, 2.5, 0); sc.add(g);
   const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 2.3, 5.4); cam.lookAt(0, 1.05, 0);
   const oc = renderer.getClearColor(new THREE.Color()), oa = renderer.getClearAlpha();
   renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(sc, cam);
@@ -2435,6 +2511,7 @@ function heroShot(S = 640) {
   cx.putImageData(img, 0, 0); return cv;
 }
 async function makeCard(km, score, rec) {
+  if (km >= 100) return makeShinyCard(km, score, rec);
   // "Cota de Cheia": o card é uma régua de nível de rio; a água sobe até a distância da partida (escala logarítmica)
   const BS = '"Big Shoulders Display", "Arial Narrow", sans-serif', MONO = '"DM Mono", ui-monospace, monospace';
   try { await Promise.all([document.fonts.load(`900 300px ${BS}`), document.fonts.load(`700 60px ${BS}`), document.fonts.load(`400 26px ${MONO}`), document.fonts.load(`500 34px ${MONO}`)]); } catch (e) {}
@@ -2525,6 +2602,11 @@ function endRun(zerou) {
   $('resHit').textContent = zerou || G.lastHit === 'A onda te levou!' ? '' : G.lastHit;
   $('resText').textContent = `Você andou ${Math.round(G.dist).toLocaleString('pt-BR')} m em ${fmt(G.t)}. Pegou ${plural(G.pin, 'pinhão', 'pinhões')}, ${plural(G.umbN || 0, 'guarda-chuva', 'guarda-chuvas')} e ${plural(G.ligN || 0, 'carona', 'caronas')} no Ligeirinho.`;
   $('resScore').textContent = `${score.toLocaleString('pt-BR')} pontos` + (rec ? ' · novo recorde' : ` · recorde ${Math.round(best).toLocaleString('pt-BR')}`);
+  const ganho = Math.round(G.dist / 1000 * 3) + G.pin * 10; LOJA.moedas += ganho; salvaLoja();
+  $('resGanho').textContent = `+${ganho} pinhões para a loja (total ${LOJA.moedas.toLocaleString('pt-BR')})`;
+  Object.assign(ULTIMA, {km: G.dist / 1000, pontos: score, enviada: false});
+  $('placarEnvio').hidden = !placarOk() || G.dist < 200; $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Enviar pro placar';
+  try { $('apelido').value = localStorage.getItem('jetski-cwb-nome') || ''; } catch (e) {}
   prepareCard(G.dist / 1000, score, rec).catch(e => console.warn('card', e));
   setTimeout(() => { $('result').hidden = false; $('retry').focus(); }, 900);
   blip(zerou ? [523, 659, 784, 1047] : [392, 330, 262], 0.14, 'square', 0.12);
@@ -2658,7 +2740,12 @@ const toggleMusic = () => setMusicStyle(MUSIC.style === 'dnb' ? 'orig' : 'dnb');
 $('bCred').addEventListener('click', () => { if (G.state === 'race' || G.state === 'count') { setPaused(true); openCredits('pausa'); } else openCredits(G.state === 'title' ? 'overlay' : null); });
 $('credVoltar').addEventListener('click', () => { $('creditos').hidden = true; if (credFrom) $(credFrom).hidden = false; });
 $('continuar').addEventListener('click', () => setPaused(false));
-$('shareBtn').addEventListener('click', shareCard); $('resCard').addEventListener('click', () => { $('cardView').hidden = false; });
+$('shareBtn').addEventListener('click', shareCard);
+$('lojaBtn').addEventListener('click', abreLoja); $('lojaRes').addEventListener('click', abreLoja); $('lojaFecha').addEventListener('click', () => { $('loja').hidden = true; });
+$('lojaAbas').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { LOJA.aba = b.dataset.aba; lojaRender(); } });
+$('lojaGrade').addEventListener('click', e => { const b = e.target.closest('.item'); if (b) lojaClica(b.dataset.id); });
+$('placarBtn').addEventListener('click', abrePlacar); $('placarFecha').addEventListener('click', () => { $('placar').hidden = true; });
+$('enviaBtn').addEventListener('click', enviaPlacar); $('apelido').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') enviaPlacar(); }); $('resCard').addEventListener('click', () => { $('cardView').hidden = false; });
 $('cardClose').addEventListener('click', () => { $('cardView').hidden = true; });
 $('copyLink').addEventListener('click', async () => { try { await navigator.clipboard.writeText(GAME_URL); $('copyLink').textContent = 'Link copiado!'; } catch (e) { $('copyLink').textContent = GAME_URL; } });
 $('hint').querySelector('span').textContent = matchMedia('(pointer:coarse)').matches ? 'Deslize para os lados para trocar de faixa' : 'Use ← → para trocar de faixa';
@@ -2755,6 +2842,7 @@ function buildIntro() {
   iSki = new THREE.Group(); iSki.scale.setScalar(1.45); iScene.add(iSki);
   iSki.add(new THREE.Mesh(GEO.jetski, VC));
   iSkiRider = new THREE.Mesh(GEO.capivara, VC); iSki.add(iSkiRider);
+  queueMicrotask(applySkin);
   const rg2 = new THREE.RingGeometry(0.6, 1.0, 32); rg2.rotateX(-Math.PI / 2);
   iSplash = new THREE.Mesh(rg2, new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false})); iScene.add(iSplash);
 }
@@ -3064,12 +3152,12 @@ function step(dt) {
     const ds = o.s - G.s;
     if (o.type === 'galho_cai') {
       if (o.state === 'wait' && ds < 62 && live) { o.state = 'warn'; o.t = 0; o.wh = treeWhistle(); const [sx, sz] = trackAt(o.s, laneOff(o.lanes[0])); o.shadow.position.set(sx, 0.36, sz); o.shadow.rotation.y = headingOf(...trackAt(o.s).slice(2)); }
-      if (o.state === 'warn') { o.t += dt; const k = Math.min(1, o.t / 0.8); o.shadow.material.opacity = 0.15 + 0.4 * k; o.shadow.scale.set(0.4 + k * 0.6, 1, (0.4 + k * 0.6) * 2.6); if (k >= 1) {
+      if (o.state === 'warn') { o.t += dt * (WX.id === 'granizo' ? 1.8 : 1); const k = Math.min(1, o.t / 0.8); o.shadow.material.opacity = 0.15 + 0.4 * k; o.shadow.scale.set(0.4 + k * 0.6, 1, (0.4 + k * 0.6) * 2.6); if (k >= 1) {
         o.state = 'fall'; o.t = 0; o.k = 0; o.mesh.visible = true;
         // começa acima da borda de cima da tela: altura do topo do campo de visão nessa distância, com folga para o tamanho do galho
         const wp = o.root.position, hd = Math.hypot(wp.x - camera.position.x, wp.z - camera.position.z);
         o.h0 = Math.max(18, camera.position.y + Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * hd * 1.25 + 6);
-        o.dur = Math.min(0.85, 0.4 * Math.sqrt(o.h0 / 13)); // queda como em gravidade: de mais alto, demora um pouco mais
+        o.dur = Math.min(0.85, 0.4 * Math.sqrt(o.h0 / 13)) * (WX.id === 'granizo' ? 0.7 : 1); // queda como em gravidade: de mais alto, demora um pouco mais
         if (o.wh) { o.wh.drop(o.dur); o.wh = null; } // o assovio termina junto com o galho na água
         o.mesh.position.set(0, o.h0, 0);
       } }
@@ -3086,7 +3174,7 @@ function step(dt) {
       if (o.state === 'down' && ds > -20 && ds < 90 && !(G.umb > 0)) for (const l of o.lanes) { const [sx, sz] = trackAt(o.s + rnd(-0.5, 0.5), laneOff(l) + rnd(-1.4, 1.4)); spawnSpark(sx, 0.6, sz); }
     }
     if (o.type === 'onibus') {
-      if (o.state === 'wait' && ds < 150 && live) { o.state = 'move'; horn(); toast('Olha o biarticulado!', 1.2); }
+      if (o.state === 'wait' && ds < 150 && live) { o.state = 'move'; busHorn(); toast('Olha o biarticulado!', 1.2); }
       if (o.state === 'move' && live) o.s -= 9 * dt;
       o.secs.forEach((m, k) => { const [bx, bz, bdx, bdz] = trackAt(o.s + k * 9.8, laneOff(o.lanes[0])); m.position.set(bx, 1.0 + wave(bx, bz, t), bz); m.rotation.set(0, headingOf(bdx, bdz), 0); m.visible = !o.done; });
     }
@@ -3131,7 +3219,7 @@ function step(dt) {
       q.alive = false;
       if (q.kind === 'lixo') { G.lixo++; G.score += 25; G.boost = 2.5; G.wave = Math.min(WAVE_MAX, G.wave + 4); blip([620, 830], 0.05, 'triangle', 0.12); msgOnce('lixo', 'Lixo recolhido: mais velocidade!', 4, 0.9); if (G.lixo % 8 === 0) toast('Descartar errado, nem pensar!', 1.2); }
       else if (q.kind === 'chuva') { G.umbN = (G.umbN || 0) + 1; G.umb = 8; umbOnSki.visible = true; G.score += 60; toast('Guarda-chuva! Vem chuva de galhos aí', 1.3); blip([523, 784, 1046], 0.08, 'triangle', 0.12); }
-      else if (q.kind === 'lig') { G.ligN = (G.ligN || 0) + 1; G.ride = 4; rideBus.visible = true; G.score += 60; toast('Carona no Ligeirinho!', 1.3); horn(); }
+      else if (q.kind === 'lig') { G.ligN = (G.ligN || 0) + 1; G.ride = 4; rideBus.visible = true; G.score += 60; toast('Carona no Ligeirinho!', 1.3); horn(); falaEstacao(); }
       else { G.pin++; G.score += 100; G.star = 5; setStarLook(true); toast('PINHÃO! Invencível', 1.2); blip([660, 880, 1320, 1760], 0.07, 'square', 0.1); }
     }
     const vis = q.alive && ds > -10 && ds < 300 ? 1 : 0;
@@ -3256,7 +3344,7 @@ function step(dt) {
   updateWave(t, dt);
   musicTick();
 }
-window.__GEO = GEO; window.__makeCard = makeCard; window.__G = G; window.__S = S; window.__LMP = LM_PASS; window.__LMK = LMK; window.__trackAt = trackAt; window.__pin = pinhoes; window.__DAY = DAY; window.__inside = insideAny;
+window.__dbg = {WX, skiMeshes, ski, CURVAS}; window.__GEO = GEO; window.__makeCard = makeCard; window.__G = G; window.__S = S; window.__LMP = LM_PASS; window.__LMK = LMK; window.__trackAt = trackAt; window.__pin = pinhoes; window.__DAY = DAY; window.__inside = insideAny;
 let ssrCheck = 8;
 // ---------- vento de velocidade: riscos passando pela câmera no pinhão, no Ligeirinho e na correnteza do Rio Belém ----------
 const SW_N = 70, SPD_WIND = new THREE.InstancedMesh(new THREE.BoxGeometry(0.035, 0.035, 1), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, fog: false}), SW_N);
@@ -3278,9 +3366,252 @@ function stepSpeedWind(dt) {
   }
   SPD_WIND.instanceMatrix.needsUpdate = true;
 }
+// ---------- loja: coletes, chapéus e jet skis, pagos com os pinhões juntados nas partidas ----------
+const LOJA_ITENS = {
+  colete: [['lima', 'Lima', 0xb5cc2e, 0], ['laranja', 'Laranja', 0xf39a2b, 30], ['rosa', 'Rosa', 0xe05a9a, 40], ['jeans', 'Azul-jeans', 0x3a6fd9, 40], ['roxo', 'Ipê roxo', 0xa05ab8, 60], ['ouro', 'Dourado', 0xf2c230, 150]],
+  chapeu: [['laranja', 'Laranja', null, 0], ['touca', 'Touca de lã', 'chapeu_touca', 50], ['capacete', 'Capacete de obra', 'chapeu_capacete', 60], ['bone', 'Boné', 'chapeu_bone', 60], ['palha', 'Chapéu de palha', 'chapeu_palha', 80], ['coroa', 'Coroa', 'chapeu_coroa', 200]],
+  jet: [['classico', 'Clássico', [0xf4f4ec, 0xb5cc2e], 0], ['tubo', 'Estação-tubo', [0xd8dde0, 0x3a6fd9], 60], ['biarticulado', 'Biarticulado', [0xd93a3a, 0xf4f4ec], 80], ['araucaria', 'Araucária', [0x3f8a46, 0xe7c77a], 80], ['noite', 'Noite', [0x2a2f2c, 0xf39a2b], 120]],
+};
+const LOJA_ABAS = [['colete', 'Coletes'], ['chapeu', 'Chapéus'], ['jet', 'Jet skis']];
+const LOJA = {moedas: 0, tem: ['colete:lima', 'chapeu:laranja', 'jet:classico'], usa: {colete: 'lima', chapeu: 'laranja', jet: 'classico'}, aba: 'colete'};
+try { const sv = JSON.parse(localStorage.getItem('jetski-cwb-loja') || 'null'); if (sv) Object.assign(LOJA, sv, {aba: 'colete'}); } catch (e) {}
+const salvaLoja = () => { try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {} };
+const itemDe = (cat, id) => LOJA_ITENS[cat].find(i => i[0] === id) || LOJA_ITENS[cat][0];
+// troca cores de vértice (comparando na cor linear do glTF) e, se pedido, esconde a laranja da cabeça
+const ORANGE_HEAD = new THREE.Vector3(0, 2.3, -0.4);
+function recolor(geo, pairs, hideOrange) {
+  const g = geo.clone(), col = g.attributes.color, pos = g.attributes.position;
+  if (!col) return g;
+  g.setAttribute('color', col.clone()); g.setAttribute('position', pos.clone());
+  const C = g.attributes.color, P = g.attributes.position, src = pairs.map(([a, b]) => [new THREE.Color(a), new THREE.Color(b)]);
+  const laranja = new THREE.Color(0xf39a2b), folha = new THREE.Color(0x3f8a46);
+  const near = (i, c) => Math.abs(C.getX(i) - c.r) + Math.abs(C.getY(i) - c.g) + Math.abs(C.getZ(i) - c.b) < 0.06;
+  for (let i = 0; i < C.count; i++) {
+    if (hideOrange && P.getY(i) > 2.2 && (near(i, laranja) || near(i, folha))) { P.setXYZ(i, ORANGE_HEAD.x, ORANGE_HEAD.y, ORANGE_HEAD.z); continue; }
+    for (const [a, b] of src) if (near(i, a)) { C.setXYZ(i, b.r, b.g, b.b); break; }
+  }
+  return g;
+}
+const SKIN = {capi: GEO.capivara, jet: GEO.jetski, hat: null};
+const SKI_JET = ski.children.find(o => o.geometry === GEO.jetski), SKI_CAPI = ski.children.find(o => o.geometry === GEO.capivara);
+skiMeshes.splice(0, skiMeshes.length, SKI_JET, SKI_CAPI); // antes pegava o grupo do farol no lugar da capivara, e o brilho do pinhão só pintava o jet ski
+function setHat(rider, hatGeo) {
+  if (rider.userData.hat) { rider.remove(rider.userData.hat); rider.userData.hat = null; }
+  if (!hatGeo) return;
+  const h = new THREE.Mesh(hatGeo, VC); h.position.copy(ORANGE_HEAD).y += 0.08; rider.add(h); rider.userData.hat = h;
+}
+function applySkin() {
+  const old = [SKIN.capi, SKIN.jet];
+  const ve = itemDe('colete', LOJA.usa.colete), ch = itemDe('chapeu', LOJA.usa.chapeu), jt = itemDe('jet', LOJA.usa.jet);
+  SKIN.capi = recolor(GEO.capivara, [[0xb5cc2e, ve[2]]], !!ch[2]);
+  SKIN.jet = recolor(GEO.jetski, [[0xf4f4ec, jt[2][0]], [0xb5cc2e, jt[2][1]]], false);
+  SKIN.hat = ch[2] ? GEO[ch[2]] : null;
+  SKI_JET.geometry = SKIN.jet; SKI_CAPI.geometry = SKIN.capi; setHat(SKI_CAPI, SKIN.hat);
+  if (INTRO.built) { iSki.children[0].geometry = SKIN.jet; iSkiRider.geometry = SKIN.capi; setHat(iSkiRider, SKIN.hat); }
+  for (const g of old) if (g !== GEO.capivara && g !== GEO.jetski) g.dispose();
+}
+applySkin();
+function lojaRender() {
+  $('lojaMoedas').textContent = LOJA.moedas.toLocaleString('pt-BR');
+  $('lojaAbas').innerHTML = LOJA_ABAS.map(([k, n]) => `<button class="${k === LOJA.aba ? 'on' : ''}" data-aba="${k}">${n}</button>`).join('');
+  $('lojaGrade').innerHTML = LOJA_ITENS[LOJA.aba].map(([id, nome, v, preco]) => {
+    const key = LOJA.aba + ':' + id, tem = LOJA.tem.includes(key), usa = LOJA.usa[LOJA.aba] === id;
+    const cor = LOJA.aba === 'colete' ? v : LOJA.aba === 'jet' ? v[1] : ({touca: 0xc23b3b, capacete: 0xf2c230, bone: 0x3a6fd9, palha: 0xe7c77a, coroa: 0xf2c230}[id] || 0xf39a2b);
+    const cor2 = LOJA.aba === 'jet' ? v[0] : cor, hex = c => '#' + c.toString(16).padStart(6, '0');
+    const acao = usa ? 'Usando' : tem ? 'Usar' : `${preco} pinhões`;
+    return `<button class="item${usa ? ' usa' : ''}${!tem && preco > LOJA.moedas ? ' caro' : ''}" data-id="${id}"><span class="sw" style="background:linear-gradient(135deg,${hex(cor2)} 50%,${hex(cor)} 50%)"></span><b>${nome}</b><small>${acao}</small></button>`;
+  }).join('');
+  try { const c = heroShot(360); $('lojaPrev').src = c.toDataURL(); } catch (e) {}
+}
+function lojaClica(id) {
+  const cat = LOJA.aba, key = cat + ':' + id, it = itemDe(cat, id);
+  if (!LOJA.tem.includes(key)) {
+    if (LOJA.moedas < it[3]) { toast(`Faltam ${it[3] - LOJA.moedas} pinhões`, 1.2); blip([220, 180], 0.08, 'square', 0.06); return; }
+    LOJA.moedas -= it[3]; LOJA.tem.push(key); blip([660, 880, 1320], 0.07, 'square', 0.08);
+  }
+  LOJA.usa[cat] = id; salvaLoja(); applySkin(); lojaRender();
+}
+function abreLoja() { lojaRender(); $('loja').hidden = false; }
+
+// ---------- placar geral (Supabase) ----------
+// para ligar: crie um projeto no Supabase, rode supabase/placar.sql e cole aqui a Project URL e a chave "anon public"
+const PLACAR = {url: '', key: ''};
+const placarOk = () => !!(PLACAR.url && PLACAR.key);
+async function placarTop(n = 30) {
+  const r = await fetch(`${PLACAR.url}/rest/v1/placar?select=nome,km,pontos&order=km.desc,pontos.desc&limit=${n}`, {headers: {apikey: PLACAR.key, Authorization: 'Bearer ' + PLACAR.key}});
+  if (!r.ok) throw new Error('placar ' + r.status); return r.json();
+}
+async function placarEnvia(nome, km, pontos) {
+  const r = await fetch(`${PLACAR.url}/rest/v1/placar`, {method: 'POST', headers: {apikey: PLACAR.key, Authorization: 'Bearer ' + PLACAR.key, 'Content-Type': 'application/json', Prefer: 'return=minimal'}, body: JSON.stringify({nome, km: Math.round(km * 100) / 100, pontos})});
+  if (!r.ok) throw new Error('placar ' + r.status);
+}
+const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+async function abrePlacar() {
+  $('placar').hidden = false; const ul = $('placarLista');
+  if (!placarOk()) { ul.innerHTML = '<li class="vazio">O placar geral ainda não foi ligado.</li>'; return; }
+  ul.innerHTML = '<li class="vazio">Carregando…</li>';
+  try {
+    const top = await placarTop(); const eu = (localStorage.getItem('jetski-cwb-nome') || '').toLowerCase();
+    ul.innerHTML = top.length ? top.map((r, i) => `<li class="${r.nome.toLowerCase() === eu ? 'eu' : ''}"><span class="pos">${i + 1}</span><span class="nm">${escHtml(r.nome)}</span><span class="km">${Number(r.km).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1})} km</span></li>`).join('') : '<li class="vazio">Ninguém ainda. Seja o primeiro!</li>';
+  } catch (e) { ul.innerHTML = '<li class="vazio">Não deu para carregar o placar agora.</li>'; }
+}
+const ULTIMA = {km: 0, pontos: 0, enviada: false};
+async function enviaPlacar() {
+  const nome = $('apelido').value.trim().slice(0, 16);
+  if (nome.length < 2) { $('apelido').focus(); toast('Escreve um apelido', 1); return; }
+  if (ULTIMA.enviada || !placarOk()) return;
+  try { localStorage.setItem('jetski-cwb-nome', nome); } catch (e) {}
+  $('enviaBtn').disabled = true; $('enviaBtn').textContent = 'Enviando…';
+  try { await placarEnvia(nome, ULTIMA.km, ULTIMA.pontos); ULTIMA.enviada = true; $('enviaBtn').textContent = 'No placar!'; abrePlacar(); }
+  catch (e) { $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Tentar de novo'; }
+}
+
+// ---------- sons: buzina do biarticulado chegando e a voz do Ligeirinho ----------
+function busHorn() {
+  const ac = audio.ctx; if (!ac || !audio.on) return;
+  const t = ac.currentTime, f = ac.createBiquadFilter(), g = ac.createGain();
+  f.type = 'lowpass'; f.frequency.value = 1400; f.Q.value = 1.2;
+  g.gain.setValueAtTime(0.0001, t);
+  for (const [t0, t1] of [[0, 0.32], [0.42, 1.25]]) { g.gain.exponentialRampToValueAtTime(0.11, t + t0 + 0.03); g.gain.setValueAtTime(0.11, t + t1 - 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + t1); }
+  for (const fr of [311, 392]) {
+    const o = ac.createOscillator(); o.type = 'sawtooth';
+    o.frequency.setValueAtTime(fr * 1.04, t); o.frequency.setValueAtTime(fr * 1.04, t + 0.7); o.frequency.linearRampToValueAtTime(fr * 0.94, t + 1.2); // passa por você: o tom cai (Doppler)
+    o.connect(f); o.start(t); o.stop(t + 1.3);
+  }
+  f.connect(g); g.connect(audio.master);
+}
+function falaEstacao() {
+  blip([784, 622], 0.28, 'sine', 0.09); // o "plim-plom" antes do aviso
+  try {
+    const sy = window.speechSynthesis; if (!sy || !audio.on) return;
+    const [x, z] = trackAt(Math.min(TRK.len - 2, G.s + 220)); let nome = streetAt(x, z);
+    if (!nome || /sem nome/i.test(nome)) nome = 'Estação Tubo Barigui';
+    const u = new SpeechSynthesisUtterance(`Próxima estação: ${nome}.`); u.lang = 'pt-BR'; u.rate = 1.05; u.volume = 0.9;
+    const v = sy.getVoices().find(v => /^pt(-|_)BR/i.test(v.lang)) || sy.getVoices().find(v => /^pt/i.test(v.lang)); if (v) u.voice = v;
+    sy.cancel(); setTimeout(() => sy.speak(u), 450);
+  } catch (e) {}
+}
+
+// ---------- granizo: pedrinhas de gelo caindo em volta da câmera ----------
+const HAIL_N = 260, HAIL = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.09, 0), new THREE.MeshBasicMaterial({color: 0xf2f7fa}), HAIL_N);
+HAIL.frustumCulled = false; HAIL.count = 0; scene.add(HAIL);
+const HAIL_P = Array.from({length: HAIL_N}, () => ({x: 0, y: -1, z: 0, v: 0}));
+let hailK = 0, hailClink = 0;
+function stepHail(dt) {
+  hailK += (((WEATHER[WX.i].hail || 0) * (G.state === 'race' ? 1 : 0)) - hailK) * Math.min(1, dt * 0.8);
+  const n = Math.floor(HAIL_N * hailK); HAIL.count = n; if (!n) return;
+  const cx = camera.position.x, cz = camera.position.z, fx = -Math.sin(camera.rotation.y), fz = -Math.cos(camera.rotation.y);
+  for (let i = 0; i < n; i++) {
+    const p = HAIL_P[i];
+    if (p.y < 0.3) { const a = rnd(-22, 22), b = rnd(2, 45); p.x = cx + fx * b - fz * a; p.z = cz + fz * b + fx * a; p.y = rnd(14, 26); p.v = rnd(24, 32); }
+    p.y -= p.v * dt; swV.set(p.x, p.y, p.z); swS.set(1, 1.6, 1); swM.compose(swV, swQ, swS); HAIL.setMatrixAt(i, swM);
+  }
+  HAIL.instanceMatrix.needsUpdate = true;
+  hailClink -= dt; if (hailClink <= 0 && audio.ctx) { hailClink = rnd(0.03, 0.09) / Math.max(0.2, hailK); sfxNoise(0, 0.03, 0.05 * hailK, 'bandpass', rnd(3500, 6500), rnd(3000, 6000), 6); }
+}
+
+// ---------- gente boiando nas boias, acenando, e a Linha Turismo virou barco ----------
+const BARCOS = []; let proxBarco = 900;
+function stepVida(dt) {
+  const t = uTime.value;
+  for (const o of ANIM) { const u = o.userData; o.position.y = u.y0 + Math.sin(t * 1.8 + u.ph) * 0.12; o.rotation.z = Math.sin(t * 1.3 + u.ph) * 0.08; o.rotation.x = Math.sin(t * 1.1 + u.ph * 2) * 0.06; }
+  if (G.state !== 'race') return;
+  if (G.s > proxBarco && G.s + 260 < TRK.len) {
+    proxBarco = G.s + rnd(1300, 2000);
+    const g = new THREE.Group(), side = Math.random() < 0.5 ? 1 : -1;
+    const pont = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.5, 10.5), new THREE.MeshLambertMaterial({color: 0xf4f4ec})); pont.position.y = 0.1; g.add(pont);
+    const bus = new THREE.Mesh(GEO.linha_turismo, VC); bus.position.y = 0.35; bus.rotation.y = Math.PI / 2; g.add(bus);
+    scene.add(g); BARCOS.push({g, s: G.s + 240, off: side * 7.6});
+  }
+  for (let i = BARCOS.length - 1; i >= 0; i--) {
+    const b = BARCOS[i]; b.s += 6 * dt;
+    if (b.s < G.s - 40 || b.s > TRK.len - 5) { scene.remove(b.g); b.g.children[0].geometry.dispose(); BARCOS.splice(i, 1); continue; }
+    placeOnTrack(b.g, b.s, b.off); b.g.position.y = wave(b.g.position.x, b.g.position.z, t) * 0.8; b.g.rotation.z = Math.sin(t * 1.2 + i) * 0.03;
+  }
+}
+function resetVida() { for (const b of BARCOS) scene.remove(b.g); BARCOS.length = 0; proxBarco = rnd(700, 1100); }
+
+
+// card especial de quem passa dos 100 km: carta holográfica "shiny", com a capivara em cores raras
+function heroShiny(S) {
+  const capi = recolor(SKIN.capi, [[0x8a5a2b, 0xf0b8d8], [0x6e4520, 0xd889b6], [0x3a2618, 0x8a3e6a]], false);
+  try { return heroShot(S, capi); } finally { capi.dispose(); }
+}
+async function makeShinyCard(km, score, rec) {
+  const BS = '"Big Shoulders Display", "Arial Narrow", sans-serif', MONO = '"DM Mono", ui-monospace, monospace';
+  try { await Promise.all([document.fonts.load(`900 200px ${BS}`), document.fonts.load(`700 60px ${BS}`), document.fonts.load(`400 26px ${MONO}`), document.fonts.load(`500 34px ${MONO}`)]); } catch (e) {}
+  const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const nf = (v, d = 1) => v.toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+  const rand = (() => { let s = Math.floor(km * 1000) % 2147483647 || 7; return () => (s = s * 16807 % 2147483647) / 2147483647; })();
+  // fundo: noite funda com brilho violeta
+  g.fillStyle = '#120b26'; g.fillRect(0, 0, W, H);
+  let gr = g.createRadialGradient(W / 2, 760, 60, W / 2, 760, 1100); gr.addColorStop(0, 'rgba(126,72,214,.55)'); gr.addColorStop(1, 'rgba(18,11,38,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 160; i++) { g.fillStyle = `rgba(255,255,255,${0.15 + rand() * 0.5})`; const r = rand() * 1.8 + 0.4; g.beginPath(); g.arc(rand() * W, rand() * H, r, 0, 7); g.fill(); }
+  // a carta
+  const CX = 90, CY = 170, CW = W - 180, CH = 1400;
+  g.save(); g.shadowColor = 'rgba(190,140,255,.55)'; g.shadowBlur = 60; rr(CX, CY, CW, CH, 46); g.fillStyle = '#000'; g.fill(); g.restore();
+  // moldura dourada com reflexo
+  gr = g.createLinearGradient(CX, CY, CX + CW, CY + CH);
+  for (const [k, col] of [[0, '#fff3c4'], [0.18, '#e7b54a'], [0.35, '#fff7da'], [0.55, '#c98d26'], [0.75, '#ffe9a8'], [1, '#b87a1c']]) gr.addColorStop(k, col);
+  rr(CX, CY, CW, CH, 46); g.fillStyle = gr; g.fill();
+  // miolo holográfico: arco-íris em diagonal, faixas finas e losangos
+  const IX = CX + 26, IY = CY + 26, IW = CW - 52, IH = CH - 52;
+  g.save(); rr(IX, IY, IW, IH, 30); g.clip();
+  gr = g.createLinearGradient(IX, IY + IH, IX + IW, IY);
+  for (const [k, col] of [[0, '#ff9ad5'], [0.2, '#ffd27a'], [0.4, '#a8f0c6'], [0.6, '#8fd3ff'], [0.8, '#c3a2ff'], [1, '#ff9ad5']]) gr.addColorStop(k, col);
+  g.fillStyle = gr; g.fillRect(IX, IY, IW, IH);
+  g.globalAlpha = 0.18; g.strokeStyle = '#fff'; g.lineWidth = 2;
+  for (let d = -IH; d < IW; d += 18) { g.beginPath(); g.moveTo(IX + d, IY + IH); g.lineTo(IX + d + IH, IY); g.stroke(); }
+  g.globalAlpha = 0.12; for (let y = IY; y < IY + IH; y += 44) for (let x = IX + ((y / 44) % 2) * 22; x < IX + IW; x += 44) { g.beginPath(); g.moveTo(x, y - 10); g.lineTo(x + 10, y); g.lineTo(x, y + 10); g.lineTo(x - 10, y); g.closePath(); g.fillStyle = '#fff'; g.fill(); }
+  g.globalAlpha = 1;
+  // brilho de reflexo em faixa larga
+  gr = g.createLinearGradient(IX, IY, IX + IW, IY + IH); gr.addColorStop(0.3, 'rgba(255,255,255,0)'); gr.addColorStop(0.42, 'rgba(255,255,255,.55)'); gr.addColorStop(0.5, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(IX, IY, IW, IH);
+  g.restore();
+  // cabeçalho da carta
+  g.fillStyle = '#2a1650'; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+  g.font = `400 24px ${MONO}`; g.fillText('✦ LENDÁRIA · SHINY', IX + 34, IY + 58);
+  g.font = `900 78px ${BS}`; g.fillText('CAPIVARA DA CHEIA', IX + 30, IY + 138);
+  g.textAlign = 'right'; g.font = `900 62px ${BS}`; g.fillText(nf(km) + ' KM', IX + IW - 32, IY + 136); g.textAlign = 'left';
+  // janela da arte: céu de aurora e a capivara rosa-shiny
+  const AX = IX + 34, AY = IY + 170, AW = IW - 68, AH = 690;
+  g.save(); rr(AX, AY, AW, AH, 18); g.clip();
+  gr = g.createLinearGradient(0, AY, 0, AY + AH); gr.addColorStop(0, '#2b1a6b'); gr.addColorStop(0.55, '#7a4fd0'); gr.addColorStop(0.56, '#3ec1c9'); gr.addColorStop(1, '#165a74'); g.fillStyle = gr; g.fillRect(AX, AY, AW, AH);
+  gr = g.createRadialGradient(AX + AW / 2, AY + AH * 0.5, 10, AX + AW / 2, AY + AH * 0.5, AW * 0.6); gr.addColorStop(0, 'rgba(255,230,160,.9)'); gr.addColorStop(0.35, 'rgba(255,170,220,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(AX, AY, AW, AH);
+  for (let i = 0; i < 6; i++) { g.strokeStyle = `rgba(255,255,255,${0.35 - i * 0.05})`; g.lineWidth = 3; g.beginPath(); const y = AY + AH * 0.6 + i * 34; for (let x = AX; x <= AX + AW; x += 12) g.lineTo(x, y + Math.sin(x / 40 + i) * 6); g.stroke(); }
+  try { const S = 620; g.drawImage(heroShiny(S), AX + AW / 2 - S / 2, AY + AH - S + 30, S, S); } catch (e) {}
+  // brilhos de shiny em volta
+  const brilho = (x, y, r, a = 1) => { g.save(); g.translate(x, y); g.globalAlpha = a; g.fillStyle = '#fff'; g.shadowColor = '#fff3b0'; g.shadowBlur = r; g.beginPath(); for (let k = 0; k < 8; k++) { const rad = k % 2 ? r * 0.18 : r, an = k * Math.PI / 4; g.lineTo(Math.cos(an) * rad, Math.sin(an) * rad); } g.closePath(); g.fill(); g.restore(); };
+  for (const [x, y, r] of [[0.2, 0.25, 46], [0.82, 0.2, 34], [0.86, 0.55, 52], [0.14, 0.62, 30], [0.68, 0.1, 22], [0.32, 0.12, 18], [0.5, 0.06, 26]]) brilho(AX + AW * x, AY + AH * y, r);
+  g.restore();
+  g.strokeStyle = '#fff7da'; g.lineWidth = 6; rr(AX, AY, AW, AH, 18); g.stroke();
+  // faixa de legenda
+  g.fillStyle = 'rgba(42,22,80,.9)'; g.font = `400 22px ${MONO}`; g.textAlign = 'center';
+  g.fillText(`Nº ${String(Math.floor(km)).padStart(3, '0')} · FUGIU DO BARIGUI E PASSOU DE ${destinoNome(km).toUpperCase()}`, W / 2, AY + AH + 44);
+  // habilidades
+  const hab = (y, nome, txt, val) => {
+    g.textAlign = 'left'; g.fillStyle = '#2a1650'; g.font = `700 50px ${BS}`; g.fillText(nome, IX + 40, y);
+    g.textAlign = 'right'; g.font = `900 54px ${BS}`; g.fillText(val, IX + IW - 40, y);
+    g.textAlign = 'left'; g.font = `400 24px ${MONO}`; g.fillStyle = 'rgba(42,22,80,.82)'; g.fillText(txt, IX + 40, y + 40);
+  };
+  hab(AY + AH + 140, 'FUGA DA CHEIA', 'Mais de 100 km sem a onda alcançar.', nf(km) + ' km');
+  g.fillStyle = 'rgba(42,22,80,.25)'; g.fillRect(IX + 40, AY + AH + 214, IW - 80, 2);
+  hab(AY + AH + 290, 'PINHÃO DOURADO', rec ? 'Novo recorde pessoal.' : 'Pontos da corrida.', score.toLocaleString('pt-BR'));
+  // selo shiny no canto
+  g.save(); g.translate(CX + CW - 74, CY + CH - 74); g.rotate(-0.2);
+  gr = g.createLinearGradient(-60, -60, 60, 60); gr.addColorStop(0, '#fff3c4'); gr.addColorStop(0.5, '#e7b54a'); gr.addColorStop(1, '#fff7da');
+  g.fillStyle = gr; g.beginPath(); for (let k = 0; k < 24; k++) { const r = k % 2 ? 50 : 62, a = k * Math.PI / 12; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill();
+  g.fillStyle = '#2a1650'; g.font = `900 30px ${BS}`; g.textAlign = 'center'; g.fillText('SHINY', 0, 4); g.font = `400 16px ${MONO}`; g.fillText('+100 KM', 0, 26); g.restore();
+  // rodapé fora da carta
+  g.textAlign = 'center'; g.fillStyle = '#fff'; g.font = `900 60px ${BS}`; g.fillText('SOBREVIVA A CURITIBA!', W / 2, CY + CH + 120);
+  g.font = `400 26px ${MONO}`; g.fillStyle = 'rgba(255,255,255,.75)'; g.fillText('JOGUE: ' + GAME_URL.replace('https://', '').replace(/\/$/, '').toUpperCase(), W / 2, CY + CH + 176);
+  for (const [x, y, r] of [[120, 110, 20], [960, 95, 26], [1000, 1730, 22], [70, 1700, 16]]) brilho(x, y, r, 0.9);
+  return c;
+}
+
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
-  if (!G.paused) { uTime.value += dt; if (G.state === 'intro') runIntro(dt); else { step(dt); stepSpeedWind(dt); } }
+  if (!G.paused) { uTime.value += dt; if (G.state === 'intro') runIntro(dt); else { step(dt); stepSpeedWind(dt); stepHail(dt); stepVida(dt); } }
   if (G.state === 'intro') renderIntro(); else composer.render();
   // rede de segurança: se a placa de vídeo reclamar de algo nos primeiros quadros, desliga o reflexo em vez de deixar a tela preta
   if (ssrCheck > 0) { ssrCheck--; const gl = renderer.getContext(); if (gl.getError() !== gl.NO_ERROR && ssrPass.enabled) { ssrPass.enabled = false; outPass.enabled = true; console.warn('Reflexo na água desligado: erro do WebGL'); } }
