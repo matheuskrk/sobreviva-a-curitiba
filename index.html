@@ -2464,8 +2464,9 @@ $('retry').addEventListener('click', go);
 // e foge pelo portal do parque. A câmera mantém a capivara sempre no centro do quadro.
 const INTRO = {t: 0, dur: 6.6, built: false, landed: false, revved: false};
 const iScene = new THREE.Scene(), iCam = new THREE.PerspectiveCamera(58, SW() / SH(), 0.3, 2600);
+const PORTAL_Z = 22;
 const I_ROOF = new THREE.Vector3(-4, 3.1, 4), I_SKI = new THREE.Vector3(1.5, 0, 6.5), I_LOOK = new THREE.Vector3();
-let iPark, iWheel, iGond, iArm, iHero, iSki, iSkiRider, iSky, iSplash, iFloat = [], iRipples = [];
+let iWave, iPark, iWheel, iGond, iArm, iHero, iSki, iSkiRider, iSky, iSplash, iFloat = [], iRipples = [];
 function buildIntro() {
   if (INTRO.built) return; INTRO.built = true;
   iScene.fog = scene.fog;
@@ -2489,19 +2490,21 @@ function buildIntro() {
   pd.add(new THREE.Mesh(GEO.pend_base, VC));
   iArm = new THREE.Mesh(GEO.pend_braco, VC); iArm.position.set(0, 20, 0); pd.add(iArm);
   // entrada do parque (por onde ela foge), quiosques, palmeiras e cercas
-  add('portal_parque', 0, -14);
+  add('portal_parque', 0, PORTAL_Z);
   add('bilheteria', I_ROOF.x, I_ROOF.z, 0.15);
   add('barraca', 11, -2, 0.5); add('barraca', -14, -6, -0.3); add('barraca', 15, -14, 1.2);
   for (const [x, z, r, s] of [[-10, 10, 0.4, 1.1], [12, 8, 2.2, 1.2], [-26, -8, 1.1, 1.3], [30, -8, 3, 1.2], [7, -24, 0.2, 1.4], [-8, -24, 4, 1.25], [-34, 6, 2, 1.1], [34, 6, 5, 1.1]]) add('palmeira', x, z, r, s);
-  for (let x = -30; x <= 30; x += 4) if (Math.abs(x) > 6) add('cerca', x, -12);
+  for (let x = -30; x <= 30; x += 4) if (Math.abs(x) > 6) add('cerca', x, PORTAL_Z);
   // coisas boiando (balões, boias, cones, sacos de lixo, patos), cada uma com seu balanço
   const boiando = [['baloes', 6, 0, 1.3], ['baloes', -12, 1, 1.2], ['boia', 4, 11, 1], ['boia', -9, 13, 1.1], ['cone', 9, 4, 1], ['cone', -2, -6, 1], ['lixo', 6, 13, 1.3], ['lixo', -6, 9, 1.2], ['pato', 10, 9, 1.3], ['pato', 11, 10.2, 1], ['pato', 9.4, 10.6, 1], ['canoa', -16, 6, 1.1]];
   for (const [k, x, z, s] of boiando) { const m = add(k, x, z, Math.random() * 6, s, 0, iScene); m.userData = {x, z, ph: Math.random() * 6, k}; iFloat.push(m); }
   // ondinhas em volta do que está dentro da água
   const rgR = new THREE.RingGeometry(0.93, 1.0, 40); rgR.rotateX(-Math.PI / 2);
   const ripMat = () => new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false});
-  for (const [x, z, r] of [[I_ROOF.x, I_ROOF.z, 2.7], [-4.6, -14, 1.6], [4.6, -14, 1.6], [11, -2, 2.2], [-14, -6, 2.2], [-10, 10, 0.7], [12, 8, 0.7]])
+  for (const [x, z, r] of [[I_ROOF.x, I_ROOF.z, 2.7], [-4.6, PORTAL_Z, 1.6], [4.6, PORTAL_Z, 1.6], [11, -2, 2.2], [-14, -6, 2.2], [-10, 10, 0.7], [12, 8, 0.7]])
     for (let k = 0; k < 2; k++) { const m = new THREE.Mesh(rgR, ripMat()); m.userData = {x, z, r, ph: k * 0.5}; iScene.add(m); iRipples.push(m); }
+  // a onda gigante que vem do fundo do parque (a mesma do jogo, maior)
+  iWave = new THREE.Mesh(waveMesh.geometry, waveMesh.material); iWave.scale.set(1.9, 1.15, 1.6); iWave.rotation.y = Math.PI; iScene.add(iWave); // a face da onda virada para a saída
   // a capivara e o jet ski
   iHero = add('capivara_heroi', I_ROOF.x, I_ROOF.z, 0, 1.5, I_ROOF.y, iScene);
   iSki = new THREE.Group(); iSki.scale.setScalar(1.45); iScene.add(iSki);
@@ -2513,7 +2516,7 @@ function buildIntro() {
 function resetIntro() {
   buildIntro();
   updateWeather(0, false); // dia de sol (o clima da corrida anterior não vaza para a abertura)
-  Object.assign(INTRO, {t: 0, landed: false, revved: false, whoosh: false});
+  Object.assign(INTRO, {t: 0, landed: false, revved: false, whoosh: false, crash: false, roar: false});
   iHero.visible = true; iSkiRider.visible = false; iSplash.material.opacity = 0; iHero.scale.setScalar(1.5);
   iCam.aspect = SW() / SH(); iCam.updateProjectionMatrix();
   $('skip').hidden = false;
@@ -2562,18 +2565,27 @@ function runIntro(dt) {
     splash(0, 1.1); blip([523, 784], 0.07, 'triangle', 0.12);
   }
   if (iSplash.material.opacity > 0) { iSplash.scale.multiplyScalar(1 + dt * 2.6); iSplash.material.opacity = Math.max(0, iSplash.material.opacity - dt * 1.1); }
-  // jet ski: espera de lado, vira para o portal e foge por ele
-  let sx = I_SKI.x, sz = I_SKI.z, ry = -Math.PI / 2 + 0.4, pitch = 0;
-  if (T > 3.9) ry = (-Math.PI / 2 + 0.4) * (1 - ease((T - 3.9) / 0.55));
-  if (T > 4.35) {
-    const k = T - 4.35; sz = I_SKI.z - (12 * k * k + 7 * k); sx = I_SKI.x * (1 - ease(k / 1.2)); pitch = 0.12;
+  // jet ski: espera de lado, vira para a saída e foge da onda; a onda chega por trás e ele salta por cima do portal
+  let sx = I_SKI.x, sz = I_SKI.z, ry = -Math.PI / 2 + 0.4, pitch = 0, jumpY = 0;
+  if (T > 4.0) ry = (-Math.PI / 2 + 0.4) + (-Math.PI - (-Math.PI / 2 + 0.4)) * ease((T - 4.0) / 0.45);
+  const k = Math.max(0, T - 4.45);
+  if (T > 4.45) {
+    sz = I_SKI.z + 10 * k * k + 8 * k; sx = I_SKI.x * (1 - ease(k / 0.8)); pitch = -0.1;
     if (!INTRO.revved) { INTRO.revved = true; blip([110, 165, 220, 330], 0.06, 'sawtooth', 0.08); }
+    // salto por cima do portal: arco entre 9 m antes e 9 m depois
+    const a = PORTAL_Z - 9, b = PORTAL_Z + 9;
+    if (sz > a && sz < b) { const u = (sz - a) / (b - a); jumpY = Math.sin(u * Math.PI) * 7.5; pitch = -0.5 * Math.cos(u * Math.PI); }
   }
-  const bob = Math.sin(T * 3) * 0.06 + (INTRO.landed && T < 3.95 ? -0.18 * (1 - (T - jumpB) / 0.2) : 0);
-  iSki.position.set(sx, wave(sx, sz, wt) + 0.35 + bob, sz);
+  const bob = Math.sin(T * 3) * 0.06 + (INTRO.landed && T < 4.05 ? -0.18 * Math.max(0, 1 - (T - jumpB) / 0.2) : 0);
+  iSki.position.set(sx, wave(sx, sz, wt) + 0.35 + bob + jumpY, sz);
   iSki.rotation.set(pitch, ry, Math.sin(T * 2.4) * 0.05);
+  // a onda: cresce lá no fundo enquanto ela está no telhado, depois persegue o jet ski e quebra no portal
+  const zw = T < 4.45 ? -58 + 12.6 * T : -1.9 + 16 * k + 4 * k * k;
+  iWave.position.set(0, -0.4 + Math.sin(wt * 3) * 0.2, Math.min(zw, PORTAL_Z - 2));
+  if (T > 1.2 && !INTRO.roar) { INTRO.roar = true; sfxNoise(0, 3.5, 0.25, 'lowpass', 180, 90, 0.7); }
+  if (zw > PORTAL_Z - 3 && !INTRO.crash) { INTRO.crash = true; splash(0, 1.4); sfxNoise(0, 1.4, 0.5, 'lowpass', 900, 120); for (let q = 0; q < 60; q++) spawnWakeIntro(rnd(-12, 12), PORTAL_Z - 4, Math.PI); }
   fogUniforms.uSkiP.value.set(sx, sz); fogUniforms.uSkiD.value.set(-Math.sin(ry), -Math.cos(ry));
-  if (T > 4.35 && Math.random() < 0.9) for (let q = 0; q < 3; q++) spawnWakeIntro(sx, sz, ry);
+  if (T > 4.45 && jumpY < 0.5 && Math.random() < 0.9) for (let q = 0; q < 3; q++) spawnWakeIntro(sx, sz, ry);
   // câmera: sempre centrada na capivara (no telhado, no ar ou no jet ski)
   const hero = iHero.visible ? iHero.position : iSki.position;
   const focus = tmpV2.set(hero.x, hero.y + (iHero.visible ? 0.9 : 1.6), hero.z);
@@ -2583,11 +2595,10 @@ function runIntro(dt) {
   } else if (T < 3.1) { // perto, ela olhando o jet ski
     const k = ease((T - 2.4) / 0.7);
     iCam.position.set(focus.x + 1.5 + 1.2 * k, focus.y + 1.6, focus.z + 6.5 - 1 * k);
-  } else if (T < 4.35) { // o salto visto de lado, acompanhando
+  } else if (T < 4.45) { // a rajada vista de lado, acompanhando
     iCam.position.lerp(tmpV.set(focus.x + 2.5, focus.y + 2.2, focus.z + 9), 1 - Math.exp(-dt * 6));
-  } else { // perseguição por trás, como na corrida
-    const [fx, fz] = [-Math.sin(ry), -Math.cos(ry)];
-    iCam.position.lerp(tmpV.set(focus.x - fx * 11, focus.y + 4.6, focus.z - fz * 11), 1 - Math.exp(-dt * 5));
+  } else { // à frente do jet ski, olhando para trás: ela no centro e a onda chegando atrás dela
+    iCam.position.lerp(tmpV.set(focus.x + 4.5, Math.max(3.2, focus.y + 1.8), focus.z + 13), 1 - Math.exp(-dt * 5));
   }
   I_LOOK.lerp(focus, T < 0.05 ? 1 : 1 - Math.exp(-dt * 10));
   iCam.lookAt(I_LOOK);
