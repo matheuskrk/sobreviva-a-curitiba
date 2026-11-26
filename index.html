@@ -2409,23 +2409,23 @@ function startRun() {
 }
 // ---------- card de fim de partida, para postar nos stories ----------
 const GAME_URL = 'https://matheuskrk.github.io/sobreviva-a-curitiba/';
-// aonde daria para ir do centro (Praça Tiradentes) com a distância percorrida, em linha reta e aproximado
+// aonde daria para ir saindo do Parque Barigui (de onde a capivara fugiu), em linha reta e aproximado
 const DESTINOS = [
-  [0.4, 'o Largo da Ordem'], [0.8, 'o Passeio Público'], [1.8, 'a Rodoferroviária'], [3.2, 'o Jardim Botânico'],
-  [3.9, 'o Parque Barigui'], [5.0, 'a Ópera de Arame'], [5.7, 'o Parque Tanguá'], [6.5, 'Santa Felicidade'],
-  [14.5, 'o Aeroporto Afonso Pena'], [28, 'Campo Largo'], [38, 'Morretes'], [75, 'Paranaguá'],
+  [1.5, 'a Torre Panorâmica'], [1.9, 'o Shopping Barigui'], [2.6, 'o Bosque Alemão'], [3.0, 'Santa Felicidade'],
+  [3.7, 'a Rua XV, no centro'], [4.2, 'o Museu do Olho'], [5.1, 'a Ópera de Arame'], [5.5, 'o Parque Tanguá'],
+  [7.2, 'o Jardim Botânico'], [18, 'o Aeroporto Afonso Pena'], [22.6, 'Campo Largo'], [48, 'Morretes'], [81, 'Paranaguá'], [93, 'Ponta Grossa'],
 ];
 function destinoPara(km) {
   let d = null; for (const x of DESTINOS) if (km >= x[0]) d = x;
-  return d ? `Dava pra ir do centro até ${d[1]}!` : 'Nem saiu da Rua XV…';
+  return d ? `Dava pra ir do Barigui até ${d[1]}!` : 'Nem saiu do Barigui…';
 }
-function destinoNome(km) { let d = null; for (const x of DESTINOS) if (km >= x[0]) d = x; return d ? d[1] : 'a esquina da Rua XV'; }
+function destinoNome(km) { let d = null; for (const x of DESTINOS) if (km >= x[0]) d = x; return d ? d[1] : 'a outra margem do lago'; }
 // capivara no jet ski desenhada pelo próprio renderizador do jogo, com fundo transparente
 function heroShot(S = 640) {
   const rt = new THREE.WebGLRenderTarget(S, S); rt.texture.colorSpace = THREE.SRGBColorSpace;
   const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x99aa88, 1.6)); const dl = new THREE.DirectionalLight(0xffffff, 2); dl.position.set(3, 5, 4); sc.add(dl);
   const g = new THREE.Group(); g.add(new THREE.Mesh(GEO.jetski, VC), new THREE.Mesh(GEO.capivara, VC)); g.rotation.set(0.1, 2.5, 0); sc.add(g);
-  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 2.6, 7.4); cam.lookAt(0, 1.0, 0);
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 2.3, 5.4); cam.lookAt(0, 1.05, 0);
   const oc = renderer.getClearColor(new THREE.Color()), oa = renderer.getClearAlpha();
   renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(sc, cam);
   const px = new Uint8Array(S * S * 4); renderer.readRenderTargetPixels(rt, 0, 0, S, S, px);
@@ -2442,11 +2442,11 @@ async function makeCard(km, score, rec) {
   const PAPER = '#eee8d5', INK = '#1d4a3c', LIME = '#b5cc2e', ORANGE = '#f0892a';
   const nf = (v, d = 1) => v.toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
   // escala da régua
-  const Y0 = 1620, Y1 = 870, yOf = k => Y0 - (Math.log10(Math.min(100, Math.max(0.1, k)) / 0.1) / 3) * (Y0 - Y1);
+  const Y0 = 1620, Y1 = 930, yOf = k => Y0 - (Math.log10(Math.min(100, Math.max(0.5, k)) / 0.5) / Math.log10(200)) * (Y0 - Y1);
   const level = yOf(km);
   g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
   // capivara no jet ski boiando na linha d'água (a água desenhada depois cobre o casco)
-  try { const S = 320, cy = level - S + 66; g.drawImage(heroShot(), M - 6, cy, S, S); } catch (e) {}
+  try { const S = Math.min(440, level + 92 - 668), cy = level - S + S * 0.21; g.drawImage(heroShot(), M - 40, cy, S, S); } catch (e) {} // menor só quando a água sobe até perto do título
   g.fillStyle = INK; g.fillRect(0, level, W, H - level);
   // tudo que pode ficar em cima ou embaixo d'água é desenhado duas vezes: tinta sobre o papel, papel sobre a água
   const dual = fn => {
@@ -2461,11 +2461,11 @@ async function makeCard(km, score, rec) {
     for (let y = Y1 - 20, k = 0; y < Y0 + 20; y += 14, k++) {
       if (k % 2 === 0) g.fillRect(GX, y, GW * (k % 10 === 0 ? 1 : 0.42), 7);
     }
-    for (const d of [0.1, 1, 10, 100]) { const y = yOf(d); g.fillRect(GX + GW * 0.58, y - 1.5, GW * 0.42, 3); }
+    for (const d of [0.5, 1, 10, 100]) { const y = yOf(d); g.fillRect(GX + GW * 0.58, y - 1.5, GW * 0.42, 3); }
   });
   // destinos marcados na régua (só os que não se atropelam)
-  const MARK = [[0.4, 'LARGO DA ORDEM'], [0.8, 'PASSEIO PÚBLICO'], [1.8, 'RODOFERROVIÁRIA'], [3.2, 'JARDIM BOTÂNICO'], [5.0, 'ÓPERA DE ARAME'],
-    [14.5, 'AEROPORTO'], [28, 'CAMPO LARGO'], [38, 'MORRETES'], [75, 'PARANAGUÁ']];
+  const MARK = [[1.5, 'TORRE PANORÂMICA'], [2.6, 'BOSQUE ALEMÃO'], [3.7, 'RUA XV'], [5.1, 'ÓPERA DE ARAME'], [7.2, 'JARDIM BOTÂNICO'],
+    [18, 'AEROPORTO'], [22.6, 'CAMPO LARGO'], [48, 'MORRETES'], [81, 'PARANAGUÁ']];
   dual(col => {
     g.fillStyle = col; g.textAlign = 'right'; g.textBaseline = 'middle';
     for (const [k, n] of MARK) {
@@ -2486,7 +2486,7 @@ async function makeCard(km, score, rec) {
     g.font = `900 76px ${BS}`; g.fillText('SOBREVIVA A CURITIBA!', M - 3, 210);
     g.font = `900 300px ${BS}`; const num = nf(km); g.fillText(num, M - 10, 490);
     const nw = g.measureText(num).width; g.font = `700 96px ${BS}`; g.fillText('KM', M + nw + 6, 490);
-    g.font = `400 24px ${MONO}`; g.fillText('DAVA PRA IR DO CENTRO ATÉ', M, 566);
+    g.font = `400 24px ${MONO}`; g.fillText('DAVA PRA IR DO BARIGUI ATÉ', M, 566);
     g.font = `700 58px ${BS}`; g.fillText(destinoNome(km).toUpperCase(), M - 2, 630);
   });
   // rodapé: pontos e link
