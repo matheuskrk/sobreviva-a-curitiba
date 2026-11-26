@@ -211,10 +211,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 #cardView .cardbox p{color:#1d4a3c}
 /* HUD: a distância num pinhãozinho, com o recorde embaixo */
 #hudKm{top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;display:grid;justify-items:end;gap:4px}
-#hudKm .pinhao{position:relative;display:flex;align-items:baseline;gap:2px;color:#fff3dc;background:#9a5a2e;border:3px solid #5e3418;border-radius:999px 70% 70% 999px / 999px 45% 45% 999px;padding:6px 34px 7px 16px;transform:rotate(-4deg);box-shadow:0 3px 0 rgba(0,0,0,.2)}
-/* a ponta clara do pinhão, afinando para a direita */
-#hudKm .pinhao::after{content:"";position:absolute;right:-3px;top:50%;width:26px;height:70%;transform:translateY(-50%);border-radius:40% 999px 999px 40% / 50% 999px 999px 50%;background:#f1d9b0;border:3px solid #5e3418;border-left:0}
-#hudKm .pinhao::before{content:"";position:absolute;left:14px;right:30px;top:5px;height:3px;border-radius:2px;background:rgba(255,243,220,.25)}
+#hudKm .pinhao{position:relative;display:flex;align-items:baseline;gap:2px;color:#6b3418;width:150px;height:60px;box-sizing:border-box;padding:16px 0 0 34px;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20200%2080%27%3E%3Cpath%20d%3D%27M40%206C12%206%203%2026%203%2041c0%2020%2018%2033%2044%2033c62%200%20120-15%20150-30C168%2026%20102%206%2040%206Z%27%20fill%3D%27%23e7a465%27/%3E%3Cpath%20d%3D%27M60%2015c-22%200-29%2014-29%2025c0%2015%2013%2025%2032%2025c52%200%2096-11%20120-21C160%2031%20110%2015%2060%2015Z%27%20fill%3D%27%23efb88c%27/%3E%3C/svg%3E") center/100% 100% no-repeat;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18));transform:rotate(-6deg)}
 #hudKm b{font:900 26px/1 var(--f-display);font-variant-numeric:tabular-nums}
 #hudKm .pinhao small{font:900 13px/1 var(--f-display)}
 #hudKm > span{font:800 11px/1 var(--f-display);color:#1d4a3c;background:rgba(255,255,255,.88);border-radius:999px;padding:4px 9px}
