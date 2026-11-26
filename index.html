@@ -2583,9 +2583,12 @@ function heroShot(S = 640, capiGeo = null, opt = {}) {
 async function makeCard(km, score, rec) {
   const FER = km >= 100; // passou de 100 km: edição de férias, mesma régua com outras cores
   // "Cota de Cheia": o card é uma régua de nível de rio; a água sobe até a distância da partida (escala logarítmica)
-  const BS = '"Big Shoulders Display", "Arial Narrow", sans-serif', MONO = '"DM Mono", ui-monospace, monospace';
-  try { await Promise.all([document.fonts.load(`900 300px ${BS}`), document.fonts.load(`700 60px ${BS}`), document.fonts.load(`400 26px ${MONO}`), document.fonts.load(`500 34px ${MONO}`)]); } catch (e) {}
+  // mesma letra do menu (Nunito, arredondada)
+  const BS = 'Nunito, "Arial Rounded MT Bold", sans-serif', MONO = BS;
+  try { await Promise.all([document.fonts.load(`900 200px ${BS}`), document.fonts.load(`800 40px ${BS}`), document.fonts.load(`700 24px ${BS}`)]); } catch (e) {}
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
   const W = 1080, H = 1920, M = 80, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const LEAF = FER ? '#ff5c8a' : '#5a9a4a';
   const [PAPER, INK, LIME, ORANGE] = FER ? ['#ffe6c2', '#0b5f6a', '#ff5c8a', '#ffb000'] : ['#eee8d5', '#1d4a3c', '#b5cc2e', '#f0892a'];
   const nf = (v, d = 1) => v.toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
   // escala da régua
@@ -2609,45 +2612,52 @@ async function makeCard(km, score, rec) {
   const GX = W - M - 76, GW = 76;
   dual(col => {
     g.fillStyle = col; g.strokeStyle = col; g.lineWidth = 3;
-    g.strokeRect(GX, Y1 - 20, GW, Y0 - Y1 + 40);
+    g.lineWidth = 5; rr(GX, Y1 - 20, GW, Y0 - Y1 + 40, 18); g.stroke();
+    g.save(); rr(GX, Y1 - 20, GW, Y0 - Y1 + 40, 18); g.clip();
     for (let y = Y1 - 20, k = 0; y < Y0 + 20; y += 14, k++) {
       if (k % 2 === 0) g.fillRect(GX, y, GW * (k % 10 === 0 ? 1 : 0.42), 7);
     }
     for (const d of [0.5, 1, 10, 100]) { const y = yOf(d); g.fillRect(GX + GW * 0.58, y - 1.5, GW * 0.42, 3); }
+    g.restore();
   });
   // destinos marcados na régua (só os que não se atropelam)
-  const MARK = [[1.5, 'TORRE PANORÂMICA'], [2.6, 'BOSQUE ALEMÃO'], [3.7, 'RUA XV'], [5.1, 'ÓPERA DE ARAME'], [7.2, 'JARDIM BOTÂNICO'],
-    [18, 'AEROPORTO'], [22.6, 'CAMPO LARGO'], [48, 'MORRETES'], [81, 'PARANAGUÁ']];
+  const MARK = [[1.5, 'Torre Panorâmica'], [2.6, 'Bosque Alemão'], [3.7, 'Rua XV'], [5.1, 'Ópera de Arame'], [7.2, 'Jardim Botânico'],
+    [18, 'Aeroporto'], [22.6, 'Campo Largo'], [48, 'Morretes'], [81, 'Paranaguá']];
   dual(col => {
     g.fillStyle = col; g.textAlign = 'right'; g.textBaseline = 'middle';
     for (const [k, n] of MARK) {
       const y = yOf(k); if (Math.abs(y - level) < 20) continue; // a linha d'água toma o lugar do rótulo
-      g.font = `400 24px ${MONO}`; g.fillText(n, GX - 120, y);
-      g.font = `400 20px ${MONO}`; g.globalAlpha = 0.6; g.fillText(nf(k, k < 10 ? 1 : 0), GX - 30, y); g.globalAlpha = 1;
-      g.fillRect(GX - 22, y - 1, 16, 2);
+      g.font = `800 26px ${MONO}`; g.fillText(n, GX - 120, y);
+      g.font = `700 21px ${MONO}`; g.globalAlpha = 0.6; g.fillText(nf(k, k < 10 ? 1 : 0), GX - 30, y); g.globalAlpha = 1;
+      rr(GX - 22, y - 2, 16, 4, 2); g.fill();
     }
   });
   // linha d'água da partida
-  g.fillStyle = LIME; g.fillRect(0, level - 4, W, 8);
+  g.fillStyle = LIME; rr(-10, level - 5, W + 20, 10, 5); g.fill();
   g.beginPath(); g.moveTo(GX - 4, level); g.lineTo(GX - 28, level - 16); g.lineTo(GX - 28, level + 16); g.closePath(); g.fill();
-  // cabeçalho
+  // cabeçalho: como o menu (título com "Curitiba!" em verde, número grande, destino)
   dual(col => {
-    g.fillStyle = col; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-    g.font = `400 24px ${MONO}`; const dt = new Date();
-    g.fillText(`${FER ? 'EDIÇÃO FÉRIAS  ·  +100 KM' : 'COTA DA CHEIA'}  ·  ${String(dt.getDate()).padStart(2, '0')}.${String(dt.getMonth() + 1).padStart(2, '0')}.${dt.getFullYear()}`, M, 128);
-    g.font = `900 76px ${BS}`; g.fillText('SOBREVIVA A CURITIBA!', M - 3, 210);
-    g.font = `900 300px ${BS}`; const num = nf(km); g.fillText(num, M - 10, 490);
-    const nw = g.measureText(num).width; g.font = `700 96px ${BS}`; g.fillText('KM', M + nw + 6, 490);
-    g.font = `400 24px ${MONO}`; g.fillText(FER ? 'DE FÉRIAS: DO BARIGUI ATÉ' : 'DAVA PRA IR DO BARIGUI ATÉ', M, 566);
-    g.font = `700 58px ${BS}`; g.fillText(destinoNome(km).toUpperCase(), M - 2, 630);
+    const dt = new Date();
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = col;
+    g.font = `800 26px ${BS}`; g.globalAlpha = 0.75;
+    g.fillText(`${FER ? 'Edição férias · mais de 100 km' : 'Cota da cheia'} · ${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}/${dt.getFullYear()}`, M, 120); g.globalAlpha = 1;
+    g.font = `900 78px ${BS}`; g.fillText('Sobreviva a ', M - 3, 206);
+    const w1 = g.measureText('Sobreviva a ').width; g.fillStyle = col === INK ? LEAF : col; g.fillText('Curitiba!', M - 3 + w1, 206); g.fillStyle = col;
+    const num = nf(km); let fs = 250; g.font = `900 ${fs}px ${BS}`; while (g.measureText(num).width > 640 && fs > 120) { fs -= 6; g.font = `900 ${fs}px ${BS}`; }
+    g.fillText(num, M - 8, 470); const nw = g.measureText(num).width; g.font = `900 90px ${BS}`; g.fillText('km', M + nw + 8, 470);
+    g.font = `800 28px ${BS}`; g.fillText(FER ? 'De férias: do Barigui até' : 'Dava pra ir do Barigui até', M, 556);
+    g.font = `900 60px ${BS}`; const dn = destinoNome(km); g.fillText(dn.charAt(0).toUpperCase() + dn.slice(1), M - 2, 626);
   });
-  // rodapé: pontos e link
-  dual(col => {
-    g.fillStyle = col; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-    g.font = `500 40px ${MONO}`; const pts = score.toLocaleString('pt-BR') + ' PONTOS'; g.fillText(pts, M, 1716);
-    if (rec) { const x = M + g.measureText(pts).width + 26; g.fillStyle = ORANGE; g.fillRect(x, 1686, 16, 16); g.font = `500 26px ${MONO}`; g.fillText('NOVO RECORDE', x + 28, 1704); g.fillStyle = col; }
-    g.font = `400 26px ${MONO}`; g.globalAlpha = 0.75; g.fillText('JOGUE: ' + GAME_URL.replace('https://', '').replace(/\/$/, '').toUpperCase(), M, 1812); g.globalAlpha = 1;
-  });
+  // rodapé: pontos numa pílula, recorde e link
+  {
+    const pts = score.toLocaleString('pt-BR') + ' pontos';
+    g.font = `900 44px ${BS}`; const pw = g.measureText(pts).width + 64;
+    g.fillStyle = PAPER; rr(M, 1668, pw, 76, 38); g.fill();
+    g.fillStyle = INK; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(pts, M + 32, 1708);
+    if (rec) { const x = M + pw + 18; g.font = `900 30px ${BS}`; const rw = g.measureText('Novo recorde!').width + 44; g.fillStyle = ORANGE; rr(x, 1680, rw, 54, 27); g.fill(); g.fillStyle = FER ? INK : '#fff'; g.fillText('Novo recorde!', x + 22, 1708); }
+    g.textBaseline = 'alphabetic'; g.fillStyle = PAPER; g.globalAlpha = 0.8; g.font = `800 28px ${BS}`;
+    g.fillText('Jogue também: ' + GAME_URL.replace('https://', '').replace(/\/$/, ''), M, 1826); g.globalAlpha = 1;
+  }
   return c;
 }
 let cardBlob = null, cardText = '';
