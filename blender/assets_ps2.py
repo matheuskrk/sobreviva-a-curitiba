@@ -1089,6 +1089,26 @@ for k in range(14):
     p.append(sphere([0xff5c8a, AMARELO, BRANCO, 0xff8c3a][k % 4], (x, y, z), 0.085, seg=6, rings=4))
 asset('colar_flores', p)
 
+# ---------------- férias: cadeira de praia e coco (mesmo referencial da capivarinha piloto: assento sob ela) ----------------
+p = []
+for k in range(5):  # assento listrado
+    y0 = 0.4 - k * 0.17
+    p.append(box([0xff5c8a, BRANCO][k % 2], (0, y0 - 0.085, 0.98), (0.92, 0.17, 0.05)))
+for k in range(6):  # encosto inclinado para trás
+    t0 = k / 6
+    y, z = -0.46 - t0 * 0.5, 1.05 + t0 * 1.0
+    p.append(box([0xff5c8a, BRANCO][k % 2], (0, y - 0.04, z + 0.08), (0.92, 0.06, 0.2), rot=(-0.46, 0, 0)))
+for sx in (-1, 1):
+    p.append(between(0xd8b27a, (sx * 0.48, 0.45, 0.0), (sx * 0.48, -0.5, 0.98), 0.04, 5))
+    p.append(between(0xd8b27a, (sx * 0.48, -0.5, 0.0), (sx * 0.48, 0.42, 0.98), 0.04, 5))
+    p.append(between(0xd8b27a, (sx * 0.48, -0.46, 0.98), (sx * 0.48, -0.98, 2.1), 0.04, 5))
+    p.append(between(0xd8b27a, (sx * 0.48, 0.4, 0.98), (sx * 0.48, -0.46, 0.98), 0.04, 5))
+asset('cadeira_praia', p)
+p = [sphere(0x6b4a2f, (0, 0.66, 1.22), 0.17, seg=8, rings=6), cyl(0xf4f4ec, (0, 0.66, 1.37), 0.1, 0.03, 8)]  # coco com canudo
+p.append(between(0xff5c8a, (0, 0.66, 1.3), (0.06, 0.56, 1.62), 0.02, 4))
+p.append(sphere(0x3f8a46, (-0.06, 0.7, 1.4), 0.05, (1.6, 1, 0.4), seg=6, rings=4))
+asset('coco', p)
+
 # ---------------- moradores boiando numa boia, acenando (frente +Y) ----------------
 for nome, boia, camisa in [('pessoa_boia', VERMELHO, JEANS), ('pessoa_boia2', AMARELO, ROSA)]:
     p = [prim('torus', boia, (0, 0, 0.12), major_radius=0.55, minor_radius=0.2, major_segments=12, minor_segments=6)]

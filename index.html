@@ -116,6 +116,7 @@ button.x:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .soc .sb svg{width:22px;height:22px;fill:#fff;stroke:#fff}
 .soc .sb:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .soc .sb[aria-disabled="true"]{background:#9aa894;cursor:default}
+.soc .sb.nome{cursor:default;padding:9px 16px}
 #resCard{width:132px;aspect-ratio:9/16;border-radius:12px;box-shadow:0 4px 14px rgba(30,94,52,.25);justify-self:center;cursor:pointer;background:#eee8d5}
 #cardView{z-index:12;background:rgba(14,40,24,.82)}
 .cardbox{display:grid;gap:12px;justify-items:center;text-align:center;max-width:100%}
@@ -184,11 +185,11 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 .mn-go{justify-self:stretch;font:900 24px/1 var(--f-display);color:var(--mn-ink);background:var(--mn-lime);border:0;border-radius:999px;padding:18px 24px;cursor:pointer;box-shadow:0 6px 0 #7f9418;transition:transform .12s,box-shadow .12s}
 .mn-go:hover,.mn-go:focus-visible{transform:translateY(-2px);box-shadow:0 8px 0 #7f9418;outline:none}
 .mn-go:active{transform:translateY(4px);box-shadow:0 2px 0 #7f9418}
-.mn-links{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.mn-links button{display:grid;justify-items:center;gap:2px;font:900 17px/1.1 var(--f-display);color:var(--mn-ink);background:var(--mn-paper);border:0;border-radius:18px;padding:13px 6px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.mn-links{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mn-links button{display:flex;align-items:center;justify-content:center;gap:7px;height:54px;font:900 17px/1 var(--f-display);color:var(--mn-ink);background:var(--mn-paper);border:0;border-radius:999px;padding:0 10px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.28);transition:transform .1s,box-shadow .1s}
+.mn-links button svg{width:20px;height:20px;flex:none;fill:var(--mn-ink);stroke:var(--mn-ink)}
 .mn-links button:hover,.mn-links button:focus-visible{background:#fff;outline:none}
-.mn-links button:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
-.mn-links small{font:800 11px/1 var(--f-display);opacity:.7}
+.mn-links button:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.28)}
 #overlay.menu .pw{grid-template-columns:repeat(3,1fr);gap:8px}
 #overlay.menu .pw .row{grid-template-columns:1fr;justify-items:center;text-align:center;background:rgba(238,232,213,.1);border:0;border-radius:16px;padding:8px 4px;gap:2px}
 #overlay.menu .pw img{width:42px;height:42px}
@@ -211,11 +212,15 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 #cardView .cardbox p{color:#1d4a3c}
 /* HUD: a distância num pinhãozinho, com o recorde embaixo */
 #hudKm{top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;display:grid;justify-items:end;gap:4px}
-#hudKm .pinhao{position:relative;display:flex;align-items:baseline;gap:2px;color:#6b3418;width:150px;height:60px;box-sizing:border-box;padding:16px 0 0 34px;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20200%2080%27%3E%3Cpath%20d%3D%27M40%206C12%206%203%2026%203%2041c0%2020%2018%2033%2044%2033c62%200%20120-15%20150-30C168%2026%20102%206%2040%206Z%27%20fill%3D%27%23e7a465%27/%3E%3Cpath%20d%3D%27M60%2015c-22%200-29%2014-29%2025c0%2015%2013%2025%2032%2025c52%200%2096-11%20120-21C160%2031%20110%2015%2060%2015Z%27%20fill%3D%27%23efb88c%27/%3E%3C/svg%3E") center/100% 100% no-repeat;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18));transform:rotate(-6deg)}
+#hudKm .pinhao{position:relative;isolation:isolate;display:flex;align-items:baseline;gap:2px;color:#6b3418;width:150px;height:60px;box-sizing:border-box;padding:16px 0 0 34px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18));transform:rotate(-6deg)}
+#hudKm .pinhao::before{content:"";position:absolute;inset:0;z-index:-1;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20200%2080%27%3E%3Cpath%20d%3D%27M40%206C12%206%203%2026%203%2041c0%2020%2018%2033%2044%2033c62%200%20120-15%20150-30C168%2026%20102%206%2040%206Z%27%20fill%3D%27%23e7a465%27/%3E%3Cpath%20d%3D%27M60%2015c-22%200-29%2014-29%2025c0%2015%2013%2025%2032%2025c52%200%2096-11%20120-21C160%2031%20110%2015%2060%2015Z%27%20fill%3D%27%23efb88c%27/%3E%3C/svg%3E") center/100% 100% no-repeat}
+/* o do recorde: menor, com a ponta para o outro lado, como dois pinhões soltos */
+#hudKm .pinhao.rec{width:146px;height:50px;padding:16px 0 0 38px;margin-right:22px;transform:rotate(5deg)}
+#hudKm .pinhao.rec::before{transform:scaleX(-1)}
+#hudKm .pinhao.rec span{font:900 11.5px/1.05 var(--f-display);color:#6b3418;white-space:nowrap}
+#hudKm.novo .pinhao.rec::before{filter:hue-rotate(-18deg) saturate(1.8) brightness(1.05)}
 #hudKm b{font:900 26px/1 var(--f-display);font-variant-numeric:tabular-nums}
 #hudKm .pinhao small{font:900 13px/1 var(--f-display)}
-#hudKm > span{font:800 11px/1 var(--f-display);color:#1d4a3c;background:rgba(255,255,255,.88);border-radius:999px;padding:4px 9px}
-#hudKm.novo > span{background:#f0892a;color:#fff}
 .grade .item.prev{border-color:#f0892a;background:#fff6ec}
 #lojaDica{margin:0;font-size:13px;font-weight:700;color:#c25e0e;min-height:1em}
 
@@ -232,7 +237,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 <div class="hud" id="wavefx"></div>
 <div class="hud" id="hint" hidden><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M8 20h48M8 20l7-6M8 20l7 6M56 20l-7-6M56 20l-7 6" fill="none" stroke="#1e5e34" stroke-width="3" stroke-linecap="round"/><circle class="dedo" cx="32" cy="20" r="6" fill="#f39a2b" stroke="#fff" stroke-width="2"/></svg><span>Deslize para os lados para trocar de faixa</span></div>
 <div class="hud" id="toast"></div>
-<div class="hud" id="hudKm" hidden><div class="pinhao"><b id="kmNow">0,0</b><small>km</small></div><span id="kmRec">primeira corrida</span></div>
+<div class="hud" id="hudKm" hidden><div class="pinhao"><b id="kmNow">0,0</b><small>km</small></div><div class="pinhao rec"><span id="kmRec">primeira corrida</span></div></div>
 <div class="hud" id="alerta" role="alert" aria-hidden="true"><svg viewBox="0 0 48 44" aria-hidden="true"><path d="M24 3 L45 40 H3 Z" fill="#f2c230" stroke="#f2c230" stroke-width="5" stroke-linejoin="round"/><rect x="21.6" y="14" width="4.8" height="15" rx="2.4" fill="#1e3a2e"/><circle cx="24" cy="34.5" r="2.7" fill="#1e3a2e"/></svg><div><div class="al-top"><b>Alerta de Apagão</b><span id="alertaHora"></span></div><p>A luz vai cair. Liga o farol!</p></div></div>
 <div class="hud" id="flash"></div>
 <div class="hud" id="skip" hidden>Toque para pular</div>
@@ -252,7 +257,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
     <div class="mn-miolo">
       <div id="loading">Esperando o Ligeirinho (pode demorar)…</div>
       <button class="mn-go" id="start" hidden>Salve-se quem puder!</button>
-      <div class="mn-links"><button id="lojaBtn">Loja <small><b id="mnPinhoes">0</b> pinhões</small></button><button id="placarBtn">Placar</button><button id="credBtn">Créditos</button></div>
+      <div class="mn-links"><button id="lojaBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg>Loja</button><button id="placarBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke-width="2"/><path d="M10 14h4v3h2v3H8v-3h2z"/></svg>Placar</button><button id="credBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Créditos</button></div>
       <div class="pw" id="pw" role="list"></div>
     </div>
   </div>
@@ -268,7 +273,8 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
     <header class="hx"><h1>Créditos</h1><button class="x" id="credVoltar" aria-label="Fechar créditos"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke-width="2.4" stroke-linecap="round"/></svg></button></header>
     <div class="body">
       <div class="soc" role="list">
-        <a class="sb" role="listitem" href="https://www.instagram.com/mathmath.zip/" target="_blank" rel="noopener" aria-label="Instagram de Matheus dos Anjos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.2"/></svg><span>@mathmath.zip</span></a>
+        <a class="sb" role="listitem" href="https://www.instagram.com/mathmath.zip/" target="_blank" rel="noopener" aria-label="Matheus dos Anjos no Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.2"/></svg><span>Matheus dos Anjos</span></a>
+        <span class="sb nome" role="listitem">Matheus Cruz</span>
         <a class="sb" role="listitem" id="gitBtn" target="_blank" rel="noopener" aria-label="Código do jogo no GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5a10.5 10.5 0 0 0-3.3 20.5c.5.1.7-.2.7-.5v-1.8c-2.9.6-3.5-1.2-3.5-1.2-.5-1.2-1.2-1.5-1.2-1.5-.9-.6.1-.6.1-.6 1 .1 1.6 1.1 1.6 1.1.9 1.6 2.5 1.1 3.1.9.1-.7.4-1.1.7-1.4-2.3-.3-4.8-1.2-4.8-5.2 0-1.1.4-2.1 1.1-2.8-.1-.3-.5-1.4.1-2.8 0 0 .9-.3 2.9 1.1a10 10 0 0 1 5.2 0c2-1.4 2.9-1.1 2.9-1.1.6 1.4.2 2.5.1 2.8.7.7 1.1 1.7 1.1 2.8 0 4-2.5 4.9-4.8 5.2.4.3.7 1 .7 2v2.9c0 .3.2.6.7.5A10.5 10.5 0 0 0 12 1.5z"/></svg><span>GitHub</span></a>
       </div>
       <div class="cred">
@@ -2581,84 +2587,103 @@ function heroShot(S = 640, capiGeo = null, opt = {}) {
   cx.putImageData(img, 0, 0); return cv;
 }
 async function makeCard(km, score, rec) {
-  const FER = km >= 100; // passou de 100 km: edição de férias, mesma régua com outras cores
-  // "Cota de Cheia": o card é uma régua de nível de rio; a água sobe até a distância da partida (escala logarítmica)
-  // mesma letra do menu (Nunito, arredondada)
-  const BS = 'Nunito, "Arial Rounded MT Bold", sans-serif', MONO = BS;
+  // estética do menu: papel, cheia, régua de nível, letra arredondada; acima de 100 km vira o card de férias
+  const BS = 'Nunito, "Arial Rounded MT Bold", sans-serif';
   try { await Promise.all([document.fonts.load(`900 200px ${BS}`), document.fonts.load(`800 40px ${BS}`), document.fonts.load(`700 24px ${BS}`)]); } catch (e) {}
-  const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
   const W = 1080, H = 1920, M = 80, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-  const LEAF = FER ? '#ff5c8a' : '#5a9a4a';
-  const [PAPER, INK, LIME, ORANGE] = FER ? ['#ffe6c2', '#0b5f6a', '#ff5c8a', '#ffb000'] : ['#eee8d5', '#1d4a3c', '#b5cc2e', '#f0892a'];
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
   const nf = (v, d = 1) => v.toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
-  // escala da régua
-  const Y0 = 1620, Y1 = 930, yOf = k => Y0 - (Math.log10(Math.min(100, Math.max(0.5, k)) / 0.5) / Math.log10(200)) * (Y0 - Y1);
+  const FER = km >= 100;
+  const [PAPER, INK, LIME, ORANGE, LEAF] = FER ? ['#ffe6c2', '#0b5f6a', '#ff5c8a', '#ffb000', '#ff5c8a'] : ['#eee8d5', '#1d4a3c', '#b5cc2e', '#f0892a', '#5a9a4a'];
+  const link = GAME_URL.replace('https://', '').replace(/\/$/, '');
+  // cabeçalho comum: "Fugi por:", os km com 3 casas e o destino
+  const cabecalho = col => {
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = col;
+    g.font = `900 64px ${BS}`; g.fillText('Fugi por:', M - 2, 140);
+    if (rec) { const sv = g.fillStyle; g.font = `900 34px ${BS}`; const t = 'Novo recorde!', rw = g.measureText(t).width + 48; g.fillStyle = ORANGE; rr(W - M - rw, 84, rw, 64, 32); g.fill(); g.fillStyle = FER ? '#0b5f6a' : '#fff'; g.textBaseline = 'middle'; g.fillText(t, W - M - rw + 24, 117); g.textBaseline = 'alphabetic'; g.fillStyle = sv; }
+    const num = nf(km, 3); let fs = 230; g.font = `900 ${fs}px ${BS}`; while (g.measureText(num).width > 700 && fs > 110) { fs -= 6; g.font = `900 ${fs}px ${BS}`; }
+    g.fillText(num, M - 8, 370); const nw = g.measureText(num).width; g.font = `900 84px ${BS}`; g.fillText('km', M + nw + 10, 370);
+    g.font = `800 44px ${BS}`; g.fillText(FER ? 'De férias: do Barigui até' : 'Dava pra ir do Barigui até', M, 462);
+    g.font = `900 74px ${BS}`; const dn = destinoNome(km); g.fillText(dn.charAt(0).toUpperCase() + dn.slice(1), M - 2, 548);
+  };
+  // rodapé comum: título do jogo, chamada e o link numa pílula
+  const rodape = (y0, col, pill, pillTxt, titulo) => {
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.font = `900 88px ${BS}`; g.fillStyle = col; const a = titulo + ' a '; g.fillText(a, M - 3, y0);
+    g.fillStyle = LIME; g.fillText('Curitiba!', M - 3 + g.measureText(a).width, y0);
+    g.fillStyle = col; g.font = `800 46px ${BS}`; g.fillText('Jogue também:', M, y0 + 84);
+    let lf = 46; g.font = `900 ${lf}px ${BS}`; while (g.measureText(link).width + 64 > W - 2 * M && lf > 28) { lf -= 2; g.font = `900 ${lf}px ${BS}`; } const lw = g.measureText(link).width + 64;
+    g.fillStyle = pill; rr(M, y0 + 116, lw, 84, 42); g.fill();
+    g.fillStyle = pillTxt; g.textBaseline = 'middle'; g.fillText(link, M + 32, y0 + 160); g.textBaseline = 'alphabetic';
+  };
+
+  if (FER) {
+    // praia ao pôr do sol: céu de areia, sol listrado no horizonte, mar e areia; a capivara numa cadeira de praia
+    g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
+    const HZ = 1060;
+    g.fillStyle = '#ffb347'; g.beginPath(); g.arc(W / 2 + 140, HZ, 300, Math.PI, 0); g.fill();
+    g.fillStyle = PAPER; for (let k = 0; k < 6; k++) g.fillRect(W / 2 - 180, HZ - 150 + k * 26, 640, 6 + k * 2.5);
+    g.fillStyle = INK; g.fillRect(0, HZ, W, 230);
+    g.strokeStyle = 'rgba(255,230,194,.35)'; g.lineWidth = 6; g.lineCap = 'round';
+    for (let k = 0; k < 4; k++) { g.beginPath(); const y = HZ + 40 + k * 46; for (let x = 40 + (k % 2) * 60; x < W - 40; x += 180) { g.moveTo(x, y); g.quadraticCurveTo(x + 30, y - 12, x + 60, y); } g.stroke(); }
+    g.fillStyle = '#f3cf8e'; g.beginPath(); g.moveTo(0, HZ + 230); for (let x = 0; x <= W; x += 30) g.lineTo(x, HZ + 230 + Math.sin(x / 70) * 8); g.lineTo(W, H); g.lineTo(0, H); g.closePath(); g.fill();
+    cabecalho(INK);
+    try { const S = 820; g.drawImage(feriasShot(S), W / 2 - S / 2 + 40, 1500 - S, S, S); } catch (e) {}
+    rodape(1640, INK, INK, PAPER, 'Sobrevivi');
+    return c;
+  }
+
+  // régua de nível (escala logarítmica de 0,5 a 100 km), mais para cima para sobrar espaço embaixo
+  const Y0 = 1330, Y1 = 660, yOf = k => Y0 - (Math.log10(Math.min(100, Math.max(0.5, k)) / 0.5) / Math.log10(200)) * (Y0 - Y1);
   const level = yOf(km);
   g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
-  if (FER) { // sol de fim de tarde atrás da capivara, com as faixas de pôr do sol
-    const sx = W - 300, sy = level - 210;
-    g.fillStyle = '#ffb347'; g.beginPath(); g.arc(sx, sy, 200, 0, Math.PI * 2); g.fill();
-    g.fillStyle = PAPER; for (let k = 0; k < 5; k++) g.fillRect(sx - 210, sy + 30 + k * 34, 420, 8 + k * 3);
-  }
-  // capivara no jet ski boiando na linha d'água (a água desenhada depois cobre o casco)
-  try { if (FER) { const S = 500; g.drawImage(heroFerias(), W - 560, level - S + S * 0.21, S, S); } else { const S = Math.min(440, level + 92 - 668), cy = level - S + S * 0.21; g.drawImage(heroShot(), M - 40, cy, S, S); } } catch (e) {} // menor só quando a água sobe até perto do título
+  try { const S = Math.max(220, Math.min(440, level + 92 - 600)), cy = level - S + S * 0.21; g.drawImage(heroShot(), M - 40, cy, S, S); } catch (e) {}
   g.fillStyle = INK; g.fillRect(0, level, W, H - level);
-  // tudo que pode ficar em cima ou embaixo d'água é desenhado duas vezes: tinta sobre o papel, papel sobre a água
   const dual = fn => {
     g.save(); g.beginPath(); g.rect(0, 0, W, level); g.clip(); fn(INK); g.restore();
     g.save(); g.beginPath(); g.rect(0, level, W, H - level); g.clip(); fn(PAPER); g.restore();
   };
-  // régua: blocos alternados em "E", como as pintadas nos pilares de ponte
   const GX = W - M - 76, GW = 76;
   dual(col => {
-    g.fillStyle = col; g.strokeStyle = col; g.lineWidth = 3;
-    g.lineWidth = 5; rr(GX, Y1 - 20, GW, Y0 - Y1 + 40, 18); g.stroke();
+    g.fillStyle = col; g.strokeStyle = col; g.lineWidth = 5; rr(GX, Y1 - 20, GW, Y0 - Y1 + 40, 18); g.stroke();
     g.save(); rr(GX, Y1 - 20, GW, Y0 - Y1 + 40, 18); g.clip();
-    for (let y = Y1 - 20, k = 0; y < Y0 + 20; y += 14, k++) {
-      if (k % 2 === 0) g.fillRect(GX, y, GW * (k % 10 === 0 ? 1 : 0.42), 7);
-    }
-    for (const d of [0.5, 1, 10, 100]) { const y = yOf(d); g.fillRect(GX + GW * 0.58, y - 1.5, GW * 0.42, 3); }
+    for (let y = Y1 - 20, k = 0; y < Y0 + 20; y += 14, k++) if (k % 2 === 0) g.fillRect(GX, y, GW * (k % 10 === 0 ? 1 : 0.42), 7);
     g.restore();
   });
-  // destinos marcados na régua (só os que não se atropelam)
   const MARK = [[1.5, 'Torre Panorâmica'], [2.6, 'Bosque Alemão'], [3.7, 'Rua XV'], [5.1, 'Ópera de Arame'], [7.2, 'Jardim Botânico'],
     [18, 'Aeroporto'], [22.6, 'Campo Largo'], [48, 'Morretes'], [81, 'Paranaguá']];
   dual(col => {
     g.fillStyle = col; g.textAlign = 'right'; g.textBaseline = 'middle';
     for (const [k, n] of MARK) {
-      const y = yOf(k); if (Math.abs(y - level) < 20) continue; // a linha d'água toma o lugar do rótulo
-      g.font = `800 26px ${MONO}`; g.fillText(n, GX - 120, y);
-      g.font = `700 21px ${MONO}`; g.globalAlpha = 0.6; g.fillText(nf(k, k < 10 ? 1 : 0), GX - 30, y); g.globalAlpha = 1;
+      const y = yOf(k); if (Math.abs(y - level) < 20) continue;
+      g.font = `800 26px ${BS}`; g.fillText(n, GX - 120, y);
+      g.font = `700 21px ${BS}`; g.globalAlpha = 0.6; g.fillText(nf(k, k < 10 ? 1 : 0), GX - 30, y); g.globalAlpha = 1;
       rr(GX - 22, y - 2, 16, 4, 2); g.fill();
     }
   });
-  // linha d'água da partida
   g.fillStyle = LIME; rr(-10, level - 5, W + 20, 10, 5); g.fill();
   g.beginPath(); g.moveTo(GX - 4, level); g.lineTo(GX - 28, level - 16); g.lineTo(GX - 28, level + 16); g.closePath(); g.fill();
-  // cabeçalho: como o menu (título com "Curitiba!" em verde, número grande, destino)
-  dual(col => {
-    const dt = new Date();
-    g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = col;
-    g.font = `800 26px ${BS}`; g.globalAlpha = 0.75;
-    g.fillText(`${FER ? 'Edição férias · mais de 100 km' : 'Cota da cheia'} · ${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}/${dt.getFullYear()}`, M, 120); g.globalAlpha = 1;
-    g.font = `900 78px ${BS}`; g.fillText('Sobreviva a ', M - 3, 206);
-    const w1 = g.measureText('Sobreviva a ').width; g.fillStyle = col === INK ? LEAF : col; g.fillText('Curitiba!', M - 3 + w1, 206); g.fillStyle = col;
-    const num = nf(km); let fs = 250; g.font = `900 ${fs}px ${BS}`; while (g.measureText(num).width > 640 && fs > 120) { fs -= 6; g.font = `900 ${fs}px ${BS}`; }
-    g.fillText(num, M - 8, 470); const nw = g.measureText(num).width; g.font = `900 90px ${BS}`; g.fillText('km', M + nw + 8, 470);
-    g.font = `800 28px ${BS}`; g.fillText(FER ? 'De férias: do Barigui até' : 'Dava pra ir do Barigui até', M, 556);
-    g.font = `900 60px ${BS}`; const dn = destinoNome(km); g.fillText(dn.charAt(0).toUpperCase() + dn.slice(1), M - 2, 626);
-  });
-  // rodapé: pontos numa pílula, recorde e link
-  {
-    const pts = score.toLocaleString('pt-BR') + ' pontos';
-    g.font = `900 44px ${BS}`; const pw = g.measureText(pts).width + 64;
-    g.fillStyle = PAPER; rr(M, 1668, pw, 76, 38); g.fill();
-    g.fillStyle = INK; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(pts, M + 32, 1708);
-    if (rec) { const x = M + pw + 18; g.font = `900 30px ${BS}`; const rw = g.measureText('Novo recorde!').width + 44; g.fillStyle = ORANGE; rr(x, 1680, rw, 54, 27); g.fill(); g.fillStyle = FER ? INK : '#fff'; g.fillText('Novo recorde!', x + 22, 1708); }
-    g.textBaseline = 'alphabetic'; g.fillStyle = PAPER; g.globalAlpha = 0.8; g.font = `800 28px ${BS}`;
-    g.fillText('Jogue também: ' + GAME_URL.replace('https://', '').replace(/\/$/, ''), M, 1826); g.globalAlpha = 1;
-  }
+  dual(cabecalho);
+  rodape(1560, PAPER, PAPER, INK, 'Sobreviva');
   return c;
+}
+// capivara de férias numa cadeira de praia, com coco, chapéu de palha, óculos escuros e colar de flores
+function feriasShot(S = 820) {
+  const capi = recolor(GEO.capivara, [[0xb5cc2e, 0xff8c3a]], true);
+  const rt = new THREE.WebGLRenderTarget(S, S); rt.texture.colorSpace = THREE.SRGBColorSpace;
+  const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0xc9a26a, 1.7)); const dl = new THREE.DirectionalLight(0xfff0d8, 2.2); dl.position.set(3, 5, 4); sc.add(dl);
+  const g = new THREE.Group(), rider = new THREE.Mesh(capi, VC);
+  g.add(new THREE.Mesh(GEO.cadeira_praia, VC), rider); setHat(rider, GEO.chapeu_palha);
+  for (const x of [GEO.oculos, GEO.colar_flores, GEO.coco]) rider.add(new THREE.Mesh(x, VC));
+  g.rotation.set(0.05, 2.75, 0); sc.add(g);
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 2.0, 6.6); cam.lookAt(0, 1.25, 0);
+  const oc = renderer.getClearColor(new THREE.Color()), oa = renderer.getClearAlpha();
+  renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(sc, cam);
+  const px = new Uint8Array(S * S * 4); renderer.readRenderTargetPixels(rt, 0, 0, S, S, px);
+  renderer.setRenderTarget(null); renderer.setClearColor(oc, oa); rt.dispose(); capi.dispose();
+  const cv = document.createElement('canvas'); cv.width = cv.height = S; const cx = cv.getContext('2d'), img = cx.createImageData(S, S);
+  for (let y = 0; y < S; y++) img.data.set(px.subarray((S - 1 - y) * S * 4, (S - y) * S * 4), y * S * 4);
+  cx.putImageData(img, 0, 0); return cv;
 }
 let cardBlob = null, cardText = '';
 async function prepareCard(km, score, rec) {
@@ -3629,7 +3654,6 @@ function salvaRecordeKm(km) { if (km > bestKm) { bestKm = km; try { localStorage
 function menuCapi() { try { $('mnCapi').src = heroShot(520).toDataURL(); } catch (e) {} }
 function menuRecorde() {
   $('best').textContent = bestKm > 0 ? `Recorde: ${kmTxt(bestKm)} km` + (best ? ` · ${Math.round(best).toLocaleString('pt-BR')} pontos` : '') : 'Sem recorde ainda';
-  $('mnPinhoes').textContent = LOJA.moedas.toLocaleString('pt-BR');
   // a marca do recorde na régua (mesma escala do card: 0,5 a 100 km)
   const y = bestKm > 0 ? Math.min(1, Math.max(0, Math.log10(Math.max(0.5, bestKm) / 0.5) / Math.log10(200))) : 0;
   $('mnMarca').style.bottom = `calc(${(y * 100).toFixed(1)}% - 1px)`; $('mnMarca').hidden = !(bestKm > 0);
