@@ -445,6 +445,7 @@ const uTime = {value: 0};
         gl_FragColor = vec4(mix(c,uFogColor,fg),1.);
       }`
   });
+  window.__waterMat = m;
   scene.add(new THREE.Mesh(g, m));
 }
 
@@ -2458,106 +2459,140 @@ $('start').addEventListener('click', go);
 $('retry').addEventListener('click', go);
 
 // ======================= ABERTURA: o Barigui alagou e a capivara foge de jet ski =======================
-// cena própria (o parque de diversões do Barigui debaixo d'água), tocada antes de cada corrida; um toque pula
-const INTRO = {t: 0, dur: 6.4, built: false, landed: false, revved: false};
-const iScene = new THREE.Scene(), iCam = new THREE.PerspectiveCamera(60, SW() / SH(), 0.3, 900);
-const iWaveT = {value: 0}, iLevel = {value: 0.3};
-let iWheel, iGond, iArm, iHero, iSki, iSkiRider, iSplash, iBalloons = [];
-const I_WHEEL_POS = new THREE.Vector3(-26, 0, -38), I_ROOF = new THREE.Vector3(-7, 3.1, 4), I_SKI = new THREE.Vector3(5, 0, 7);
+// Cena própria tocada antes de cada corrida (um toque pula). Usa a mesma água e o mesmo céu do jogo, então o reflexo
+// na água (SSR) também vale aqui. O parque vai afundando, a capivara espera no telhado da bilheteria, pula no jet ski
+// e foge pelo portal do parque. A câmera mantém a capivara sempre no centro do quadro.
+const INTRO = {t: 0, dur: 6.6, built: false, landed: false, revved: false};
+const iScene = new THREE.Scene(), iCam = new THREE.PerspectiveCamera(58, SW() / SH(), 0.3, 2600);
+const I_ROOF = new THREE.Vector3(-4, 3.1, 4), I_SKI = new THREE.Vector3(1.5, 0, 6.5), I_LOOK = new THREE.Vector3();
+let iPark, iWheel, iGond, iArm, iHero, iSki, iSkiRider, iSky, iSplash, iFloat = [], iRipples = [];
 function buildIntro() {
   if (INTRO.built) return; INTRO.built = true;
-  iScene.background = new THREE.Color(0xbfe1ef);
-  iScene.fog = new THREE.Fog(0xcfe3e6, 70, 280);
-  iScene.add(new THREE.HemisphereLight(0xeaf6ff, 0x6a8a4a, 1.4));
-  const sunI = new THREE.DirectionalLight(0xfff4dc, 2.2); sunI.position.set(60, 120, 80); iScene.add(sunI);
-  // água barrenta subindo
-  const wg = new THREE.PlaneGeometry(520, 520, 104, 104); wg.rotateX(-Math.PI / 2);
-  iScene.add(new THREE.Mesh(wg, new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false,
-    uniforms: {uT: iWaveT, uL: iLevel, uFog: {value: new THREE.Color(0xcfe3e6)}},
-    vertexShader: `uniform float uT, uL; varying vec3 vW; varying float vD;
-      void main(){ vec3 p = position; p.y = uL + sin(p.x*.15+uT*1.3)*.15 + sin(p.z*.2-uT*1.6)*.12; vW = p; vec4 mv = modelViewMatrix*vec4(p,1.); vD = -mv.z; gl_Position = projectionMatrix*mv; }`,
-    fragmentShader: `uniform vec3 uFog; varying vec3 vW; varying float vD;
-      void main(){ vec3 n = normalize(cross(dFdx(vW), dFdy(vW))); if(n.y<0.) n=-n; vec3 v = normalize(cameraPosition - vW);
-        float fr = pow(1.-max(dot(n,v),0.),3.);
-        vec3 c = mix(vec3(.30,.50,.40), vec3(.82,.90,.93), fr*.8); c = mix(c, vec3(.55,.45,.32), .22);
-        gl_FragColor = vec4(mix(pow(c, vec3(2.2)), uFog, smoothstep(70.,280.,vD)), .93); }`
-  })));
-  const add = (k, x, z, ry = 0, sc = 1, y = 0) => { const m = new THREE.Mesh(GEO[k], VC); m.position.set(x, y, z); m.rotation.y = ry; m.scale.setScalar(sc); iScene.add(m); return m; };
-  // roda-gigante: base fixa, roda girando e gôndolas sempre em pé
-  const rg = new THREE.Group(); rg.position.copy(I_WHEEL_POS); rg.rotation.y = 0.35; iScene.add(rg);
+  iScene.fog = scene.fog;
+  iScene.add(new THREE.HemisphereLight(0xeaf6ff, 0x6a8a4a, 1.35));
+  const sunI = new THREE.DirectionalLight(0xfff4dc, 2.1); sunI.position.set(450, 800, 300); iScene.add(sunI);
+  iSky = new THREE.Mesh(window.__sky.geometry, window.__sky.material); iSky.renderOrder = -1; iScene.add(iSky);
+  const wg = new THREE.PlaneGeometry(700, 700, 140, 140); wg.rotateX(-Math.PI / 2);
+  iScene.add(new THREE.Mesh(wg, window.__waterMat));
+  // o parque inteiro num grupo, que afunda durante a cena
+  iPark = new THREE.Group(); iScene.add(iPark);
+  const add = (k, x, z, ry = 0, sc = 1, y = 0, par = iPark) => { const m = new THREE.Mesh(GEO[k], VC); m.position.set(x, y, z); m.rotation.y = ry; m.scale.setScalar(sc); par.add(m); return m; };
+  // roda-gigante atrás à esquerda: roda girando, gôndolas sempre em pé
+  const rg = new THREE.Group(); rg.position.set(-20, 0, -30); rg.rotation.y = 0.45; iPark.add(rg);
   rg.add(new THREE.Mesh(GEO.rg_base, VC));
   iWheel = new THREE.Mesh(GEO.rg_roda, VC); iWheel.position.set(0, 14, 0); rg.add(iWheel);
   iGond = new THREE.InstancedMesh(GEO.rg_gondola, VC, 16);
   const gc = [0xf2c230, 0xb5cc2e, 0xf39a2b, 0xffffff]; for (let k = 0; k < 16; k++) iGond.setColorAt(k, new THREE.Color(gc[k % 4]));
   rg.add(iGond);
-  // kamikaze: o braço balança de um lado para o outro
-  const pd = new THREE.Group(); pd.position.set(28, 0, -30); pd.rotation.y = -0.4; iScene.add(pd);
+  // kamikaze atrás à direita, balançando
+  const pd = new THREE.Group(); pd.position.set(22, 0, -26); pd.rotation.y = -0.5; iPark.add(pd);
   pd.add(new THREE.Mesh(GEO.pend_base, VC));
   iArm = new THREE.Mesh(GEO.pend_braco, VC); iArm.position.set(0, 20, 0); pd.add(iArm);
-  // entrada, quiosques, palmeiras, cercas e balões soltos
-  add('portal_parque', 0, -12);
-  add('bilheteria', I_ROOF.x, I_ROOF.z, 0.2);
-  add('barraca', 14, -6, 0.5); add('barraca', -17, -9, -0.3);
-  for (const [x, z, r] of [[-13, 15, 0.4], [19, 11, 2.2], [-31, -4, 1.1], [36, -12, 3], [9, -26, 0.2], [-4, -30, 4]]) add('palmeira', x, z, r, 1.1);
-  for (let x = -34; x <= 34; x += 4) if (Math.abs(x) > 7) add('cerca', x, -10, 0, 1, 0);
-  for (const [x, z] of [[3, -3], [-12, -2], [20, 2]]) iBalloons.push(add('baloes', x, z, Math.random() * 6, 1.3));
-  // a capivara em cima da bilheteria e o jet ski boiando ao lado
-  iHero = add('capivara_heroi', I_ROOF.x, I_ROOF.z, -Math.PI / 2, 1.5, I_ROOF.y);
+  // entrada do parque (por onde ela foge), quiosques, palmeiras e cercas
+  add('portal_parque', 0, -14);
+  add('bilheteria', I_ROOF.x, I_ROOF.z, 0.15);
+  add('barraca', 11, -2, 0.5); add('barraca', -14, -6, -0.3); add('barraca', 15, -14, 1.2);
+  for (const [x, z, r, s] of [[-10, 10, 0.4, 1.1], [12, 8, 2.2, 1.2], [-26, -8, 1.1, 1.3], [30, -8, 3, 1.2], [7, -24, 0.2, 1.4], [-8, -24, 4, 1.25], [-34, 6, 2, 1.1], [34, 6, 5, 1.1]]) add('palmeira', x, z, r, s);
+  for (let x = -30; x <= 30; x += 4) if (Math.abs(x) > 6) add('cerca', x, -12);
+  // coisas boiando (balões, boias, cones, sacos de lixo, patos), cada uma com seu balanço
+  const boiando = [['baloes', 6, 0, 1.3], ['baloes', -12, 1, 1.2], ['boia', 4, 11, 1], ['boia', -9, 13, 1.1], ['cone', 9, 4, 1], ['cone', -2, -6, 1], ['lixo', 6, 13, 1.3], ['lixo', -6, 9, 1.2], ['pato', 10, 9, 1.3], ['pato', 11, 10.2, 1], ['pato', 9.4, 10.6, 1], ['canoa', -16, 6, 1.1]];
+  for (const [k, x, z, s] of boiando) { const m = add(k, x, z, Math.random() * 6, s, 0, iScene); m.userData = {x, z, ph: Math.random() * 6, k}; iFloat.push(m); }
+  // ondinhas em volta do que está dentro da água
+  const rgR = new THREE.RingGeometry(0.93, 1.0, 40); rgR.rotateX(-Math.PI / 2);
+  const ripMat = () => new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false});
+  for (const [x, z, r] of [[I_ROOF.x, I_ROOF.z, 2.7], [-4.6, -14, 1.6], [4.6, -14, 1.6], [11, -2, 2.2], [-14, -6, 2.2], [-10, 10, 0.7], [12, 8, 0.7]])
+    for (let k = 0; k < 2; k++) { const m = new THREE.Mesh(rgR, ripMat()); m.userData = {x, z, r, ph: k * 0.5}; iScene.add(m); iRipples.push(m); }
+  // a capivara e o jet ski
+  iHero = add('capivara_heroi', I_ROOF.x, I_ROOF.z, 0, 1.5, I_ROOF.y, iScene);
   iSki = new THREE.Group(); iSki.scale.setScalar(1.45); iScene.add(iSki);
   iSki.add(new THREE.Mesh(GEO.jetski, VC));
   iSkiRider = new THREE.Mesh(GEO.capivara, VC); iSki.add(iSkiRider);
-  const rg2 = new THREE.RingGeometry(0.6, 1.0, 24); rg2.rotateX(-Math.PI / 2);
+  const rg2 = new THREE.RingGeometry(0.6, 1.0, 32); rg2.rotateX(-Math.PI / 2);
   iSplash = new THREE.Mesh(rg2, new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false})); iScene.add(iSplash);
 }
 function resetIntro() {
   buildIntro();
-  Object.assign(INTRO, {t: 0, landed: false, revved: false});
-  iHero.visible = true; iSkiRider.visible = false; iSplash.material.opacity = 0;
-  iHero.position.copy(I_ROOF); iHero.rotation.set(0, -Math.PI / 2, 0);
-  iSki.position.set(I_SKI.x, 0.6, I_SKI.z); iSki.rotation.set(0, Math.PI / 2, 0);
+  updateWeather(0, false); // dia de sol (o clima da corrida anterior não vaza para a abertura)
+  Object.assign(INTRO, {t: 0, landed: false, revved: false, whoosh: false});
+  iHero.visible = true; iSkiRider.visible = false; iSplash.material.opacity = 0; iHero.scale.setScalar(1.5);
   iCam.aspect = SW() / SH(); iCam.updateProjectionMatrix();
   $('skip').hidden = false;
-  setTimeout(() => { if (G.state === 'intro') toast('O Parque Barigui alagou!', 1.6); }, 150);
+  setTimeout(() => { if (G.state === 'intro') toast('O Parque Barigui alagou!', 1.8); }, 150);
 }
 const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+const towards = (a, b) => Math.atan2(-(b.x - a.x), -(b.z - a.z)); // rotação y para olhar de a até b (frente em -z)
 function runIntro(dt) {
-  const T = INTRO.t += dt; iWaveT.value += dt;
-  if (BOT.on) INTRO.t = INTRO.dur;
-  // a água sobe durante a cena inteira
-  iLevel.value = 0.3 + 1.6 * ease(T / 4);
-  const L = iLevel.value;
+  const T = INTRO.t += dt; if (BOT.on) INTRO.t = INTRO.dur;
+  // o parque afunda (a água parece subir) e o telhado da bilheteria vai ficando rente à água
+  const sink = 0.5 + 1.2 * ease(T / 3.2);
+  iPark.position.y = -sink;
+  const roofY = I_ROOF.y - sink;
   // brinquedos funcionando mesmo alagados
   const ang = T * 0.3; iWheel.rotation.z = ang;
   for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2 + ang; tmpM.makeTranslation(Math.cos(a) * 12, 14 + Math.sin(a) * 12, 0); iGond.setMatrixAt(k, tmpM); }
   iGond.instanceMatrix.needsUpdate = true;
   iArm.rotation.z = Math.sin(T * 1.1) * 1.05;
-  iBalloons.forEach((b, i) => { b.position.y = L - 0.3 + Math.sin(T * 1.5 + i) * 0.25 + T * 0.4; b.rotation.y += dt * 0.3; });
-  // capivara: aflita no telhado, depois pula no jet ski
-  const jumpA = 3.0, jumpB = 3.7;
+  const wt = uTime.value;
+  for (const m of iFloat) { const u = m.userData; const lift = u.k === 'baloes' ? 0.3 + T * 0.5 : u.k === 'boia' || u.k === 'pato' ? 0.05 : -0.05;
+    m.position.set(u.x + Math.sin(wt * 0.4 + u.ph) * 0.5, wave(u.x, u.z, wt) + lift, u.z + Math.cos(wt * 0.3 + u.ph) * 0.4); m.rotation.set(Math.sin(wt * 1.3 + u.ph) * 0.12, u.ph + wt * 0.2, Math.cos(wt * 1.1 + u.ph) * 0.1); }
+  for (const m of iRipples) { const u = m.userData, f = (wt * 0.6 + u.ph) % 1; m.position.set(u.x, 0.28, u.z); m.scale.setScalar(u.r * (1 + f * 0.7)); m.material.opacity = 0.22 * (1 - f); }
+  // capivara: aflita no telhado, depois salta para o jet ski
+  const jumpA = 2.95, jumpB = 3.85;
+  const gust = stepWind(T, dt);
+  if (T > 2.7 && !INTRO.whoosh) { INTRO.whoosh = true; sfxNoise(0, 1.2, 0.4, 'bandpass', 260, 1600, 0.7); sfxNoise(0.25, 0.9, 0.2, 'highpass', 2500, 800); }
+  const skiY = wave(iSki.position.x, iSki.position.z, wt) + 0.35;
+  const seat = new THREE.Vector3(I_SKI.x, skiY + 1.3, I_SKI.z);
   if (T < jumpA) {
-    iHero.position.set(I_ROOF.x, I_ROOF.y + Math.abs(Math.sin(T * 7)) * 0.18, I_ROOF.z);
-    iHero.rotation.y = T < 2.4 ? -Math.PI / 2 + Math.sin(T * 5) * 0.6 : -Math.PI / 2; // olha para os lados, depois mira o jet ski
+    const hop = Math.abs(Math.sin(T * 6.5)) * (T > 2.4 ? 0.05 : 0.22);
+    iHero.position.set(I_ROOF.x, roofY + hop, I_ROOF.z);
+    // olha para a água subindo, para os lados e por fim mira o jet ski
+    iHero.rotation.set(0, T < 2.5 ? Math.PI * 0.85 + Math.sin(T * 3.2) * 0.9 : towards(I_ROOF, I_SKI) + Math.PI, 0);
+    iHero.scale.set(1.5, 1.5 * (1 - hop * 0.4), 1.5);
   } else if (T < jumpB) {
-    const k = (T - jumpA) / (jumpB - jumpA), to = new THREE.Vector3(I_SKI.x, L + 1.2, I_SKI.z);
-    iHero.position.lerpVectors(I_ROOF, to, k); iHero.position.y += Math.sin(k * Math.PI) * 3.2;
-    iHero.rotation.set(0, -Math.PI / 2, -k * Math.PI * 2); // cambalhota
+    // o vento arranca ela do telhado: sobe rodopiando, faz uma curva no ar e cai sentada no jet ski
+    const k = (T - jumpA) / (jumpB - jumpA), e = ease(k), from = new THREE.Vector3(I_ROOF.x, roofY, I_ROOF.z);
+    iHero.position.lerpVectors(from, seat, e); iHero.position.y += Math.sin(k * Math.PI) * 3.4;
+    iHero.position.x += Math.sin(k * Math.PI) * -1.2; iHero.position.z += Math.sin(k * Math.PI) * 1.4; // a curva da rajada
+    const spin = (1 - e) * Math.PI * 4; // gira rápido no começo e vai assentando
+    iHero.rotation.set(Math.sin(k * Math.PI * 2) * 0.5, towards(I_ROOF, I_SKI) + Math.PI + spin, Math.sin(k * Math.PI * 3) * 0.35);
+    iHero.scale.set(1.5, 1.5 * (1 + Math.sin(k * Math.PI) * 0.12), 1.5);
   } else if (!INTRO.landed) {
     INTRO.landed = true; iHero.visible = false; iSkiRider.visible = true;
-    iSplash.position.set(I_SKI.x, L + 0.05, I_SKI.z); iSplash.material.opacity = 0.9; iSplash.scale.setScalar(1);
+    iSplash.position.set(I_SKI.x, 0.3, I_SKI.z); iSplash.material.opacity = 0.9; iSplash.scale.setScalar(1.2);
     splash(0, 1.1); blip([523, 784], 0.07, 'triangle', 0.12);
   }
-  if (iSplash.material.opacity > 0) { iSplash.scale.multiplyScalar(1 + dt * 3); iSplash.material.opacity = Math.max(0, iSplash.material.opacity - dt * 1.2); }
-  // jet ski: balança, vira para a câmera e arranca
-  let sz = I_SKI.z, ry = Math.PI / 2;
-  if (T > 3.8) ry = Math.PI / 2 + (Math.PI / 2) * ease((T - 3.8) / 0.5);
-  if (T > 4.3) { const k = T - 4.3; sz = I_SKI.z + 9 * k * k + 6 * k; if (!INTRO.revved) { INTRO.revved = true; blip([110, 165, 220, 330], 0.06, 'sawtooth', 0.08); } }
-  iSki.position.set(I_SKI.x - (T > 4.3 ? (T - 4.3) * 1.5 : 0), L + 0.35 + Math.sin(T * 3) * 0.08 + (INTRO.landed && T < 4 ? -0.15 : 0), sz);
-  iSki.rotation.set(T > 4.3 ? -0.12 : 0, ry, Math.sin(T * 2.4) * 0.05);
-  // câmera: plano geral do parque, plano médio na bilheteria e perseguição do jet ski
-  if (T < 2.0) { const k = ease(T / 2); iCam.position.set(0, 18 - 6 * k, 58 - 18 * k); iCam.lookAt(0, 9 - 4 * k, -20 + 12 * k); }
-  else if (T < 4.3) { iCam.position.set(-0.5, 4.2 + L * 0.5, 17.5); iCam.lookAt(-0.5, 2.6 + L * 0.3, 4.5); }
-  else { iCam.position.set(I_SKI.x + 7, L + 3.4, Math.max(sz + 11, 20)); iCam.lookAt(iSki.position.x, iSki.position.y + 1, iSki.position.z); }
+  if (iSplash.material.opacity > 0) { iSplash.scale.multiplyScalar(1 + dt * 2.6); iSplash.material.opacity = Math.max(0, iSplash.material.opacity - dt * 1.1); }
+  // jet ski: espera de lado, vira para o portal e foge por ele
+  let sx = I_SKI.x, sz = I_SKI.z, ry = -Math.PI / 2 + 0.4, pitch = 0;
+  if (T > 3.9) ry = (-Math.PI / 2 + 0.4) * (1 - ease((T - 3.9) / 0.55));
+  if (T > 4.35) {
+    const k = T - 4.35; sz = I_SKI.z - (12 * k * k + 7 * k); sx = I_SKI.x * (1 - ease(k / 1.2)); pitch = 0.12;
+    if (!INTRO.revved) { INTRO.revved = true; blip([110, 165, 220, 330], 0.06, 'sawtooth', 0.08); }
+  }
+  const bob = Math.sin(T * 3) * 0.06 + (INTRO.landed && T < 3.95 ? -0.18 * (1 - (T - jumpB) / 0.2) : 0);
+  iSki.position.set(sx, wave(sx, sz, wt) + 0.35 + bob, sz);
+  iSki.rotation.set(pitch, ry, Math.sin(T * 2.4) * 0.05);
+  fogUniforms.uSkiP.value.set(sx, sz); fogUniforms.uSkiD.value.set(-Math.sin(ry), -Math.cos(ry));
+  if (T > 4.35 && Math.random() < 0.9) for (let q = 0; q < 3; q++) spawnWakeIntro(sx, sz, ry);
+  // câmera: sempre centrada na capivara (no telhado, no ar ou no jet ski)
+  const hero = iHero.visible ? iHero.position : iSki.position;
+  const focus = tmpV2.set(hero.x, hero.y + (iHero.visible ? 0.9 : 1.6), hero.z);
+  if (T < 2.4) { // plano geral girando devagar em volta dela, com o parque afundando atrás
+    const k = ease(T / 2.4), a = 0.55 - 0.45 * k, r = 17 - 6 * k;
+    iCam.position.set(focus.x + Math.sin(a) * r, focus.y + 4.5 - 2 * k, focus.z + Math.cos(a) * r);
+  } else if (T < 3.1) { // perto, ela olhando o jet ski
+    const k = ease((T - 2.4) / 0.7);
+    iCam.position.set(focus.x + 1.5 + 1.2 * k, focus.y + 1.6, focus.z + 6.5 - 1 * k);
+  } else if (T < 4.35) { // o salto visto de lado, acompanhando
+    iCam.position.lerp(tmpV.set(focus.x + 2.5, focus.y + 2.2, focus.z + 9), 1 - Math.exp(-dt * 6));
+  } else { // perseguição por trás, como na corrida
+    const [fx, fz] = [-Math.sin(ry), -Math.cos(ry)];
+    iCam.position.lerp(tmpV.set(focus.x - fx * 11, focus.y + 4.6, focus.z - fz * 11), 1 - Math.exp(-dt * 5));
+  }
+  I_LOOK.lerp(focus, T < 0.05 ? 1 : 1 - Math.exp(-dt * 10));
+  iCam.lookAt(I_LOOK);
+  if (gust > 0.3) { iCam.position.x += (Math.random() - .5) * 0.12 * gust; iCam.position.y += (Math.random() - .5) * 0.12 * gust; }
+  iSky.position.copy(iCam.position);
   // clarão no fim e começa a corrida
   if (T > INTRO.dur - 0.45) G.flash = Math.max(G.flash || 0, (T - (INTRO.dur - 0.45)) / 0.45);
   { const f = (G.flash || 0).toFixed(2); if (f !== flashDOM) { flashDOM = f; elFlash.style.opacity = f; } }
@@ -2565,12 +2600,58 @@ function runIntro(dt) {
   musicTick();
   if (T >= INTRO.dur) { G.state = 'count'; G.flash = 1; $('skip').hidden = true; $('hint').hidden = false; }
 }
+// rajada de vento que arranca a capivara do telhado e joga em cima do jet ski: riscos brancos e folhas voando
+const WIND_N = 46, windP = new Float32Array(WIND_N * 6), windS = [];
+const windG = new THREE.BufferGeometry(); windG.setAttribute('position', new THREE.BufferAttribute(windP, 3));
+const windMat = new THREE.LineBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false});
+const windL = new THREE.LineSegments(windG, windMat); windL.frustumCulled = false; iScene.add(windL);
+for (let i = 0; i < WIND_N; i++) windS.push({u: Math.random(), side: (Math.random() - .5) * 6, up: Math.random() * 3.5 - 0.5, len: 1.5 + Math.random() * 2.5, sp: 0.8 + Math.random() * 0.6, curl: Math.random() * 6});
+const LEAF_N = 18, leafM = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.35, 0.22), new THREE.MeshLambertMaterial({color: 0x5a9a4a, side: THREE.DoubleSide}), LEAF_N);
+leafM.frustumCulled = false; iScene.add(leafM); const leafS = [];
+for (let i = 0; i < LEAF_N; i++) { leafS.push({u: Math.random(), side: (Math.random() - .5) * 5, up: Math.random() * 3, rot: Math.random() * 6}); leafM.setColorAt(i, new THREE.Color([0x5a9a4a, 0x3f8a46, 0xb5cc2e, 0xf2c230][i % 4])); }
+function stepWind(T, dt) {
+  const a = 2.65, b = 4.05, on = T > a && T < b ? Math.sin((T - a) / (b - a) * Math.PI) : 0;
+  windMat.opacity = 0.75 * on;
+  const dx = I_SKI.x - I_ROOF.x, dz = I_SKI.z - I_ROOF.z, L = Math.hypot(dx, dz), fx = dx / L, fz = dz / L, px = -fz, pz = fx;
+  const ox = I_ROOF.x - fx * 9, oz = I_ROOF.z - fz * 9, span = L + 16;
+  for (let i = 0; i < WIND_N; i++) {
+    const w = windS[i]; w.u = (w.u + dt * w.sp * 1.6) % 1;
+    const d = w.u * span, y = 1 + w.up + Math.sin(d * 0.5 + w.curl) * 0.6, sw = Math.sin(d * 0.35 + w.curl) * 0.8;
+    const x0 = ox + fx * d + px * (w.side + sw), z0 = oz + fz * d + pz * (w.side + sw);
+    windP.set([x0, y, z0, x0 + fx * w.len, y + 0.15, z0 + fz * w.len], i * 6);
+  }
+  windG.attributes.position.needsUpdate = true;
+  for (let i = 0; i < LEAF_N; i++) {
+    const f = leafS[i]; f.u = (f.u + dt * 1.2) % 1; f.rot += dt * 9;
+    const d = f.u * span, sc = on > 0.02 ? 1 : 0;
+    tmpM.compose(tmpV.set(ox + fx * d + px * f.side, 1 + f.up + Math.sin(d + f.rot) * 0.8, oz + fz * d + pz * f.side), tmpQ.setFromEuler(tmpE.set(f.rot, f.rot * 0.7, f.rot * 1.3)), tmpS.set(sc, sc, sc));
+    leafM.setMatrixAt(i, tmpM);
+  }
+  leafM.instanceMatrix.needsUpdate = true;
+  return on;
+}
+// espuma do jet ski na abertura (pontinhos brancos que sobem e caem)
+const IW_N = 240, iwP = new Float32Array(IW_N * 3), iwV = new Float32Array(IW_N * 3), iwL = new Float32Array(IW_N);
+const iwG = new THREE.BufferGeometry(); iwG.setAttribute('position', new THREE.BufferAttribute(iwP, 3));
+const iwPts = new THREE.Points(iwG, new THREE.PointsMaterial({size: 0.7, map: window.__glowTex, color: 0xffffff, transparent: true, opacity: 0.85, depthWrite: false}));
+iwPts.frustumCulled = false; iScene.add(iwPts);
+let iwI = 0;
+function spawnWakeIntro(x, z, ry) {
+  const i = iwI = (iwI + 1) % IW_N, fx = -Math.sin(ry), fz = -Math.cos(ry), sd = (Math.random() - .5) * 2;
+  iwP.set([x - fx * 2 - fz * sd * 0.5, 0.4, z - fz * 2 + fx * sd * 0.5], i * 3); iwV.set([-fz * sd * 3 - fx * 2, 2 + Math.random() * 3, fx * sd * 3 - fz * 2], i * 3); iwL[i] = 1;
+}
+function stepWakeIntro(dt) {
+  for (let i = 0; i < IW_N; i++) { if (iwL[i] <= 0) { iwP[i * 3 + 1] = -50; continue; } iwL[i] -= dt; const k = i * 3; iwV[k + 1] -= 9 * dt; iwP[k] += iwV[k] * dt; iwP[k + 1] = Math.max(0.3, iwP[k + 1] + iwV[k + 1] * dt); iwP[k + 2] += iwV[k + 2] * dt; }
+  iwG.attributes.position.needsUpdate = true;
+}
 const rPass = composer.passes[0];
+// a abertura é desenhada com a câmera do jogo (copiando a da cena), para o reflexo na água funcionar igual
 function renderIntro() {
-  rPass.scene = iScene; rPass.camera = iCam;
-  const ssrOn = ssrPass.enabled; ssrPass.enabled = false; outPass.enabled = true;
-  composer.render();
-  rPass.scene = scene; rPass.camera = camera; ssrPass.enabled = ssrOn; outPass.enabled = !ssrOn;
+  stepWakeIntro(1 / 60);
+  camera.position.copy(iCam.position); camera.quaternion.copy(iCam.quaternion);
+  if (camera.fov !== iCam.fov || camera.aspect !== iCam.aspect) { camera.fov = iCam.fov; camera.aspect = iCam.aspect; camera.updateProjectionMatrix(); }
+  camera.updateMatrixWorld();
+  rPass.scene = iScene; composer.render(); rPass.scene = scene;
 }
 
 // ---------- loop ----------
