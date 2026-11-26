@@ -1012,6 +1012,48 @@ p.append(box(FOLHA_ESC, (0.05, 0.76, 1.63), (0.14, 0.05, 0.03), rot=(0, 0.5, 0))
 asset('capivara_heroi', p)
 
 # ---------------- material de cor por vértice (para o preview e o exportador) ----------------
+# ---------------- equipe da poda: dois trabalhadores de colete e capacete cortando uma árvore caída ----------------
+PELE, REFLEX = 0xc98a5e, 0xe8eadf
+def pessoa(ox, oy, yaw, tool):
+    c, s_ = math.cos(yaw), math.sin(yaw)
+    P = lambda x, y, z: (ox + x * c - y * s_, oy + x * s_ + y * c, z)
+    R = (0, 0, yaw)
+    q = []
+    for sx in (-1, 1): q.append(box(JEANS, P(sx * 0.12, 0, 0.45), (0.18, 0.22, 0.9), R))
+    q.append(box(0x2f5fb0, P(0, 0, 1.2), (0.46, 0.26, 0.62), R))          # camisa
+    q.append(box(LARANJA, P(0, 0, 1.22), (0.5, 0.3, 0.56), R))           # colete
+    for z in (1.08, 1.32): q.append(box(REFLEX, P(0, 0, z), (0.52, 0.32, 0.06), R))  # faixas refletivas
+    q.append(sphere(PELE, P(0, 0, 1.68), 0.15, seg=8, rings=6))
+    q.append(sphere(AMARELO, P(0, 0, 1.76), 0.18, (1, 1, 0.75), seg=8, rings=5))   # capacete
+    q.append(cyl(AMARELO, P(0, 0.04, 1.73), 0.22, 0.03, 10))
+    sh = [P(sx * 0.3, 0, 1.45) for sx in (-1, 1)]
+    if tool == 'serra':
+        hands = [P(-0.12, 0.42, 1.05), P(0.12, 0.42, 1.05)]
+        q.append(box(LARANJA, P(0, 0.48, 1.0), (0.2, 0.42, 0.22), R))       # motosserra
+        q.append(box(PRETO, P(0, 0.5, 1.13), (0.06, 0.3, 0.06), R))
+        q.append(box(CINZA, P(0, 0.98, 0.96), (0.05, 0.66, 0.08), R))       # sabre
+    else:
+        hands = [P(-0.15, 0.35, 1.15), P(0.15, 0.3, 1.25)]
+        q.append(between(MADEIRA, P(0.15, -0.2, 1.7), P(0.15, 0.9, 0.05), 0.03, 5))  # rastelo
+        q.append(box(CINZA_ESC, P(0.15, 0.95, 0.04), (0.5, 0.06, 0.06), R))
+    for a, b in zip(sh, hands): q.append(between(0x2f5fb0, a, b, 0.07, 5))
+    for h in hands: q.append(sphere(PELE, h, 0.06, seg=6, rings=4))
+    return q
+p = []
+p.append(cyl(MADEIRA, (0, 1.2, 0.35), 0.34, 0.7, 7))                     # toco
+p.append(cyl(0xd9b98a, (0, 1.2, 0.71), 0.3, 0.02, 7))
+p.append(between(MADEIRA, (0.4, 1.3, 0.35), (6.2, 1.9, 0.6), 0.3, 7, r2=0.2))  # tronco caído
+for (x, y, z, r, col) in [(6.6, 2.0, 1.1, 1.9, FOLHA), (5.2, 2.6, 0.9, 1.4, FOLHA_ESC), (7.4, 1.2, 0.8, 1.3, FOLHA_ESC), (4.6, 1.2, 0.7, 1.0, FOLHA)]:
+    p.append(ico(col, (x, y, z), r, (1, 1, 0.7)))
+for (x, y) in [(2.2, 1.0), (3.4, 1.2)]: p.append(cyl(0xd9b98a, (x, y, 0.36), 0.25, 0.5, 7, rot=(0, math.pi / 2, 0.1)))  # toras cortadas
+p += pessoa(1.5, 0.95, -math.pi / 2, 'serra')       # de perfil para a rua, serrando as toras
+p += pessoa(-1.1, 0.7, -1.1, 'rastelo')
+for x in (-2.6, 3.0, 5.4):
+    p.append(cyl(LARANJA, (x, -0.6, 0.38), 0.22, 0.76, 8, r2=0.03))
+    p.append(cyl(BRANCO, (x, -0.6, 0.45), 0.15, 0.12, 8))
+    p.append(box(LARANJA, (x, -0.6, 0.03), (0.5, 0.5, 0.06)))
+asset('equipe_poda', p)
+
 mat = bpy.data.materials.new('VC'); mat.use_nodes = True
 nt = mat.node_tree; bsdf = nt.nodes.get('Principled BSDF')
 attr = nt.nodes.new('ShaderNodeVertexColor'); attr.layer_name = 'Col'
@@ -1071,6 +1113,7 @@ def render(path, names, spacing, cam_loc, cam_rot, ortho, target=None):
 
 if '--preview' in sys.argv:
     render(os.path.join(OUT, 'preview_piloto.png'), ['jetski', 'capivara'], {'jetski': 0, 'capivara': 0}, (4.5, 5.5, 3.2), (0, 0, 0), 4.6, target=(0, 0.1, 1.1))
+    render(os.path.join(OUT, 'preview_poda.png'), ['equipe_poda'], {'equipe_poda': 4}, (2.5, -11, 6), (math.radians(65), 0, 0), 12, target=(2.5, 0.8, 0.8))
     render(os.path.join(OUT, 'preview_parque.png'), ['capivara_heroi', 'baloes', 'cerca', 'barraca', 'bilheteria', 'palmeira', 'portal_parque', 'rg_base', 'pend_base'], {'capivara_heroi': 4, 'baloes': 4, 'cerca': 6, 'barraca': 7, 'bilheteria': 8, 'palmeira': 10, 'portal_parque': 18, 'rg_base': 22, 'pend_base': 4}, (0, -110, 14), (math.radians(82), 0, 0), 105)
     render(os.path.join(OUT, 'preview_bi.png'), ['bi_frente', 'bi_meio', 'bi_tras'], {'bi_frente': 3.1, 'bi_meio': 3.1, 'bi_tras': 3.1}, (-12, -14, 5), (0, 0, 0), 16, target=(3.1, 0, 0))
     render(os.path.join(OUT, 'preview_v2_a.png'), ['relogio_flores', 'farol_saber', 'memorial_ucraniano', 'rua_24h', 'paco_liberdade', 'catedral'], {'relogio_flores': 14, 'farol_saber': 16, 'memorial_ucraniano': 26, 'rua_24h': 34, 'paco_liberdade': 30, 'catedral': 4}, (0, -130, 22), (math.radians(80), 0, 0), 150)
@@ -1083,6 +1126,6 @@ if '--preview' in sys.argv:
     render(os.path.join(OUT, 'preview_pinhao.png'), ['pinhao'], {'pinhao': 0}, (2.2, -3.2, 1.2), (0, 0, 0), 3.2, target=(0, 0, 0))
     render(os.path.join(OUT, 'preview_cenario.png'), ['pato', 'boia', 'banco', 'lixeiras', 'placa', 'tapume', 'capivara_enfeite', 'canoa', 'banca', 'luminaria', 'chafariz', 'obelisco', 'colunata', 'portal'],
            {'pato': 2, 'boia': 2.5, 'banco': 3.5, 'lixeiras': 3.5, 'placa': 3.5, 'tapume': 4.5, 'capivara_enfeite': 3, 'canoa': 3, 'banca': 4.5, 'luminaria': 6, 'chafariz': 8, 'obelisco': 7, 'colunata': 17, 'portal': 10}, (0, -70, 8), (math.radians(84), 0, 0), 80)
-    render(os.path.join(OUT, 'preview_props.png'), ['pinhao', 'lixo', 'cone', 'fusivel', 'galho', 'poste', 'arvore_verde', 'ipe_amarelo', 'ipe_roxo', 'araucaria', 'bi_frente', 'tubo', 'lancha_copel'],
-           {'pinhao': 2.5, 'lixo': 2.5, 'cone': 3, 'fusivel': 6, 'galho': 8, 'poste': 7, 'arvore_verde': 8, 'ipe_amarelo': 8, 'ipe_roxo': 9, 'araucaria': 10, 'bi_frente': 7, 'tubo': 8, 'lancha_copel': 4},
+    render(os.path.join(OUT, 'preview_props.png'), ['equipe_poda', 'pinhao', 'lixo', 'cone', 'fusivel', 'galho', 'poste', 'arvore_verde', 'ipe_amarelo', 'ipe_roxo', 'araucaria', 'bi_frente', 'tubo', 'lancha_copel'],
+           {'equipe_poda': 12, 'pinhao': 2.5, 'lixo': 2.5, 'cone': 3, 'fusivel': 6, 'galho': 8, 'poste': 7, 'arvore_verde': 8, 'ipe_amarelo': 8, 'ipe_roxo': 9, 'araucaria': 10, 'bi_frente': 7, 'tubo': 8, 'lancha_copel': 4},
            (0, -60, 14), (math.radians(80), 0, 0), 90)
