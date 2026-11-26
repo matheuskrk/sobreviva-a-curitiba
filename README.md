@@ -29,6 +29,6 @@ blender -b -P blender/assets_ps2.py -- . --preview
 
 ## Créditos
 
-Desenvolvido por Matheus dos Anjos ([@mathmath.zip](https://www.instagram.com/mathmath.zip/)) e Matheus Tomiatti ([@matheustomiatti](https://www.instagram.com/matheustomiatti/)).
+Desenvolvido por Matheus dos Anjos ([@mathmath.zip](https://www.instagram.com/mathmath.zip/)) e Matheus Cruz.
 
 Mapa e dados das ruas: © [colaboradores do OpenStreetMap](https://www.openstreetmap.org/copyright), sob a licença ODbL.
