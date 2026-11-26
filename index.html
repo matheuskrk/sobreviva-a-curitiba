@@ -69,7 +69,7 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-a
   color:#dff3e2;background:rgba(10,28,22,.82);padding:7px 9px;border-radius:7px;pointer-events:none;letter-spacing:.2px}
 #skip{bottom:calc(env(safe-area-inset-bottom,0px) + 22px);left:50%;transform:translateX(-50%);font-weight:800;font-size:13px;color:#fff;background:rgba(30,94,52,.55);padding:6px 14px;border-radius:999px}
 #toast.mid{top:58%;font-size:46px;padding:2px 8px} /* contagem regressiva no meio da tela */
-#overlay,#result,#pausa,#creditos{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:rgba(244,246,234,.55);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow:auto}
+#overlay,#result,#pausa,#creditos,#cardView{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:rgba(244,246,234,.55);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow:auto}
 .card{max-width:540px;display:grid;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 12px 40px rgba(30,94,52,.25)}
 .card header{background:var(--lime);padding:22px 26px 18px}
 .card h1{font-family:var(--f-display);font-weight:900;font-size:clamp(34px,8vw,56px);line-height:.95;margin:0;color:#fff;text-wrap:balance}
@@ -100,6 +100,11 @@ button.x:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .soc .sb svg{width:22px;height:22px;fill:#fff;stroke:#fff}
 .soc .sb:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .soc .sb[aria-disabled="true"]{background:#9aa894;cursor:default}
+#resCard{width:132px;aspect-ratio:9/16;border-radius:12px;box-shadow:0 4px 14px rgba(30,94,52,.25);justify-self:center;cursor:pointer;background:#5a9a4a}
+#cardView{z-index:12;background:rgba(14,40,24,.82)}
+.cardbox{display:grid;gap:12px;justify-items:center;text-align:center;max-width:100%}
+.cardbox img{max-height:72vh;max-width:100%;aspect-ratio:9/16;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.cardbox p{margin:0;color:#fff;font-weight:800;font-size:14px}
 .card .meta{font-size:13px;color:var(--dim);font-weight:700}
 .keys{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;color:var(--dim);font-weight:600}
 .keys b{color:var(--ink);font-weight:900}
@@ -162,7 +167,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
     <p>O Parque Barigui está inundado e você precisa encontrar um lugar seco para curtir o fim de semana. Só cuidado para a onda não te levar!</p>
     <div class="pw" id="pw" role="list"></div>
     <div id="loading">Esperando o Ligeirinho (pode demorar)…</div>
-    <div class="acoes"><button class="go" id="start" hidden>Salve-se quem puder!</button><button class="sec" id="credBtn">Créditos</button><button class="sec musica" id="musicaBtn">Música: Original</button></div>
+    <div class="acoes"><button class="go" id="start" hidden>Salve-se quem puder!</button><button class="sec" id="credBtn">Créditos</button></div>
     <div class="meta" id="best"></div>
     </div>
   </div>
@@ -170,7 +175,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 <div id="pausa" class="screen" hidden>
   <div class="card">
     <header><h1>Pausado</h1></header>
-    <div class="body"><div class="acoes"><button class="go" id="continuar">Continuar</button><button class="sec" id="recomecar">Recomeçar</button><button class="sec" id="credPausa">Créditos</button><button class="sec musica" id="musicaPausa">Música: Original</button></div></div>
+    <div class="body"><div class="acoes"><button class="go" id="continuar">Continuar</button><button class="sec" id="recomecar">Recomeçar</button><button class="sec" id="credPausa">Créditos</button></div></div>
   </div>
 </div>
 <div id="creditos" class="screen" hidden>
@@ -189,6 +194,13 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
     </div>
   </div>
 </div>
+<div id="cardView" class="screen" hidden>
+  <div class="cardbox">
+    <img id="cardBig" alt="Card com a sua distância e pontuação">
+    <p>Toque e segure na imagem para salvar e depois poste nos stories.</p>
+    <div class="acoes"><button class="sec" id="copyLink">Copiar link do jogo</button><button class="go" id="cardClose">Fechar</button></div>
+  </div>
+</div>
 <div id="result" class="screen" hidden>
   <div class="card">
     <header><h1 id="resTitle">Fim da linha</h1></header>
@@ -196,7 +208,8 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
       <p id="resHit" class="hit"></p>
       <p id="resText"></p>
       <p class="meta" id="resScore"></p>
-      <button class="go" id="retry">Jogar de novo</button>
+      <img id="resCard" alt="Card com a sua distância e pontuação">
+      <div class="acoes"><button class="go" id="retry">Jogar de novo</button><button class="sec" id="shareBtn">Compartilhar nos stories</button></div>
     </div>
   </div>
 </div>
@@ -1610,12 +1623,28 @@ const LIGHTNING = {t: 0, cool: 8, str: 1, far: 0, thunderAt: 0}, LIGHT_C = new T
 function lightning(far) { LIGHTNING.t = 0.75; LIGHTNING.far = far; LIGHTNING.str = 1 - far * 0.5; LIGHTNING.thunderAt = 0.15 + far * 1.8; }
 const BO = {t: 0, cool: 6, k: 0, head: 0, warned: false, alertT: 0};
 const BO_DUR = 10.6; // apagão: ~0,5 s piscando + 10 s no escuro
+// alerta de emergência no celular (como o da Defesa Civil): os dois tons juntos de 853 Hz e 960 Hz, em toques longos,
+// com o celular vibrando por baixo
+function civilAlert() {
+  const ac = audio.ctx; if (!ac || !audio.on) return;
+  const t = ac.currentTime;
+  for (let k = 0; k < 3; k++) {
+    const t0 = t + k * 0.7;
+    for (const f of [853, 960]) {
+      const o = ac.createOscillator(), og = ac.createGain(); o.type = 'square'; o.frequency.value = f;
+      og.gain.setValueAtTime(0.0001, t0); og.gain.exponentialRampToValueAtTime(0.055, t0 + 0.015); og.gain.setValueAtTime(0.055, t0 + 0.52); og.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.56);
+      o.connect(og); og.connect(audio.master); o.start(t0); o.stop(t0 + 0.6);
+    }
+    sfxTone(k * 0.7, 0.5, 0.12, 'sawtooth', 62, 58); // vibração
+  }
+  try { navigator.vibrate && navigator.vibrate([500, 200, 500, 200, 500]); } catch (e) {}
+}
 function showBlackoutAlert() {
   // hora do jogo: o dia de 150 s vira 24 h (fim de tarde perto de 17h, noite das 19h às 3h)
   const mins = Math.floor((((DAY.t / DAY.period) % 1) * 24 + 6) % 24 * 60);
   $('alertaHora').textContent = Math.floor(mins / 60) + 'h' + String(mins % 60).padStart(2, '0');
   $('alerta').classList.add('on'); $('alerta').setAttribute('aria-hidden', 'false'); BO.alertT = 4.6;
-  blip([880, 660, 880, 660], 0.09, 'square', 0.07); // toque de alerta de celular
+  civilAlert(); // toque do alerta de emergência do celular (Defesa Civil)
   setTimeout(() => lightning(0.1), 500); // e cai um raio perto
 }
 const NIGHT_FOG = new THREE.Color(0x141d33), NIGHT_TOP = new THREE.Color(0x050a1a), DUSK_C = new THREE.Color(0xf09a6a);
@@ -1890,25 +1919,83 @@ function dnbReese(midi, t, dur, vol) {
   sub.connect(sg); sg.connect(MUSIC.gain); sub.start(t); sub.stop(t + dur + 0.02);
   f.connect(g); g.connect(MUSIC.gain); lfo.start(t); lfo.stop(t + dur + 0.02);
 }
+// ---------- trilha drum & bass em seções (≈2 min antes de repetir) ----------
+// introdução, A (melodia do hino), B (melodia + arpejo e baixo sincopado), respiro (sem bateria, crescendo até a volta),
+// drop (melodia uma oitava acima, dobrada, com ride e arpejo) e A' (melodia com eco); viradas a cada 4 e 8 compassos
+const SONG = [['intro', 4], ['A', 20], ['B', 20], ['respiro', 8], ['drop', 20], ['A2', 20]];
+const SONG_LEN = SONG.reduce((a, s) => a + s[1], 0);
+function songAt(bar) { let b = bar % SONG_LEN; for (const [name, len] of SONG) { if (b < len) return {name, i: b, len}; b -= len; } return {name: 'A', i: 0, len: 20}; }
+const LEAD_AT = new Map(); { let e = 0; for (const [m, d] of LEAD) { LEAD_AT.set(e, [m, d]); e += d; } }
+const hsh2 = n => { const s = Math.sin(n * 91.7 + 13.3) * 43758.5453; return s - Math.floor(s); };
+function dnbPad(root, t, dur, vol) {
+  const ac = audio.ctx, f = ac.createBiquadFilter(), g = ac.createGain();
+  f.type = 'lowpass'; f.frequency.setValueAtTime(500, t); f.frequency.linearRampToValueAtTime(1300, t + dur * 0.6); f.Q.value = 2;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + dur * 0.25); g.gain.setValueAtTime(vol, t + dur * 0.8); g.gain.linearRampToValueAtTime(0, t + dur);
+  for (const [iv, det] of [[12, -9], [19, 7], [24, 0], [12, 11]]) { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mtof(root + iv); o.detune.value = det; o.connect(f); o.start(t); o.stop(t + dur + 0.05); }
+  f.connect(g); g.connect(MUSIC.gain);
+}
+function dnbTom(t, f0, vol) {
+  const ac = audio.ctx, o = ac.createOscillator(), g = ac.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * 0.55, t + 0.18);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.22); o.connect(g); g.connect(MUSIC.gain); o.start(t); o.stop(t + 0.25);
+}
+function dnbRiser(t, dur, vol) {
+  const ac = audio.ctx, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  s.buffer = audio.nb; s.loop = true; f.type = 'bandpass'; f.Q.value = 1.5; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(7000, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur); g.gain.linearRampToValueAtTime(0, t + dur + 0.05);
+  s.connect(f); f.connect(g); g.connect(MUSIC.gain); s.start(t); s.stop(t + dur + 0.1);
+}
 function dnbTick(ac) {
   MUSIC.bpm = 174 + (G.star > 0 ? 10 : 0);
   const sx = 60 / MUSIC.bpm / 4; // semicolcheia
   while (MUSIC.next < ac.currentTime + 0.15) {
-    const t = MUSIC.next, k = MUSIC.step, s16 = k % 16, e8 = k >> 1;
-    const st = e8 % LEAD_STEPS, bar = Math.floor(st / 8) % BASS_ROOTS.length;
-    if (k % 2 === 0) {
-      // melodia: a mesma do jogo, uma nota por colcheia
-      if (MUSIC.lLeft <= 0) { const [m, d] = LEAD[MUSIC.li % LEAD.length]; MUSIC.li++; MUSIC.lLeft = d; if (m) chipNote('square', m - 12, t, d * sx * 2 * 0.9, 0.065); }
-      MUSIC.lLeft--;
+    const t = MUSIC.next, k = MUSIC.step, s16 = k % 16, bar = Math.floor(k / 16), sec = songAt(bar), bi = sec.i, nm = sec.name;
+    const root = BASS_ROOTS[bi % BASS_ROOTS.length], v = hsh2(bar), main = nm === 'A' || nm === 'B' || nm === 'drop' || nm === 'A2';
+    const lastOf8 = bi % 8 === 7, lastOf4 = bi % 4 === 3;
+    if (s16 === 0 && bi === 0 && nm !== 'intro') chipNoise(t, 1.3, nm === 'drop' ? 0.16 : 0.1, 6000, 'highpass'); // prato na entrada da seção
+    // melodia (a mesma do hino), com timbre e oitava diferentes em cada seção
+    if (main && k % 2 === 0) {
+      const note = LEAD_AT.get(bi * 8 + (s16 >> 1));
+      if (note && note[0]) {
+        const base = note[0] - 12, dur = note[1] * sx * 2 * 0.9;
+        if (nm === 'A') chipNote('square', base, t, dur, 0.06);
+        else if (nm === 'B') { chipNote('square', base, t, dur, 0.05); chipNote('triangle', base - 12, t, dur, 0.035); }
+        else if (nm === 'drop') { chipNote('square', base + 12, t, dur, 0.045); chipNote('triangle', base, t, dur, 0.06); }
+        else { chipNote('triangle', base, t, dur, 0.07); chipNote('square', base + 12, t + sx * 3, dur * 0.6, 0.022); } // A': com eco
+      }
     }
-    // baixo reese: meio compasso por nota, tônica e depois a quinta (oitava abaixo do original)
-    if (s16 === 0 || s16 === 8) { const r = BASS_ROOTS[bar] - 12; dnbReese(s16 === 0 ? r : r + 7, t, sx * 8, 0.11); }
-    // bateria quebrada
-    if (s16 === 0 || s16 === 10) dnbKick(t, 0.75);
-    if (s16 === 4 || s16 === 12) dnbSnare(t, 0.32);
-    if ((s16 === 7 || s16 === 15) && Math.random() < 0.6) dnbSnare(t, 0.07); // caixa fantasma
-    chipNoise(t, 0.025, s16 % 2 ? 0.03 : 0.06, 8000, 'highpass'); // chimbal em semicolcheias
-    if (s16 === 14) chipNoise(t, 0.12, 0.05, 9000, 'highpass'); // chimbal aberto
+    // baixo reese: padrão muda por seção
+    if (nm === 'A' || nm === 'A2') { if (s16 === 0 || s16 === 8) dnbReese(s16 === 0 ? root - 12 : root - 5, t, sx * 8, 0.11); if (nm === 'A2' && s16 === 14) dnbReese(root, t, sx * 2, 0.08); }
+    else if (nm === 'B') { const pat = {0: 0, 3: 0, 6: 12, 10: 7, 12: 0}; if (s16 in pat) dnbReese(root - 12 + pat[s16], t, sx * (s16 === 12 ? 4 : 3), 0.1); }
+    else if (nm === 'drop') { if (s16 % 4 === 0 || s16 === 10) dnbReese(root - 12 + (s16 === 8 ? 7 : 0), t, sx * 3, 0.12); }
+    else if (nm === 'intro' && bi >= 2 && s16 === 0) dnbReese(root - 12, t, sx * 16, 0.07);
+    else if (nm === 'respiro' && s16 === 0 && bi < sec.len - 2) dnbReese(root - 12, t, sx * 16, 0.05);
+    // acordes longos
+    if ((nm === 'intro' || nm === 'B' || nm === 'respiro' || nm === 'A2') && s16 === 0 && bi % 2 === 0) dnbPad(root, t, sx * 32, nm === 'respiro' ? 0.05 : 0.03);
+    // arpejo em semicolcheias
+    if ((nm === 'B' && bi >= 4) || nm === 'drop') { const arp = [24, 31, 36, 31, 24, 31, 39, 31]; chipNote('square', root + arp[s16 % 8] - 12, t, sx * 0.8, nm === 'drop' ? 0.024 : 0.018); }
+    // bateria
+    if (main) {
+      const kicks = v < 0.4 ? [0, 10] : v < 0.7 ? [0, 6, 10] : [0, 10, 11];
+      if (kicks.includes(s16)) dnbKick(t, 0.75);
+      if (s16 === 4 || s16 === 12) dnbSnare(t, 0.32);
+      if (lastOf8 && s16 >= 12) { dnbSnare(t, 0.12 + (s16 - 12) * 0.06); if (s16 === 12) dnbTom(t, 190, 0.35); if (s16 === 14) dnbTom(t, 140, 0.35); } // virada
+      else if (lastOf4 && (s16 === 14 || s16 === 15)) dnbSnare(t, 0.14);
+      else if ((s16 === 7 || s16 === 15 || s16 === 9) && Math.random() < 0.45) dnbSnare(t, 0.06); // caixa fantasma
+      chipNoise(t, 0.025, s16 % 4 === 2 ? 0.07 : (s16 % 2 ? 0.025 : 0.045), 8000, 'highpass');
+      if (s16 === (v > 0.5 ? 6 : 14)) chipNoise(t, 0.12, 0.05, 9000, 'highpass'); // chimbal aberto
+      if (nm === 'drop' && s16 % 2 === 0) chipNoise(t, 0.3, 0.03, 5200, 'highpass'); // ride
+    } else if (nm === 'intro') {
+      chipNoise(t, 0.025, s16 % 2 ? 0.02 : 0.04, 8000, 'highpass');
+      if (bi >= 2 && (s16 === 0 || s16 === 10)) dnbKick(t, 0.5);
+    } else if (nm === 'respiro') {
+      if (bi < sec.len - 2) { if (s16 % 4 === 0) chipNoise(t, 0.03, 0.03, 8000, 'highpass'); }
+      else { // os 2 compassos finais crescem até o drop: caixa cada vez mais rápida e um sopro subindo
+        if (bi === sec.len - 2 && s16 === 0) dnbRiser(t, sx * 32, 0.12);
+        const step = bi === sec.len - 2 ? 4 : (s16 < 8 ? 2 : 1);
+        if (s16 % step === 0) dnbSnare(t, 0.08 + (bi === sec.len - 1 ? s16 / 16 * 0.2 : 0));
+      }
+    }
     MUSIC.next += sx; MUSIC.step++;
   }
 }
@@ -1929,7 +2016,7 @@ function startMusic() {
 function musicTick() {
   if (!audio.ctx || !MUSIC.playing) return;
   const ac = audio.ctx;
-  if (MUSIC.style === 'dnb') return dnbTick(ac);
+  return dnbTick(ac); // a trilha agora é só a versão drum & bass
   MUSIC.bpm = Math.min(170, 112 + Math.max(0, G.speed - 22) * 1.5) + (G.star > 0 ? 18 : 0);
   const e = 60 / MUSIC.bpm / 2; // uma colcheia
   while (MUSIC.next < ac.currentTime + 0.15) {
@@ -2184,16 +2271,24 @@ const WAVE_VS = `attribute vec2 aUV; attribute float aAmp; uniform float uTime;
 const WAVE_FS = `uniform float uTime; uniform vec3 uFogColor; uniform float uFogNear,uFogFar,uLight;
   varying vec2 vUV; varying vec3 vN; varying float vD;
   float h21(vec2 p){ return fract(sin(dot(p, vec2(41.3,289.1)))*43758.5); }
+  float n2(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); return mix(mix(h21(i),h21(i+vec2(1,0)),f.x), mix(h21(i+vec2(0,1)),h21(i+1.),f.x), f.y); }
+  float fbm(vec2 p){ return n2(p)*.55 + n2(p*2.1+3.1)*.3 + n2(p*4.3+7.7)*.15; }
   void main(){
-    float v = vUV.y;
-    vec3 c = mix(vec3(.20,.58,.49), mix(vec3(.26,.66,.56), vec3(.10,.40,.37), smoothstep(.62,1.,v)), smoothstep(.55,.70,v));
-    float crista = smoothstep(.33,.44,v)*smoothstep(.70,.55,v);                    // espuma da crista e do lábio
-    float st = fract(vUV.x*15. + sin(v*5. + uTime*1.1)*0.3 + h21(floor(vec2(vUV.x*15.,0.))));
-    float estria = smoothstep(0.,.1,st)*smoothstep(.34,.14,st)*smoothstep(.55,.75,v)*smoothstep(1.,.72,v)*0.75; // espuma escorrendo pela face
-    float pe = smoothstep(.86,1.,v)*0.7;                                           // espuma batendo no pé da onda
-    c = mix(c, vec3(.94,.99,.97), clamp(crista + estria + pe + step(1., vUV.y), 0., 1.));
-    float lit = 0.78 + 0.22*max(dot(normalize(vN), normalize(vec3(0.45,0.8,0.3))), 0.); // a face é quase vertical: sem isso fica escura demais
-    c = pow(c, vec3(2.2)) * uLight * lit;
+    float v = vUV.y, u = vUV.x;
+    float face = smoothstep(.5,1.,v);                                   // 0 no lábio, 1 no pé (lado da capivara)
+    vec3 deep = vec3(.04,.27,.27), mid = vec3(.12,.50,.46), glow = vec3(.42,.86,.76);
+    vec3 c = mix(glow, deep, pow(face, .8));                             // luz atravessando a água fina perto da crista
+    c = mix(c, mid, smoothstep(.0,.35,v)*(1.-smoothstep(.35,.5,v)));     // costas da onda
+    float fn = fbm(vec2(u*34., v*9. - uTime*1.6));
+    float crista = smoothstep(.36,.46,v)*smoothstep(.64,.5,v)*(.7+.3*fn);
+    float escorre = smoothstep(.6,.78,fn)*smoothstep(.5,.62,v)*smoothstep(1.,.74,v);   // espuma escorrendo pela face
+    float pe = smoothstep(.84,1.,v)*smoothstep(.3,.65,fbm(vec2(u*44., uTime*.9)));    // espuma batendo no pé
+    float foam = clamp(crista + escorre*.85 + pe + step(1., vUV.y), 0., 1.);
+    c = mix(c, vec3(.95,.99,.97), foam);
+    vec3 N = normalize(vN);
+    float lit = 0.8 + 0.2*max(dot(N, normalize(vec3(0.45,0.8,0.3))), 0.);
+    float spec = pow(max(dot(reflect(vec3(0.,0.,-1.), N), normalize(vec3(.3,.7,.6))), 0.), 28.)*(1.-foam)*.5;
+    c = pow(c, vec3(2.2)) * uLight * lit + spec * uLight;
     gl_FragColor = vec4(mix(c, uFogColor, smoothstep(uFogNear,uFogFar,vD)), 1.);
   }`;
 const waveMesh = (() => {
@@ -2232,7 +2327,7 @@ function updateWave(t, dt) {
   const [x, z, dx, dz] = trackAt(Math.max(0, s));
   waveG.position.set(x, -0.3 + Math.sin(t * 3) * 0.2, z); waveG.rotation.set(0, headingOf(dx, dz), 0);
   for (const m of WAVE_JUNK) { const u = m.userData; m.position.set(u.x + Math.sin(t * u.sp + u.ph) * 0.6, u.y + Math.sin(t * 2 + u.ph) * 0.4, u.z); m.rotation.set(t * u.sp, t * u.sp * 0.7 + u.ph, 0); }
-  if (Math.random() < 0.8) for (let k = 0; k < 3; k++) spawnWake(x - dz * rnd(-8, 8), 2.6, z + dx * rnd(-8, 8), dx * 6 + rnd(-2, 2), rnd(2, 6), dz * 6 + rnd(-2, 2), 0.8);
+  for (let k = 0; k < 6; k++) spawnWake(x - dz * rnd(-10, 10), 4.2 + rnd(0, 0.6), z + dx * rnd(-10, 10), dx * rnd(5, 9) + rnd(-2, 2), rnd(3, 7), dz * rnd(5, 9) + rnd(-2, 2), 0.9); // borrifo da crista
 }
 
 // ---------- estado do jogo ----------
@@ -2267,9 +2362,79 @@ function startRun() {
   LM_PASS.forEach(l => l.done = false);
   resetGen(); GEN.bag = []; GEN.s = 170; resetChunks(); startMusic(); setStarLook(false); // na contagem a capivara já anda ~75 m: os obstáculos começam depois disso
   { const [x, z, dx, dz] = trackAt(0); camPos.set(x - dx * 12, 7, z - dz * 12); camDir.set(dx, 0, dz); }
-  $('overlay').hidden = true; $('result').hidden = true; $('pausa').hidden = true;
+  $('overlay').hidden = true; $('result').hidden = true; $('pausa').hidden = true; $('cardView').hidden = true;
   $('hint').hidden = true;
   G.state = 'intro'; resetIntro();
+}
+// ---------- card de fim de partida, para postar nos stories ----------
+const GAME_URL = 'https://matheuskrk.github.io/sobreviva-a-curitiba/';
+// aonde daria para ir do centro (Praça Tiradentes) com a distância percorrida, em linha reta e aproximado
+const DESTINOS = [
+  [0.4, 'o Largo da Ordem'], [0.8, 'o Passeio Público'], [1.8, 'a Rodoferroviária'], [3.2, 'o Jardim Botânico'],
+  [3.9, 'o Parque Barigui'], [5.0, 'a Ópera de Arame'], [5.7, 'o Parque Tanguá'], [6.5, 'Santa Felicidade'],
+  [14.5, 'o Aeroporto Afonso Pena'], [28, 'Campo Largo'], [38, 'Morretes'], [75, 'Paranaguá'],
+];
+function destinoPara(km) {
+  let d = null; for (const x of DESTINOS) if (km >= x[0]) d = x;
+  return d ? `Dava pra ir do centro até ${d[1]}!` : 'Nem saiu da Rua XV…';
+}
+// capivara no jet ski desenhada pelo próprio renderizador do jogo, com fundo transparente
+function heroShot(S = 640) {
+  const rt = new THREE.WebGLRenderTarget(S, S); rt.texture.colorSpace = THREE.SRGBColorSpace;
+  const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x99aa88, 1.6)); const dl = new THREE.DirectionalLight(0xffffff, 2); dl.position.set(3, 5, 4); sc.add(dl);
+  const g = new THREE.Group(); g.add(new THREE.Mesh(GEO.jetski, VC), new THREE.Mesh(GEO.capivara, VC)); g.rotation.set(0.1, 2.5, 0); sc.add(g);
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 2.6, 7.4); cam.lookAt(0, 1.0, 0);
+  const oc = renderer.getClearColor(new THREE.Color()), oa = renderer.getClearAlpha();
+  renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(sc, cam);
+  const px = new Uint8Array(S * S * 4); renderer.readRenderTargetPixels(rt, 0, 0, S, S, px);
+  renderer.setRenderTarget(null); renderer.setClearColor(oc, oa); rt.dispose();
+  const cv = document.createElement('canvas'); cv.width = cv.height = S; const cx = cv.getContext('2d'), img = cx.createImageData(S, S);
+  for (let y = 0; y < S; y++) img.data.set(px.subarray((S - 1 - y) * S * 4, (S - y) * S * 4), y * S * 4);
+  cx.putImageData(img, 0, 0); return cv;
+}
+async function makeCard(km, score, rec) {
+  try { await Promise.all([document.fonts.load('900 80px Nunito'), document.fonts.load('800 40px Nunito')]); } catch (e) {}
+  const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  let gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#c4d84a'); gr.addColorStop(0.5, '#5a9a4a'); gr.addColorStop(1, '#16492a');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  // ondas no pé do card
+  for (let k = 0; k < 3; k++) { g.fillStyle = `rgba(255,255,255,${0.08 + k * 0.04})`; g.beginPath(); const y0 = H - 330 + k * 80; g.moveTo(0, y0); for (let x = 0; x <= W; x += 20) g.lineTo(x, y0 + Math.sin(x / 80 + k * 1.7) * 22); g.lineTo(W, H); g.lineTo(0, H); g.fill(); }
+  const F = (w, s) => `${w} ${s}px Nunito, "Arial Rounded MT Bold", sans-serif`;
+  g.textAlign = 'center';
+  g.fillStyle = '#fff'; g.font = F(900, 96); g.fillText('Sobreviva a', W / 2, 200);
+  g.fillStyle = '#1e5e34'; g.fillText('Curitiba!', W / 2, 305);
+  try { g.drawImage(heroShot(), W / 2 - 340, 330, 680, 680); } catch (e) {}
+  g.fillStyle = '#fff'; g.font = F(900, 200);
+  g.shadowColor = 'rgba(0,0,0,.25)'; g.shadowBlur = 18; g.fillText(km.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' km', W / 2, 1180); g.shadowBlur = 0;
+  // frase do destino, quebrada em linhas
+  g.font = F(800, 50); const words = destinoPara(km).split(' '); let line = '', y = 1275;
+  for (const w of words) { const tl = line ? line + ' ' + w : w; if (g.measureText(tl).width > W - 160) { g.fillText(line, W / 2, y); line = w; y += 64; } else line = tl; }
+  g.fillText(line, W / 2, y);
+  // pontos numa pílula branca
+  const pill = (x, y, w, h) => { g.beginPath(); g.moveTo(x + h / 2, y); g.arcTo(x + w, y, x + w, y + h, h / 2); g.arcTo(x + w, y + h, x, y + h, h / 2); g.arcTo(x, y + h, x, y, h / 2); g.arcTo(x, y, x + w, y, h / 2); g.fill(); };
+  g.fillStyle = 'rgba(255,255,255,.94)'; pill(W / 2 - 330, 1440, 660, 124);
+  g.fillStyle = '#1e5e34'; g.font = F(900, 62); g.fillText(score.toLocaleString('pt-BR') + ' pontos', W / 2, 1524);
+  if (rec) { g.fillStyle = '#f39a2b'; g.font = F(900, 40); g.fillText('NOVO RECORDE!', W / 2, 1620); }
+  g.fillStyle = '#fff'; g.font = F(800, 42); g.fillText('Jogue também:', W / 2, 1745);
+  g.font = F(900, 44); g.fillText(GAME_URL.replace('https://', '').replace(/\/$/, ''), W / 2, 1805);
+  return c;
+}
+let cardBlob = null, cardText = '';
+async function prepareCard(km, score, rec) {
+  const c = await makeCard(km, score, rec);
+  const url = c.toDataURL('image/png');
+  $('resCard').src = url; $('cardBig').src = url;
+  cardBlob = await new Promise(r => c.toBlob(r, 'image/png'));
+  cardText = `Fiz ${km.toLocaleString('pt-BR', {maximumFractionDigits: 1})} km fugindo da onda no Sobreviva a Curitiba! ${GAME_URL}`;
+}
+async function shareCard() {
+  // celular: abre a folha de compartilhar do sistema com a imagem (dá para mandar direto pros stories)
+  try {
+    const file = new File([cardBlob], 'sobreviva-a-curitiba.png', {type: 'image/png'});
+    if (cardBlob && navigator.canShare && navigator.canShare({files: [file]})) { await navigator.share({files: [file], text: cardText}); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  // onde não dá (computador ou dentro de outro site): mostra o card grande para salvar
+  $('cardView').hidden = false;
 }
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
 function endRun(zerou) {
@@ -2281,6 +2446,7 @@ function endRun(zerou) {
   $('resHit').textContent = zerou || G.lastHit === 'A onda te levou!' ? '' : G.lastHit;
   $('resText').textContent = `Você andou ${Math.round(G.dist).toLocaleString('pt-BR')} m em ${fmt(G.t)}. Pegou ${plural(G.pin, 'pinhão', 'pinhões')}, ${plural(G.umbN || 0, 'guarda-chuva', 'guarda-chuvas')} e ${plural(G.ligN || 0, 'carona', 'caronas')} no Ligeirinho.`;
   $('resScore').textContent = `${score.toLocaleString('pt-BR')} pontos` + (rec ? ' · novo recorde' : ` · recorde ${Math.round(best).toLocaleString('pt-BR')}`);
+  prepareCard(G.dist / 1000, score, rec).catch(e => console.warn('card', e));
   setTimeout(() => { $('result').hidden = false; $('retry').focus(); }, 900);
   blip(zerou ? [523, 659, 784, 1047] : [392, 330, 262], 0.14, 'square', 0.12);
 }
@@ -2385,7 +2551,6 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyR' && G.state !== 'title') restartRun();
   if (e.code === 'KeyC') camMode = (camMode + 1) % 2;
   if (e.code === 'KeyM') toggleSound();
-  if (e.code === 'KeyB') toggleMusic();
   if (e.code === 'Escape' || e.code === 'KeyP' || e.code === 'Space') setPaused(!G.paused); // esc, P ou barra de espaço
   if (e.code === 'Enter' && G.state === 'title' && !$('start').hidden) $('start').click();
   if ((e.code === 'Enter' || e.code === 'Space') && G.state === 'intro') INTRO.t = Math.max(INTRO.t, INTRO.dur - 0.3);
@@ -2411,11 +2576,12 @@ $('credBtn').addEventListener('click', () => openCredits('overlay'));
 $('credPausa').addEventListener('click', () => openCredits('pausa'));
 $('recomecar').addEventListener('click', restartRun);
 const toggleMusic = () => setMusicStyle(MUSIC.style === 'dnb' ? 'orig' : 'dnb');
-$('musicaBtn').addEventListener('click', toggleMusic); $('musicaPausa').addEventListener('click', toggleMusic);
-setMusicStyle(MUSIC.style);
 $('bCred').addEventListener('click', () => { if (G.state === 'race' || G.state === 'count') { setPaused(true); openCredits('pausa'); } else openCredits(G.state === 'title' ? 'overlay' : null); });
 $('credVoltar').addEventListener('click', () => { $('creditos').hidden = true; if (credFrom) $(credFrom).hidden = false; });
 $('continuar').addEventListener('click', () => setPaused(false));
+$('shareBtn').addEventListener('click', shareCard); $('resCard').addEventListener('click', () => { $('cardView').hidden = false; });
+$('cardClose').addEventListener('click', () => { $('cardView').hidden = true; });
+$('copyLink').addEventListener('click', async () => { try { await navigator.clipboard.writeText(GAME_URL); $('copyLink').textContent = 'Link copiado!'; } catch (e) { $('copyLink').textContent = GAME_URL; } });
 $('hint').querySelector('span').textContent = matchMedia('(pointer:coarse)').matches ? 'Deslize para os lados para trocar de faixa' : 'Use ← → para trocar de faixa';
 
 // miniaturas dos power-ups, renderizadas dos próprios modelos
