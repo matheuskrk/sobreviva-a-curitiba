@@ -176,7 +176,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 .mn-regua{--c:var(--mn-ink);position:absolute;right:22px;top:calc(env(safe-area-inset-top,0px) + 30px);bottom:52%;width:40px;border:3px solid var(--c);border-bottom:0;border-radius:14px 14px 0 0;
   background:repeating-linear-gradient(to top,var(--c) 0 5px,transparent 5px 10px) left/45% 100% no-repeat,
              repeating-linear-gradient(to top,var(--c) 0 3px,transparent 3px 50px) left/100% 100% no-repeat}
-.mn-regua.agua{--c:var(--mn-paper);top:0;bottom:22px;border-top:0;border-bottom:3px solid var(--c);border-radius:0 0 14px 14px;z-index:3;opacity:.85;
+.mn-regua.agua{--c:var(--mn-paper);top:0;bottom:22px;border-top:0;border-bottom:3px solid var(--c);border-radius:0 0 14px 14px;z-index:1;opacity:.85;
   background:repeating-linear-gradient(to bottom,var(--c) 0 5px,transparent 5px 10px) left/45% 100% no-repeat,
              repeating-linear-gradient(to bottom,var(--c) 0 3px,transparent 3px 50px) left/100% 100% no-repeat}
 .mn-marca{position:absolute;left:-14px;right:-6px;height:5px;border-radius:3px;background:var(--mn-lime)}
@@ -184,16 +184,16 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 .mn-agua{position:absolute;left:0;right:0;bottom:0;height:52%;background:var(--mn-ink);color:var(--mn-paper)}
 .mn-onda{position:absolute;left:0;top:-12px;width:200%;height:24px;fill:var(--mn-ink);animation:mn-mar 6s linear infinite}
 @keyframes mn-mar{to{transform:translateX(-50%)}}
-.mn-capi{position:absolute;right:76px;bottom:calc(52% - 30px);width:min(44%,230px);pointer-events:none;animation:mn-boia 3.2s ease-in-out infinite;z-index:1}
+.mn-capi{position:absolute;right:70px;bottom:calc(52% - 26px);width:min(40%,230px,calc(var(--mn-w) * 1.78 * .24));pointer-events:none;animation:mn-boia 3.2s ease-in-out infinite;z-index:1}
 @keyframes mn-boia{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-7px) rotate(1.5deg)}}
-.mn-miolo{position:absolute;inset:0;padding:40px 84px calc(env(safe-area-inset-bottom,0px) + 22px) 24px;display:grid;align-content:center;gap:16px;z-index:2}
+.mn-miolo{position:absolute;inset:0;padding:40px 78px calc(env(safe-area-inset-bottom,0px) + 22px) 24px;display:grid;align-content:center;gap:16px;z-index:2}
 #overlay.menu #loading{font:700 14px var(--f-display);color:var(--mn-paper);opacity:.85}
-.mn-go{justify-self:stretch;font:900 24px/1 var(--f-display);color:var(--mn-ink);background:var(--mn-lime);border:0;border-radius:999px;padding:18px 24px;cursor:pointer;box-shadow:0 6px 0 #7f9418;transition:transform .12s,box-shadow .12s}
+.mn-go{justify-self:stretch;font:900 clamp(19px,calc(var(--mn-w) * .052),24px)/1 var(--f-display);color:var(--mn-ink);background:var(--mn-lime);border:0;border-radius:999px;padding:18px 24px;cursor:pointer;box-shadow:0 6px 0 #7f9418;transition:transform .12s,box-shadow .12s}
 .mn-go:hover,.mn-go:focus-visible{transform:translateY(-2px);box-shadow:0 8px 0 #7f9418;outline:none}
 .mn-go:active{transform:translateY(4px);box-shadow:0 2px 0 #7f9418}
-.mn-links{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.mn-links button{display:flex;align-items:center;justify-content:center;gap:7px;height:54px;font:900 17px/1 var(--f-display);color:var(--mn-ink);background:var(--mn-paper);border:0;border-radius:999px;padding:0 10px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.28);transition:transform .1s,box-shadow .1s}
-.mn-links button svg{width:20px;height:20px;flex:none;fill:var(--mn-ink);stroke:var(--mn-ink)}
+.mn-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mn-links button{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;height:50px;font:900 clamp(13px,calc(var(--mn-w) * .036),17px)/1 var(--f-display);color:var(--mn-ink);background:var(--mn-paper);border:0;border-radius:999px;padding:0 10px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.28);transition:transform .1s,box-shadow .1s}
+.mn-links button svg{width:18px;height:18px;flex:none;fill:var(--mn-ink);stroke:var(--mn-ink)}
 .mn-links button:hover,.mn-links button:focus-visible{background:#fff;outline:none}
 .mn-links button:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.28)}
 #overlay.menu .pw{grid-template-columns:repeat(3,1fr);gap:8px}
@@ -206,7 +206,8 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 #overlay.menu .pw img{width:42px;height:42px}
 #overlay.menu .pw b{font:800 12px/1.2 var(--f-display);color:var(--mn-paper)}
 #overlay.menu .pw div span{display:none}
-@media (max-height:640px){.mn-sub{display:none}#overlay.menu .pw,.pw-desc{display:none!important}}
+@media (max-height:640px){#overlay.menu .pw,.pw-desc{display:none!important}}
+@media (max-height:520px){.mn-sub{display:none}}
 @media (prefers-reduced-motion:reduce){.mn-onda,.mn-capi{animation:none}}
 /* as outras telas na mesma estética: papel, um pouco de cheia embaixo, cartão creme arredondado */
 #result,#pausa,#creditos,#cardView,#loja,#placar{background:#eee8d5 linear-gradient(#1d4a3c,#1d4a3c) bottom/100% 22% no-repeat}
@@ -223,15 +224,16 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 #cardView .cardbox p{color:#1d4a3c}
 /* HUD: a distância num pinhãozinho, com o recorde embaixo */
 #hudKm{top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;display:grid;justify-items:end;gap:4px}
-#hudKm .pinhao{position:relative;isolation:isolate;display:flex;align-items:baseline;gap:2px;color:#6b3418;width:196px;height:78px;box-sizing:border-box;justify-content:center;align-items:center;padding:0 8px 2px 0;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18));transform:rotate(-6deg)}
-#hudKm .pinhao::before{content:"";position:absolute;inset:0;z-index:-1;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20200%2080%27%3E%3Cpath%20d%3D%27M40%206C12%206%203%2026%203%2041c0%2020%2018%2033%2044%2033c62%200%20120-15%20150-30C168%2026%20102%206%2040%206Z%27%20fill%3D%27%23e7a465%27/%3E%3Cpath%20d%3D%27M60%2015c-22%200-29%2014-29%2025c0%2015%2013%2025%2032%2025c52%200%2096-11%20120-21C160%2031%20110%2015%2060%2015Z%27%20fill%3D%27%23efb88c%27/%3E%3C/svg%3E") center/100% 100% no-repeat}
+#hudInfo{bottom:calc(env(safe-area-inset-bottom,0px) + 14px);right:10px;display:grid;justify-items:end;gap:2px}
+#hudKm .pinhao,#hudInfo .pinhao{position:relative;isolation:isolate;display:flex;align-items:baseline;gap:2px;color:#6b3418;width:196px;height:78px;box-sizing:border-box;justify-content:center;align-items:center;padding:0 8px 2px 0;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18));transform:rotate(-6deg)}
+#hudKm .pinhao::before,#hudInfo .pinhao::before{content:"";position:absolute;inset:0;z-index:-1;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20200%2080%27%3E%3Cpath%20d%3D%27M40%206C12%206%203%2026%203%2041c0%2020%2018%2033%2044%2033c62%200%20120-15%20150-30C168%2026%20102%206%2040%206Z%27%20fill%3D%27%23e7a465%27/%3E%3Cpath%20d%3D%27M60%2015c-22%200-29%2014-29%2025c0%2015%2013%2025%2032%2025c52%200%2096-11%20120-21C160%2031%20110%2015%2060%2015Z%27%20fill%3D%27%23efb88c%27/%3E%3C/svg%3E") center/100% 100% no-repeat}
 /* o do recorde: menor, com a ponta para o outro lado, como dois pinhões soltos */
-#hudKm .pinhao.rec{width:172px;height:62px;padding:0 0 2px 10px;margin-right:22px;transform:rotate(5deg)}
-#hudKm .pinhao.rec::before{transform:scaleX(-1)}
-#hudKm .pinhao.moe{width:140px;height:50px;padding:0 6px 2px 0;margin-right:4px;transform:rotate(-3deg)}
-#hudKm .pinhao.moe span{font:900 12.5px/1 var(--f-display);color:#6b3418;white-space:nowrap}
-#hudKm .pinhao.rec span{font:900 14px/1.05 var(--f-display);color:#6b3418;white-space:nowrap}
-#hudKm.novo .pinhao.rec::before{filter:hue-rotate(-18deg) saturate(1.8) brightness(1.05)}
+#hudInfo .pinhao.rec{width:160px;height:56px;padding:0 0 2px 10px;margin-right:16px;transform:rotate(5deg)}
+#hudInfo .pinhao.rec::before{transform:scaleX(-1)}
+#hudInfo .pinhao.moe{width:140px;height:50px;padding:0 6px 2px 0;margin-right:4px;transform:rotate(-3deg)}
+#hudInfo .pinhao.moe span{font:900 12.5px/1 var(--f-display);color:#6b3418;white-space:nowrap}
+#hudInfo .pinhao.rec span{font:900 14px/1.05 var(--f-display);color:#6b3418;white-space:nowrap}
+#hudInfo.novo .pinhao.rec::before{filter:hue-rotate(-18deg) saturate(1.8) brightness(1.05)}
 #hudKm b{font:900 32px/1 var(--f-display);font-variant-numeric:tabular-nums}
 #hudKm .pinhao small{font:900 16px/1 var(--f-display);margin-left:2px}
 .grade .item.prev{border-color:#f0892a;background:#fff6ec}
@@ -250,7 +252,8 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 <div class="hud" id="wavefx"></div>
 <div class="hud" id="hint" hidden><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M8 20h48M8 20l7-6M8 20l7 6M56 20l-7-6M56 20l-7 6" fill="none" stroke="#1e5e34" stroke-width="3" stroke-linecap="round"/><circle class="dedo" cx="32" cy="20" r="6" fill="#f39a2b" stroke="#fff" stroke-width="2"/></svg><span>Deslize para os lados para trocar de faixa</span></div>
 <div class="hud" id="toast"></div>
-<div class="hud" id="hudKm" hidden><div class="pinhao"><b id="kmNow">0,0</b><small>km</small></div><div class="pinhao rec"><span id="kmRec">primeira corrida</span></div><div class="pinhao moe"><span id="hudMoe">0 pinhões</span></div></div>
+<div class="hud" id="hudKm" hidden><div class="pinhao"><b id="kmNow">0,0</b><small>km</small></div></div>
+<div class="hud" id="hudInfo" hidden><div class="pinhao rec"><span id="kmRec">primeira corrida</span></div><div class="pinhao moe"><span id="hudMoe">0 pinhões</span></div></div>
 <div class="hud" id="alerta" role="alert" aria-hidden="true"><svg viewBox="0 0 48 44" aria-hidden="true"><path d="M24 3 L45 40 H3 Z" fill="#f2c230" stroke="#f2c230" stroke-width="5" stroke-linejoin="round"/><rect x="21.6" y="14" width="4.8" height="15" rx="2.4" fill="#1e3a2e"/><circle cx="24" cy="34.5" r="2.7" fill="#1e3a2e"/></svg><div><div class="al-top"><b>Alerta de Apagão</b><span id="alertaHora"></span></div><p>A luz vai cair. Liga o farol!</p></div></div>
 <div class="hud" id="flash"></div>
 <div class="hud" id="skip" hidden>Toque para pular</div>
@@ -2711,7 +2714,10 @@ async function shareCard() {
   // celular: abre a folha de compartilhar do sistema com a imagem (dá para mandar direto pros stories)
   try {
     const file = new File([cardBlob], 'sobreviva-a-curitiba.png', {type: 'image/png'});
-    if (cardBlob && navigator.canShare && navigator.canShare({files: [file]})) { await navigator.share({files: [file], text: cardText}); return; }
+    if (cardBlob && navigator.canShare && navigator.canShare({files: [file]})) {
+      try { navigator.clipboard && navigator.clipboard.writeText(GAME_URL).catch(() => {}); } catch (e) {} // para colar como figurinha de link no story
+      await navigator.share({files: [file]}); return;
+    }
   } catch (e) { if (e && e.name === 'AbortError') return; }
   // onde não dá (computador ou dentro de outro site): mostra o card grande para salvar
   $('cardView').hidden = false;
@@ -3672,11 +3678,11 @@ const kmTxt = v => v.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumF
 let hudKmT = 0;
 function stepHudKm(dt) {
   const on = G.state === 'race' || G.state === 'count' || G.state === 'over';
-  $('hudKm').hidden = !on; if (!on) return;
+  $('hudKm').hidden = $('hudInfo').hidden = !on; if (!on) return;
   hudKmT -= dt; if (hudKmT > 0) return; hudKmT = 0.1;
   const km = G.dist / 1000; $('kmNow').textContent = kmTxt(km);
   const rec = Math.max(bestKm, 0); $('kmRec').textContent = rec > 0 ? 'recorde ' + kmTxt(rec) + ' km' : 'primeira corrida';
-  $('hudKm').classList.toggle('novo', bestKm > 0 && km > bestKm);
+  $('hudInfo').classList.toggle('novo', bestKm > 0 && km > bestKm);
   $('hudMoe').textContent = LOJA.moedas.toLocaleString('pt-BR') + (LOJA.moedas === 1 ? ' pinhão' : ' pinhões');
 }
 function salvaRecordeKm(km) { if (km > bestKm) { bestKm = km; try { localStorage.setItem('jetski-cwb-km', String(km)); } catch (e) {} } }
@@ -3684,7 +3690,7 @@ function salvaRecordeKm(km) { if (km > bestKm) { bestKm = km; try { localStorage
 // ---------- menu principal ----------
 function menuCapi() { try { $('mnCapi').src = heroShot(520).toDataURL(); } catch (e) {} }
 function menuRecorde() {
-  $('best').textContent = bestKm > 0 ? `Recorde: ${kmTxt(bestKm)} km` + (best ? ` · ${Math.round(best).toLocaleString('pt-BR')} pontos` : '') : 'Sem recorde ainda';
+  $('best').textContent = bestKm > 0 ? `Recorde: ${kmTxt(bestKm)} km` : 'Sem recorde ainda';
   // a marca do recorde na régua (mesma escala do card: 0,5 a 100 km)
   const y = bestKm > 0 ? Math.min(1, Math.max(0, Math.log10(Math.max(0.5, bestKm) / 0.5) / Math.log10(200))) : 0;
   $('mnMarca').style.bottom = `calc(${(y * 100).toFixed(1)}% - 1px)`; $('mnMarca').hidden = !(bestKm > 0);
