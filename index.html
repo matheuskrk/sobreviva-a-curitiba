@@ -158,6 +158,54 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 @keyframes dedo{0%,100%{transform:translateX(-16px)}50%{transform:translateX(16px)}}
 @media (prefers-reduced-motion:reduce){#hint .dedo{animation:none}}
 @media (prefers-reduced-motion:reduce){#toast{transition:none}}
+/* menu principal "Marca d'Água": papel cru em cima, a cheia embaixo, régua de nível na lateral */
+#overlay.menu{--mn-w:min(100vw,calc(100vh * 9 / 16));display:block;place-items:initial;padding:0;background:#eee8d5;overflow:hidden;--mn-paper:#eee8d5;--mn-ink:#1d4a3c;--mn-lime:#b5cc2e;--mn-mono:"DM Mono",ui-monospace,monospace;--mn-cond:"Big Shoulders Display","Arial Narrow",sans-serif}
+.mn-ar{position:absolute;left:24px;right:84px;top:calc(env(safe-area-inset-top,0px) + 30px);display:grid;gap:10px}
+.mn-tag{margin:0;font:400 11px/1 var(--mn-mono);letter-spacing:.14em;color:var(--mn-ink)}
+.mn-tag span{opacity:.5;margin:0 4px}
+.mn-titulo{margin:0;font:900 clamp(44px,calc(var(--mn-w) * .158),96px)/.84 var(--mn-cond);text-transform:uppercase;color:var(--mn-ink);letter-spacing:-.01em}
+.mn-sub{margin:0;font:400 13px/1.45 var(--mn-mono);color:var(--mn-ink);opacity:.8;max-width:30ch}
+.mn-rec{margin:4px 0 0;font:500 12px/1 var(--mn-mono);letter-spacing:.08em;color:var(--mn-ink)}
+.mn-rec::before{content:"";display:inline-block;width:10px;height:10px;background:var(--mn-lime);margin-right:8px;vertical-align:-1px}
+/* régua: blocos alternados, como as pintadas nos pilares de ponte */
+.mn-regua{--c:var(--mn-ink);position:absolute;right:22px;top:calc(env(safe-area-inset-top,0px) + 30px);bottom:52%;width:40px;border:2px solid var(--c);border-bottom:0;
+  background:repeating-linear-gradient(to top,var(--c) 0 5px,transparent 5px 10px) left/45% 100% no-repeat,
+             repeating-linear-gradient(to top,var(--c) 0 3px,transparent 3px 50px) left/100% 100% no-repeat}
+.mn-regua.agua{--c:var(--mn-paper);top:0;bottom:22px;border-top:0;border-bottom:2px solid var(--c);z-index:3;opacity:.85;
+  background:repeating-linear-gradient(to bottom,var(--c) 0 5px,transparent 5px 10px) left/45% 100% no-repeat,
+             repeating-linear-gradient(to bottom,var(--c) 0 3px,transparent 3px 50px) left/100% 100% no-repeat}
+.mn-marca{position:absolute;left:-14px;right:-6px;height:4px;background:var(--mn-lime)}
+.mn-marca::before{content:"";position:absolute;left:-10px;top:-6px;border:8px solid transparent;border-left:10px solid var(--mn-lime);border-right:0}
+.mn-agua{position:absolute;left:0;right:0;bottom:0;height:52%;background:var(--mn-ink);color:var(--mn-paper)}
+.mn-onda{position:absolute;left:0;top:-12px;width:200%;height:24px;fill:var(--mn-ink);animation:mn-mar 6s linear infinite}
+.mn-onda+.mn-miolo::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--mn-lime)}
+@keyframes mn-mar{to{transform:translateX(-50%)}}
+.mn-capi{position:absolute;right:76px;bottom:calc(52% - 30px);width:min(44%,230px);transform:none;pointer-events:none;animation:mn-boia 3.2s ease-in-out infinite;z-index:1}
+@keyframes mn-boia{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-7px) rotate(1.5deg)}}
+.mn-miolo{position:absolute;inset:0;padding:44px 84px calc(env(safe-area-inset-bottom,0px) + 22px) 24px;display:grid;align-content:center;gap:16px;z-index:2}
+#overlay.menu #loading{font:400 12px var(--mn-mono);letter-spacing:.06em;color:var(--mn-paper);opacity:.8}
+.mn-go{justify-self:start;font:900 26px/1 var(--mn-cond);text-transform:uppercase;letter-spacing:.02em;color:var(--mn-ink);background:var(--mn-lime);border:0;border-radius:4px;padding:16px 22px 14px;cursor:pointer;box-shadow:6px 6px 0 rgba(0,0,0,.25);transition:transform .12s,box-shadow .12s}
+.mn-go:hover,.mn-go:focus-visible{transform:translate(-2px,-2px);box-shadow:8px 8px 0 rgba(0,0,0,.25);outline:none}
+.mn-go:active{transform:translate(3px,3px);box-shadow:2px 2px 0 rgba(0,0,0,.25)}
+.mn-links{display:flex;flex-wrap:wrap;gap:6px 18px}
+.mn-links button{font:500 13px/1 var(--mn-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mn-paper);background:none;border:0;border-bottom:2px solid rgba(238,232,213,.35);padding:6px 0;cursor:pointer}
+.mn-links button:hover,.mn-links button:focus-visible{border-bottom-color:var(--mn-lime);outline:none}
+.mn-links small{font-size:10px;opacity:.7;letter-spacing:.04em;margin-left:4px;text-transform:none}
+#overlay.menu .pw{grid-template-columns:repeat(3,1fr);gap:6px}
+#overlay.menu .pw .row{grid-template-columns:1fr;justify-items:center;text-align:center;background:rgba(238,232,213,.08);border:1px solid rgba(238,232,213,.22);border-radius:4px;padding:8px 4px;gap:2px}
+#overlay.menu .pw img{width:40px;height:40px}
+#overlay.menu .pw b{font:500 11px/1.2 var(--mn-mono);letter-spacing:.04em;color:var(--mn-paper)}
+#overlay.menu .pw span span,#overlay.menu .pw div span{display:none}
+@media (max-height:640px){.mn-titulo{font-size:52px}.mn-sub{display:none}#overlay.menu .pw{display:none}}
+@media (prefers-reduced-motion:reduce){.mn-onda,.mn-capi{animation:none}}
+/* HUD: distância e recorde no canto de cima à direita */
+#hudKm{top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;display:grid;justify-items:end;gap:2px;background:rgba(238,232,213,.92);border-left:4px solid #b5cc2e;border-radius:4px;padding:6px 10px 7px;color:#1d4a3c;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+#hudKm b{font:900 30px/1 "Big Shoulders Display","Arial Narrow",sans-serif;font-variant-numeric:tabular-nums}
+#hudKm b small{font-size:15px;margin-left:2px}
+#hudKm > span{font:500 10px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.08em;opacity:.75}
+#hudKm.novo{border-left-color:#f0892a}#hudKm.novo > span{color:#c25e0e;opacity:1}
+.grade .item.prev{border-color:#f0892a;background:#fff6ec}
+#lojaDica{margin:0;font-size:13px;font-weight:700;color:#c25e0e;min-height:1em}
 </style>
 
 <div id="stage">
@@ -171,27 +219,36 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 <div class="hud" id="wavefx"></div>
 <div class="hud" id="hint" hidden><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M8 20h48M8 20l7-6M8 20l7 6M56 20l-7-6M56 20l-7 6" fill="none" stroke="#1e5e34" stroke-width="3" stroke-linecap="round"/><circle class="dedo" cx="32" cy="20" r="6" fill="#f39a2b" stroke="#fff" stroke-width="2"/></svg><span>Deslize para os lados para trocar de faixa</span></div>
 <div class="hud" id="toast"></div>
+<div class="hud" id="hudKm" hidden><b><span id="kmNow">0,0</span><small>KM</small></b><span id="kmRec">PRIMEIRA CORRIDA</span></div>
 <div class="hud" id="alerta" role="alert" aria-hidden="true"><svg viewBox="0 0 48 44" aria-hidden="true"><path d="M24 3 L45 40 H3 Z" fill="#f2c230" stroke="#f2c230" stroke-width="5" stroke-linejoin="round"/><rect x="21.6" y="14" width="4.8" height="15" rx="2.4" fill="#1e3a2e"/><circle cx="24" cy="34.5" r="2.7" fill="#1e3a2e"/></svg><div><div class="al-top"><b>Alerta de Apagão</b><span id="alertaHora"></span></div><p>A luz vai cair. Liga o farol!</p></div></div>
 <div class="hud" id="flash"></div>
 <div class="hud" id="skip" hidden>Toque para pular</div>
 <div id="botHud" hidden></div>
 
-<div id="overlay" class="screen">
-  <div class="card">
-    <header><h1>Sobreviva a <span>Curitiba!</span></h1></header>
-    <div class="body">
-    <p>O Parque Barigui está inundado e você precisa encontrar um lugar seco para curtir o fim de semana. Só cuidado para a onda não te levar!</p>
-    <div class="pw" id="pw" role="list"></div>
-    <div id="loading">Esperando o Ligeirinho (pode demorar)…</div>
-    <div class="acoes"><button class="go" id="start" hidden>Salve-se quem puder!</button><button class="sec" id="lojaBtn">Loja</button><button class="sec" id="placarBtn">Placar</button><button class="sec" id="credBtn">Créditos</button></div>
-    <div class="meta" id="best"></div>
+<div id="overlay" class="screen menu">
+  <div class="mn-ar">
+    <p class="mn-tag">COTA DA CHEIA <span>·</span> PARQUE BARIGUI</p>
+    <h1 class="mn-titulo">Sobreviva<br>a Curitiba!</h1>
+    <p class="mn-sub">O Barigui alagou. Foge da onda e acha um lugar seco.</p>
+    <p class="mn-rec" id="best"></p>
+  </div>
+  <div class="mn-regua" aria-hidden="true"><i class="mn-marca" id="mnMarca" hidden></i></div>
+  <img class="mn-capi" id="mnCapi" alt="">
+  <div class="mn-agua">
+    <svg class="mn-onda" viewBox="0 0 400 24" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12 Q25 2 50 12 T100 12 T150 12 T200 12 T250 12 T300 12 T350 12 T400 12 T450 12 T500 12 V24 H0Z"/></svg>
+    <div class="mn-regua agua" aria-hidden="true"></div>
+    <div class="mn-miolo">
+      <div id="loading">Esperando o Ligeirinho (pode demorar)…</div>
+      <button class="mn-go" id="start" hidden>Salve-se quem puder!</button>
+      <div class="mn-links"><button id="lojaBtn">Loja <small><b id="mnPinhoes">0</b> pinhões</small></button><button id="placarBtn">Placar</button><button id="credBtn">Créditos</button></div>
+      <div class="pw" id="pw" role="list"></div>
     </div>
   </div>
 </div>
 <div id="pausa" class="screen" hidden>
   <div class="card">
     <header><h1>Pausado</h1></header>
-    <div class="body"><div class="acoes"><button class="go" id="continuar">Continuar</button><button class="sec" id="recomecar">Recomeçar</button><button class="sec" id="credPausa">Créditos</button></div></div>
+    <div class="body"><div class="acoes"><button class="go" id="continuar">Continuar</button><button class="sec" id="recomecar">Recomeçar</button><button class="sec" id="credPausa">Créditos</button><button class="sec" id="menuPausa">Menu principal</button></div></div>
   </div>
 </div>
 <div id="creditos" class="screen" hidden>
@@ -223,11 +280,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
       <div class="lojatopo"><img id="lojaPrev" alt="Sua capivara com a roupa escolhida"><p class="moedas"><b id="lojaMoedas">0</b> pinhões<br><small>3 por km e 10 por pinhão pego</small></p></div>
       <div class="abas" id="lojaAbas" role="tablist"></div>
       <div class="grade" id="lojaGrade"></div>
-      <div class="nuvem" id="nuvem" hidden>
-        <p class="meta">Seu código de save: <b id="saveCod">—</b> <button class="sec mini" id="copiaCod">Copiar</button><br><small>Guarde para recuperar pinhões e roupas noutro aparelho.</small></p>
-        <div class="envio"><input id="codIn" maxlength="16" placeholder="Código de outro aparelho" autocomplete="off" aria-label="Código de save"><button class="sec" id="recBtn">Recuperar</button></div>
-        <p class="meta" id="nuvemMsg" aria-live="polite"></p>
-      </div>
+      <p id="lojaDica" aria-live="polite"></p>
     </div>
   </div>
 </div>
@@ -2458,7 +2511,6 @@ const S = {x: 0, z: 0, a: 0, y: 0, roll: 0, pitch: 0, shake: 0};
 const G = {state: 'title', dist: 0, cps: 0, s: 0, speed: 0, lane: 0, off: 0, wave: 45, inv: 0, score: 0, pin: 0, lixo: 0, star: 0, boost: 0, umb: 0, ride: 0, lift: 0, cp: 0, t: 0, slow: 0, galhoT: 6, lastHit: '', lastSwitch: -9, paused: false, hint: 0};
 let best = null; try { best = parseFloat(localStorage.getItem('jetski-cwb-score')) || null; } catch (e) {}
 const fmt = t => { const m = Math.floor(t / 60), s = t - m * 60; return String(m).padStart(2, '0') + ':' + s.toFixed(1).padStart(4, '0'); };
-if (best) $('best').textContent = 'Seu recorde: ' + Math.round(best).toLocaleString('pt-BR') + ' pontos';
 let toastT = 0;
 function toast(msg, dur = 1.6, mid = false) { const el = $('toast'); el.innerHTML = msg; el.classList.toggle('mid', mid); el.classList.add('on'); toastT = dur; }
 const skiMeshes = ski.children.slice(0, 2);
@@ -2481,7 +2533,7 @@ function shockSound() {
 function startRun() {
   Object.assign(G, {state: 'count', count: 3, lvl: 0, lastN: null, s: 0, speed: 24, waveVis: 13, lane: 0, off: 0, wave: 45, inv: 0, score: 0, pin: 0, lixo: 0, star: 0, boost: 0, umb: 0, ride: 0, lift: 0, umbN: 0, ligN: 0, cp: 0, cps: 0, t: 0, slow: 0, galhoT: 6, dist: 0, lastSwitch: -9, paused: false, hint: 10});
   umbOnSki.visible = false; rideBus.visible = false; G.zap = 0; setZapLook(false); G.riv = 0; G.rioIn = false; DAY.t = 0; DAY.night = false; BO.t = 0; BO.cool = 6; BO.k = 0; BO.head = 0; BO.warned = false; BO.alertT = 0; $('alerta').classList.remove('on');
-  WX.i = WX.prev = 0; WX.t = 0; resetVida(); try { speechSynthesis.cancel(); } catch (e) {}
+  WX.i = WX.prev = 0; WX.t = 0; resetVida(); srvInicia(); try { speechSynthesis.cancel(); } catch (e) {}
   LM_PASS.forEach(l => l.done = false);
   resetGen(); GEN.bag = []; GEN.s = 170; resetChunks(); startMusic(); setStarLook(false); // na contagem a capivara já anda ~75 m: os obstáculos começam depois disso
   { const [x, z, dx, dz] = trackAt(0); camPos.set(x - dx * 12, 7, z - dz * 12); camDir.set(dx, 0, dz); }
@@ -2608,11 +2660,14 @@ function endRun(zerou) {
   $('resHit').textContent = zerou || G.lastHit === 'A onda te levou!' ? '' : G.lastHit;
   $('resText').textContent = `Você andou ${Math.round(G.dist).toLocaleString('pt-BR')} m em ${fmt(G.t)}. Pegou ${plural(G.pin, 'pinhão', 'pinhões')}, ${plural(G.umbN || 0, 'guarda-chuva', 'guarda-chuvas')} e ${plural(G.ligN || 0, 'carona', 'caronas')} no Ligeirinho.`;
   $('resScore').textContent = `${score.toLocaleString('pt-BR')} pontos` + (rec ? ' · novo recorde' : ` · recorde ${Math.round(best).toLocaleString('pt-BR')}`);
-  const ganho = Math.round(G.dist / 1000 * 3) + G.pin * 10; LOJA.moedas += ganho; salvaLoja();
-  $('resGanho').textContent = `+${ganho} pinhões para a loja (total ${LOJA.moedas.toLocaleString('pt-BR')})`;
-  Object.assign(ULTIMA, {km: G.dist / 1000, pontos: score, enviada: false});
-  $('placarEnvio').hidden = !placarOk() || G.dist < 200; $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Enviar pro placar';
+  salvaRecordeKm(G.dist / 1000);
+  Object.assign(ULTIMA, {km: G.dist / 1000, pontos: score, enviada: false, partida: null});
+  $('resGanho').textContent = 'Contando pinhões…';
+  ULTIMA.fim = srvTermina(G.dist / 1000, G.pin, score).then(r => { $('resGanho').textContent = `+${r.ganho} pinhões para a loja (total ${r.total.toLocaleString('pt-BR')})`; })
+    .catch(() => { $('resGanho').textContent = 'Sem conexão: os pinhões desta partida não foram contados.'; });
+  $('placarEnvio').hidden = !SRV.ok || G.dist < 200; $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Enviar pro placar';
   try { $('apelido').value = localStorage.getItem('jetski-cwb-nome') || ''; } catch (e) {}
+  menuRecorde();
   prepareCard(G.dist / 1000, score, rec).catch(e => console.warn('card', e));
   setTimeout(() => { $('result').hidden = false; $('retry').focus(); }, 900);
   blip(zerou ? [523, 659, 784, 1047] : [392, 330, 262], 0.14, 'square', 0.12);
@@ -2747,13 +2802,12 @@ $('bCred').addEventListener('click', () => { if (G.state === 'race' || G.state =
 $('credVoltar').addEventListener('click', () => { $('creditos').hidden = true; if (credFrom) $(credFrom).hidden = false; });
 $('continuar').addEventListener('click', () => setPaused(false));
 $('shareBtn').addEventListener('click', shareCard);
-$('lojaBtn').addEventListener('click', abreLoja); $('lojaRes').addEventListener('click', abreLoja); $('lojaFecha').addEventListener('click', () => { $('loja').hidden = true; });
+$('lojaBtn').addEventListener('click', abreLoja); $('lojaRes').addEventListener('click', abreLoja); $('lojaFecha').addEventListener('click', fechaLoja);
 $('lojaAbas').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { LOJA.aba = b.dataset.aba; lojaRender(); } });
 $('lojaGrade').addEventListener('click', e => { const b = e.target.closest('.item'); if (b) lojaClica(b.dataset.id); });
 $('placarBtn').addEventListener('click', abrePlacar); $('placarFecha').addEventListener('click', () => { $('placar').hidden = true; });
 $('enviaBtn').addEventListener('click', enviaPlacar);
-$('recBtn').addEventListener('click', recuperaNuvem); $('codIn').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') recuperaNuvem(); });
-$('copiaCod').addEventListener('click', async () => { try { await navigator.clipboard.writeText(fmtCod(SAVE_COD)); $('copiaCod').textContent = 'Copiado!'; } catch (e) {} }); $('apelido').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') enviaPlacar(); }); $('resCard').addEventListener('click', () => { $('cardView').hidden = false; });
+$('menuPausa').addEventListener('click', voltaMenu); $('apelido').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') enviaPlacar(); }); $('resCard').addEventListener('click', () => { $('cardView').hidden = false; });
 $('cardClose').addEventListener('click', () => { $('cardView').hidden = true; });
 $('copyLink').addEventListener('click', async () => { try { await navigator.clipboard.writeText(GAME_URL); $('copyLink').textContent = 'Link copiado!'; } catch (e) { $('copyLink').textContent = GAME_URL; } });
 $('hint').querySelector('span').textContent = matchMedia('(pointer:coarse)').matches ? 'Deslize para os lados para trocar de faixa' : 'Use ← → para trocar de faixa';
@@ -2794,6 +2848,7 @@ $('hint').querySelector('span').textContent = matchMedia('(pointer:coarse)').mat
   $('pw').innerHTML = POWER.map(([, name, what], i) => `<div class="row" role="listitem">${urls[i] ? `<img src="${urls[i]}" alt="">` : '<span></span>'}<div><b>${name}</b><span>${what}</span></div></div>`).join('');
 }
 $('loading').hidden = true; $('start').hidden = false; $('start').focus();
+queueMicrotask(() => { menuCapi(); menuRecorde(); srvConecta(); });
 const go = () => { initAudio(); if (audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume(); startRun(); };
 $('start').addEventListener('click', go);
 $('retry').addEventListener('click', go);
@@ -3383,7 +3438,7 @@ const LOJA_ITENS = {
 const LOJA_ABAS = [['colete', 'Coletes'], ['chapeu', 'Chapéus'], ['jet', 'Jet skis']];
 const LOJA = {moedas: 0, tem: ['colete:lima', 'chapeu:laranja', 'jet:classico'], usa: {colete: 'lima', chapeu: 'laranja', jet: 'classico'}, aba: 'colete'};
 try { const sv = JSON.parse(localStorage.getItem('jetski-cwb-loja') || 'null'); if (sv) Object.assign(LOJA, sv, {aba: 'colete'}); } catch (e) {}
-const salvaLoja = () => { try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {} salvaNuvem(); };
+const salvaLoja = () => { try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {} };
 const itemDe = (cat, id) => LOJA_ITENS[cat].find(i => i[0] === id) || LOJA_ITENS[cat][0];
 // troca cores de vértice (comparando na cor linear do glTF) e, se pedido, esconde a laranja da cabeça
 const ORANGE_HEAD = new THREE.Vector3(0, 2.3, -0.4);
@@ -3419,40 +3474,48 @@ function applySkin() {
   for (const g of old) if (g !== GEO.capivara && g !== GEO.jetski) g.dispose();
 }
 applySkin();
+// prévia: tocar num item que ainda não é seu veste a capivara com ele; tocar de novo compra
+function skinCom(cat, id) { const keep = LOJA.usa[cat]; LOJA.usa[cat] = id; applySkin(); LOJA.usa[cat] = keep; }
 function lojaRender() {
   $('lojaMoedas').textContent = LOJA.moedas.toLocaleString('pt-BR');
   $('lojaAbas').innerHTML = LOJA_ABAS.map(([k, n]) => `<button class="${k === LOJA.aba ? 'on' : ''}" data-aba="${k}">${n}</button>`).join('');
   $('lojaGrade').innerHTML = LOJA_ITENS[LOJA.aba].map(([id, nome, v, preco]) => {
-    const key = LOJA.aba + ':' + id, tem = LOJA.tem.includes(key), usa = LOJA.usa[LOJA.aba] === id;
+    const key = LOJA.aba + ':' + id, tem = LOJA.tem.includes(key), usa = LOJA.usa[LOJA.aba] === id, prev = LOJA.prev === key;
     const cor = LOJA.aba === 'colete' ? v : LOJA.aba === 'jet' ? v[1] : ({touca: 0xc23b3b, capacete: 0xf2c230, bone: 0x3a6fd9, palha: 0xe7c77a, coroa: 0xf2c230}[id] || 0xf39a2b);
     const cor2 = LOJA.aba === 'jet' ? v[0] : cor, hex = c => '#' + c.toString(16).padStart(6, '0');
-    const acao = usa ? 'Usando' : tem ? 'Usar' : `${preco} pinhões`;
-    return `<button class="item${usa ? ' usa' : ''}${!tem && preco > LOJA.moedas ? ' caro' : ''}" data-id="${id}"><span class="sw" style="background:linear-gradient(135deg,${hex(cor2)} 50%,${hex(cor)} 50%)"></span><b>${nome}</b><small>${acao}</small></button>`;
+    const acao = usa ? 'Usando' : tem ? 'Usar' : prev ? (preco > LOJA.moedas ? `Faltam ${preco - LOJA.moedas}` : `Comprar · ${preco}`) : `${preco} pinhões`;
+    return `<button class="item${usa ? ' usa' : ''}${prev ? ' prev' : ''}${!tem && preco > LOJA.moedas ? ' caro' : ''}" data-id="${id}"><span class="sw" style="background:linear-gradient(135deg,${hex(cor2)} 50%,${hex(cor)} 50%)"></span><b>${nome}</b><small>${acao}</small></button>`;
   }).join('');
-  try { const c = heroShot(360); $('lojaPrev').src = c.toDataURL(); } catch (e) {}
-  $('nuvem').hidden = !placarOk(); if (placarOk() && !SAVE_COD) salvaNuvem(true); $('saveCod').textContent = fmtCod(SAVE_COD);
+  if (LOJA.prev) { const [c, i] = LOJA.prev.split(':'); skinCom(c, i); } else applySkin();
+  try { $('lojaPrev').src = heroShot(360).toDataURL(); } catch (e) {}
+  $('lojaDica').textContent = LOJA.prev ? 'Prévia. Toque de novo para comprar.' : (SRV.ok ? '' : 'Sem conexão com o servidor: a loja está só neste aparelho.');
 }
-function lojaClica(id) {
+async function lojaClica(id) {
   const cat = LOJA.aba, key = cat + ':' + id, it = itemDe(cat, id);
   if (!LOJA.tem.includes(key)) {
+    if (LOJA.prev !== key) { LOJA.prev = key; lojaRender(); return; } // primeiro toque: só prévia
     if (LOJA.moedas < it[3]) { toast(`Faltam ${it[3] - LOJA.moedas} pinhões`, 1.2); blip([220, 180], 0.08, 'square', 0.06); return; }
-    LOJA.moedas -= it[3]; LOJA.tem.push(key); blip([660, 880, 1320], 0.07, 'square', 0.08);
   }
-  LOJA.usa[cat] = id; salvaLoja(); applySkin(); lojaRender();
+  LOJA.prev = null;
+  if (SRV.ok) {
+    try { aplicaEstado(await rpc('comprar', {p_codigo: SAVE_COD, p_item: key})); }
+    catch (e) { toast('Não deu para falar com o servidor', 1.4); lojaRender(); return; }
+  } else {
+    if (!LOJA.tem.includes(key)) { LOJA.moedas -= it[3]; LOJA.tem.push(key); }
+    LOJA.usa[cat] = id; salvaLoja();
+  }
+  if (!LOJA.tem.includes(key)) return lojaRender();
+  blip([660, 880, 1320], 0.07, 'square', 0.08); applySkin(); lojaRender(); menuCapi();
 }
-function abreLoja() { lojaRender(); $('loja').hidden = false; }
+function abreLoja() { LOJA.prev = null; lojaRender(); $('loja').hidden = false; }
+function fechaLoja() { LOJA.prev = null; applySkin(); menuCapi(); $('loja').hidden = true; }
 
 // ---------- placar geral (Supabase) ----------
-// para ligar: crie um projeto no Supabase, rode supabase/placar.sql e cole aqui a Project URL e a chave "anon public"
 const PLACAR = {url: 'https://cuwnpzokroxgsdgqglsj.supabase.co', key: 'sb_publishable_IbsawVnc9cf_LlRCLd7YzA_FPXovGE9'}; // chave publicável: feita para ficar no site
 const placarOk = () => !!(PLACAR.url && PLACAR.key);
 async function placarTop(n = 30) {
   const r = await fetch(`${PLACAR.url}/rest/v1/placar?select=nome,km,pontos&order=km.desc,pontos.desc&limit=${n}`, {headers: {apikey: PLACAR.key}});
   if (!r.ok) throw new Error('placar ' + r.status); return r.json();
-}
-async function placarEnvia(nome, km, pontos) {
-  const r = await fetch(`${PLACAR.url}/rest/v1/placar`, {method: 'POST', headers: {apikey: PLACAR.key, 'Content-Type': 'application/json', Prefer: 'return=minimal'}, body: JSON.stringify({nome, km: Math.round(km * 100) / 100, pontos})});
-  if (!r.ok) throw new Error('placar ' + r.status);
 }
 const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 async function abrePlacar() {
@@ -3460,59 +3523,95 @@ async function abrePlacar() {
   if (!placarOk()) { ul.innerHTML = '<li class="vazio">O placar geral ainda não foi ligado.</li>'; return; }
   ul.innerHTML = '<li class="vazio">Carregando…</li>';
   try {
-    const top = await placarTop(); const eu = (localStorage.getItem('jetski-cwb-nome') || '').toLowerCase();
+    const top = await placarTop(); let eu = ''; try { eu = (localStorage.getItem('jetski-cwb-nome') || '').toLowerCase(); } catch (e) {}
     ul.innerHTML = top.length ? top.map((r, i) => `<li class="${r.nome.toLowerCase() === eu ? 'eu' : ''}"><span class="pos">${i + 1}</span><span class="nm">${escHtml(r.nome)}</span><span class="km">${Number(r.km).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1})} km</span></li>`).join('') : '<li class="vazio">Ninguém ainda. Seja o primeiro!</li>';
   } catch (e) { ul.innerHTML = '<li class="vazio">Não deu para carregar o placar agora.</li>'; }
 }
-const ULTIMA = {km: 0, pontos: 0, enviada: false};
+const ULTIMA = {km: 0, pontos: 0, enviada: false, partida: null, fim: null};
 async function enviaPlacar() {
   const nome = $('apelido').value.trim().slice(0, 16);
   if (nome.length < 2) { $('apelido').focus(); toast('Escreve um apelido', 1); return; }
-  if (ULTIMA.enviada || !placarOk()) return;
+  if (ULTIMA.enviada || !ULTIMA.partida) return;
   try { localStorage.setItem('jetski-cwb-nome', nome); } catch (e) {}
   $('enviaBtn').disabled = true; $('enviaBtn').textContent = 'Enviando…';
-  try { await placarEnvia(nome, ULTIMA.km, ULTIMA.pontos); ULTIMA.enviada = true; $('enviaBtn').textContent = 'No placar!'; abrePlacar(); }
+  try { await ULTIMA.fim; await rpc('enviar_placar', {p_codigo: SAVE_COD, p_id: ULTIMA.partida, p_nome: nome}); ULTIMA.enviada = true; $('enviaBtn').textContent = 'No placar!'; abrePlacar(); }
   catch (e) { $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Tentar de novo'; }
 }
 
-// ---------- progresso na nuvem: pinhões, roupas e recorde, guardados por um código de save ----------
-// cada aparelho ganha um código aleatório de 12 letras; quem digita o código noutro aparelho recupera tudo
+// ---------- servidor: pinhões, compras e partidas validados no Supabase (supabase/servidor.sql) ----------
+// cada aparelho tem um código aleatório guardado no navegador (e num cookie, de reserva); o servidor guarda os pinhões
+// e as roupas desse código. Sem conexão, o jogo continua com a loja só neste aparelho.
 const ALFA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const lerCookie = n => (document.cookie.split('; ').find(c => c.startsWith(n + '=')) || '').split('=')[1] || null;
 let SAVE_COD = null; try { SAVE_COD = localStorage.getItem('jetski-cwb-codigo'); } catch (e) {}
-const fmtCod = c => c ? c.replace(/(.{4})(?=.)/g, '$1-') : '—';
-function novoCodigo() { const a = new Uint32Array(12); crypto.getRandomValues(a); return Array.from(a, n => ALFA[n % ALFA.length]).join(''); }
+if (!SAVE_COD) SAVE_COD = lerCookie('jcwb_cod');
+function guardaCod() {
+  try { localStorage.setItem('jetski-cwb-codigo', SAVE_COD); } catch (e) {}
+  try { document.cookie = `jcwb_cod=${SAVE_COD}; max-age=315360000; path=/; SameSite=Lax`; } catch (e) {}
+}
+if (!SAVE_COD || !/^[A-Z0-9]{12}$/.test(SAVE_COD)) { const a = new Uint32Array(12); crypto.getRandomValues(a); SAVE_COD = Array.from(a, n => ALFA[n % ALFA.length]).join(''); }
+guardaCod();
 async function rpc(fn, args) {
   const r = await fetch(`${PLACAR.url}/rest/v1/rpc/${fn}`, {method: 'POST', headers: {apikey: PLACAR.key, 'Content-Type': 'application/json'}, body: JSON.stringify(args)});
   if (!r.ok) throw new Error(fn + ' ' + r.status);
   const t = await r.text(); return t ? JSON.parse(t) : null;
 }
-let nuvemT = 0;
-function salvaNuvem(ja) {
-  if (!placarOk()) return;
-  if (!SAVE_COD) { SAVE_COD = novoCodigo(); try { localStorage.setItem('jetski-cwb-codigo', SAVE_COD); } catch (e) {} }
-  clearTimeout(nuvemT);
-  const vai = () => { let nome = ''; try { nome = localStorage.getItem('jetski-cwb-nome') || ''; } catch (e) {}
-    return rpc('salvar_progresso', {p_codigo: SAVE_COD, p_dados: {v: 1, moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa, best: best || 0, nome}}).catch(e => console.warn('save', e)); };
-  if (ja) return vai(); nuvemT = setTimeout(vai, 800);
+const SRV = {ok: false, partida: null};
+function aplicaEstado(d) {
+  if (!d) return;
+  const ok = k => { const [cat, id] = String(k).split(':'); return LOJA_ITENS[cat] && LOJA_ITENS[cat].some(i => i[0] === id); };
+  LOJA.moedas = Math.max(0, Math.floor(Number(d.moedas) || 0));
+  LOJA.tem = [...new Set(['colete:lima', 'chapeu:laranja', 'jet:classico', ...(d.tem || []).filter(ok)])];
+  for (const cat of Object.keys(LOJA_ITENS)) { const id = d.usa && d.usa[cat]; LOJA.usa[cat] = LOJA.tem.includes(cat + ':' + id) ? id : LOJA_ITENS[cat][0][0]; }
+  if (d.best > (best || 0)) { best = Math.floor(d.best); try { localStorage.setItem('jetski-cwb-score', String(best)); } catch (e) {} }
+  try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {}
 }
-async function recuperaNuvem() {
-  const msg = t => { $('nuvemMsg').textContent = t; };
-  const c = $('codIn').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (c.length !== 12) { msg('O código tem 12 letras e números.'); return; }
-  msg('Procurando…');
-  try {
-    const d = await rpc('carregar_progresso', {p_codigo: c});
-    if (!d) { msg('Não achei esse código.'); return; }
-    const ok = k => { const [cat, id] = String(k).split(':'); return LOJA_ITENS[cat] && LOJA_ITENS[cat].some(i => i[0] === id); };
-    LOJA.moedas = Math.max(0, Math.min(1e6, Math.floor(Number(d.moedas) || 0)));
-    LOJA.tem = [...new Set(['colete:lima', 'chapeu:laranja', 'jet:classico', ...(Array.isArray(d.tem) ? d.tem.filter(ok) : [])])];
-    for (const cat of Object.keys(LOJA_ITENS)) { const id = d.usa && d.usa[cat]; LOJA.usa[cat] = LOJA.tem.includes(cat + ':' + id) ? id : LOJA_ITENS[cat][0][0]; }
-    if (d.best > (best || 0)) { best = Math.floor(d.best); try { localStorage.setItem('jetski-cwb-score', String(best)); } catch (e) {} }
-    if (d.nome) try { localStorage.setItem('jetski-cwb-nome', String(d.nome).slice(0, 16)); } catch (e) {}
-    SAVE_COD = c; try { localStorage.setItem('jetski-cwb-codigo', c); } catch (e) {}
-    try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {}
-    applySkin(); lojaRender(); msg('Progresso recuperado!'); $('codIn').value = ''; blip([660, 880, 1320], 0.07, 'square', 0.08);
-  } catch (e) { msg('Não deu para falar com o servidor agora.'); }
+async function srvConecta() {
+  if (!placarOk()) return;
+  try { aplicaEstado(await rpc('estado', {p_codigo: SAVE_COD, p_moedas: LOJA.moedas, p_best: Math.round(best || 0)})); SRV.ok = true; applySkin(); menuCapi(); menuRecorde(); }
+  catch (e) { SRV.ok = false; console.warn('servidor', e); }
+}
+function srvInicia() { SRV.partida = null; if (SRV.ok) rpc('iniciar_partida', {p_codigo: SAVE_COD}).then(id => { SRV.partida = id; }).catch(() => {}); }
+// fim da partida: devolve uma promessa com {ganho, total}
+async function srvTermina(km, pin, pontos) {
+  const local = Math.round(km * 3) + pin * 10;
+  if (SRV.ok && SRV.partida) {
+    const id = SRV.partida; SRV.partida = null; ULTIMA.partida = id;
+    const d = await rpc('terminar_partida', {p_codigo: SAVE_COD, p_id: id, p_km: Math.round(km * 100) / 100, p_pinhoes: pin, p_pontos: pontos});
+    aplicaEstado(d); return {ganho: d.ganho, total: LOJA.moedas};
+  }
+  if (SRV.ok) throw new Error('partida não registrada');
+  LOJA.moedas += local; salvaLoja(); return {ganho: local, total: LOJA.moedas};
+}
+
+// ---------- HUD: distância e recorde em km ----------
+let bestKm = 0; try { bestKm = parseFloat(localStorage.getItem('jetski-cwb-km')) || 0; } catch (e) {}
+const kmTxt = v => v.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+let hudKmT = 0;
+function stepHudKm(dt) {
+  const on = G.state === 'race' || G.state === 'count' || G.state === 'over';
+  $('hudKm').hidden = !on; if (!on) return;
+  hudKmT -= dt; if (hudKmT > 0) return; hudKmT = 0.1;
+  const km = G.dist / 1000; $('kmNow').textContent = kmTxt(km);
+  const rec = Math.max(bestKm, 0); $('kmRec').textContent = rec > 0 ? 'RECORDE ' + kmTxt(rec) + ' KM' : 'PRIMEIRA CORRIDA';
+  $('hudKm').classList.toggle('novo', bestKm > 0 && km > bestKm);
+}
+function salvaRecordeKm(km) { if (km > bestKm) { bestKm = km; try { localStorage.setItem('jetski-cwb-km', String(km)); } catch (e) {} } }
+
+// ---------- menu principal ----------
+function menuCapi() { try { $('mnCapi').src = heroShot(520).toDataURL(); } catch (e) {} }
+function menuRecorde() {
+  $('best').textContent = bestKm > 0 ? `RECORDE ${kmTxt(bestKm)} KM` + (best ? ` · ${Math.round(best).toLocaleString('pt-BR')} PTS` : '') : 'SEM RECORDE AINDA';
+  $('mnPinhoes').textContent = LOJA.moedas.toLocaleString('pt-BR');
+  // a marca do recorde na régua (mesma escala do card: 0,5 a 100 km)
+  const y = bestKm > 0 ? Math.min(1, Math.max(0, Math.log10(Math.max(0.5, bestKm) / 0.5) / Math.log10(200))) : 0;
+  $('mnMarca').style.bottom = `calc(${(y * 100).toFixed(1)}% - 1px)`; $('mnMarca').hidden = !(bestKm > 0);
+}
+function voltaMenu() {
+  G.paused = false; $('pausa').hidden = true; if (audio.ctx) audio.ctx.resume();
+  G.state = 'title'; MUSIC.playing = false; G.speed = 0; $('hint').hidden = true; setStarLook(false);
+  try { speechSynthesis.cancel(); } catch (e) {}
+  SRV.partida = null; menuCapi(); menuRecorde(); $('overlay').hidden = false; $('start').focus();
 }
 
 // ---------- sons: buzina do biarticulado chegando e a voz do Ligeirinho ----------
@@ -3661,6 +3760,7 @@ async function makeShinyCard(km, score, rec) {
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
   if (!G.paused) { uTime.value += dt; if (G.state === 'intro') runIntro(dt); else { step(dt); stepSpeedWind(dt); stepHail(dt); stepVida(dt); } }
+  stepHudKm(dt);
   if (G.state === 'intro') renderIntro(); else composer.render();
   // rede de segurança: se a placa de vídeo reclamar de algo nos primeiros quadros, desliga o reflexo em vez de deixar a tela preta
   if (ssrCheck > 0) { ssrCheck--; const gl = renderer.getContext(); if (gl.getError() !== gl.NO_ERROR && ssrPass.enabled) { ssrPass.enabled = false; outPass.enabled = true; console.warn('Reflexo na água desligado: erro do WebGL'); } }
