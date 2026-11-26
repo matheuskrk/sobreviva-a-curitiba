@@ -92,7 +92,7 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-a
 .grade .item{display:grid;justify-items:center;gap:4px;padding:10px 6px;border-radius:14px;border:2px solid #dfe6cf;background:#fff;cursor:pointer;font-family:var(--f-display);color:var(--ink)}
 .grade .item b{font-size:14px}.grade .item small{font-size:12px;font-weight:700;opacity:.75}
 .grade .item.usa{border-color:var(--leaf);background:#f1f7df}.grade .item.caro{opacity:.55}
-.grade .sw{width:34px;height:34px;border-radius:50%;border:2px solid rgba(0,0,0,.15)}
+.grade .sw{width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(0,0,0,.14)}
 .nuvem{display:grid;gap:8px;border-top:2px dashed #dfe6cf;padding-top:12px}.nuvem b{font-family:var(--f-display);letter-spacing:.04em}button.sec.mini{padding:5px 12px;font-size:13px}
 .envio{display:flex;gap:8px;flex-wrap:wrap}.envio input{flex:1;min-width:140px;font:700 15px var(--f-display);padding:11px 14px;border-radius:999px;border:2px solid var(--leaf);color:var(--ink)}
 ol.placar{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:60vh;overflow:auto}
@@ -222,6 +222,8 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 /* o do recorde: menor, com a ponta para o outro lado, como dois pinhões soltos */
 #hudKm .pinhao.rec{width:172px;height:62px;padding:0 0 2px 10px;margin-right:22px;transform:rotate(5deg)}
 #hudKm .pinhao.rec::before{transform:scaleX(-1)}
+#hudKm .pinhao.moe{width:140px;height:50px;padding:0 6px 2px 0;margin-right:4px;transform:rotate(-3deg)}
+#hudKm .pinhao.moe span{font:900 12.5px/1 var(--f-display);color:#6b3418;white-space:nowrap}
 #hudKm .pinhao.rec span{font:900 14px/1.05 var(--f-display);color:#6b3418;white-space:nowrap}
 #hudKm.novo .pinhao.rec::before{filter:hue-rotate(-18deg) saturate(1.8) brightness(1.05)}
 #hudKm b{font:900 32px/1 var(--f-display);font-variant-numeric:tabular-nums}
@@ -242,7 +244,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 <div class="hud" id="wavefx"></div>
 <div class="hud" id="hint" hidden><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M8 20h48M8 20l7-6M8 20l7 6M56 20l-7-6M56 20l-7 6" fill="none" stroke="#1e5e34" stroke-width="3" stroke-linecap="round"/><circle class="dedo" cx="32" cy="20" r="6" fill="#f39a2b" stroke="#fff" stroke-width="2"/></svg><span>Deslize para os lados para trocar de faixa</span></div>
 <div class="hud" id="toast"></div>
-<div class="hud" id="hudKm" hidden><div class="pinhao"><b id="kmNow">0,0</b><small>km</small></div><div class="pinhao rec"><span id="kmRec">primeira corrida</span></div></div>
+<div class="hud" id="hudKm" hidden><div class="pinhao"><b id="kmNow">0,0</b><small>km</small></div><div class="pinhao rec"><span id="kmRec">primeira corrida</span></div><div class="pinhao moe"><span id="hudMoe">0 pinhões</span></div></div>
 <div class="hud" id="alerta" role="alert" aria-hidden="true"><svg viewBox="0 0 48 44" aria-hidden="true"><path d="M24 3 L45 40 H3 Z" fill="#f2c230" stroke="#f2c230" stroke-width="5" stroke-linejoin="round"/><rect x="21.6" y="14" width="4.8" height="15" rx="2.4" fill="#1e3a2e"/><circle cx="24" cy="34.5" r="2.7" fill="#1e3a2e"/></svg><div><div class="al-top"><b>Alerta de Apagão</b><span id="alertaHora"></span></div><p>A luz vai cair. Liga o farol!</p></div></div>
 <div class="hud" id="flash"></div>
 <div class="hud" id="skip" hidden>Toque para pular</div>
@@ -2722,7 +2724,7 @@ function endRun(zerou) {
   Object.assign(ULTIMA, {km: G.dist / 1000, pontos: score, enviada: false, partida: null});
   $('resGanho').textContent = 'Contando pinhões…';
   const tinhaLaranja = LOJA.tem.includes('chapeu:laranja');
-  ULTIMA.fim = srvTermina(G.dist / 1000, G.pin, score).then(r => { $('resGanho').textContent = `+${r.ganho} pinhões para a loja (total ${r.total.toLocaleString('pt-BR')})` + (!tinhaLaranja && LOJA.tem.includes('chapeu:laranja') ? ' · Segredo liberado: a laranja na cabeça! Veja na loja.' : ''); })
+  ULTIMA.fim = srvTermina(G.dist / 1000, G.pin, score).then(r => { $('resGanho').textContent = `+${r.ganho} pinhões para a loja (total ${r.total.toLocaleString('pt-BR')})` + (!tinhaLaranja && LOJA.tem.includes('chapeu:laranja') ? ' · Você achou um segredo! Veja na loja.' : ''); })
     .catch(() => { $('resGanho').textContent = 'Sem conexão: os pinhões desta partida não foram contados.'; });
   $('placarEnvio').hidden = !SRV.ok || G.dist < 200; $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Enviar pro placar';
   try { $('apelido').value = localStorage.getItem('jetski-cwb-nome') || ''; } catch (e) {}
@@ -3500,7 +3502,7 @@ function stepSpeedWind(dt) {
 // ---------- loja: coletes, chapéus e jet skis, pagos com os pinhões juntados nas partidas ----------
 const LOJA_ITENS = {
   colete: [['lima', 'Lima', 0xb5cc2e, 0], ['laranja', 'Laranja', 0xf39a2b, 30], ['rosa', 'Rosa', 0xe05a9a, 40], ['jeans', 'Azul-jeans', 0x3a6fd9, 40], ['roxo', 'Ipê roxo', 0xa05ab8, 60], ['ouro', 'Dourado', 0xf2c230, 150]],
-  chapeu: [['nenhum', 'Sem chapéu', null, 0], ['laranja', 'Laranja', 'laranja', -1], ['touca', 'Touca de lã', 'chapeu_touca', 50], ['capacete', 'Capacete de obra', 'chapeu_capacete', 60], ['bone', 'Boné', 'chapeu_bone', 60], ['palha', 'Chapéu de palha', 'chapeu_palha', 80], ['coroa', 'Coroa', 'chapeu_coroa', 200]],
+  chapeu: [['nenhum', 'Sem chapéu', null, 0], ['touca', 'Touca de lã', 'chapeu_touca', 50], ['capacete', 'Capacete de obra', 'chapeu_capacete', 60], ['bone', 'Boné', 'chapeu_bone', 60], ['palha', 'Chapéu de palha', 'chapeu_palha', 80], ['coroa', 'Coroa', 'chapeu_coroa', 200], ['laranja', 'Laranja', 'laranja', -1]],
   jet: [['classico', 'Clássico', [0xf4f4ec, 0xb5cc2e], 0], ['tubo', 'Estação-tubo', [0xd8dde0, 0x3a6fd9], 60], ['biarticulado', 'Biarticulado', [0xd93a3a, 0xf4f4ec], 80], ['araucaria', 'Araucária', [0x3f8a46, 0xe7c77a], 80], ['noite', 'Noite', [0x2a2f2c, 0xf39a2b], 120]],
 };
 const LOJA_ABAS = [['colete', 'Coletes'], ['chapeu', 'Chapéus'], ['jet', 'Jet skis']];
@@ -3555,7 +3557,7 @@ function lojaRender() {
     const key = LOJA.aba + ':' + id, tem = LOJA.tem.includes(key), usa = LOJA.usa[LOJA.aba] === id, prev = LOJA.prev === key;
     const cor = LOJA.aba === 'colete' ? v : LOJA.aba === 'jet' ? v[1] : ({nenhum: 0xeee8d5, laranja: 0xf39a2b, touca: 0xc23b3b, capacete: 0xf2c230, bone: 0x3a6fd9, palha: 0xe7c77a, coroa: 0xf2c230}[id] || 0xf39a2b);
     const cor2 = LOJA.aba === 'jet' ? v[0] : cor, hex = c => '#' + c.toString(16).padStart(6, '0');
-    if (preco < 0 && !tem) return `<button class="item caro" data-id="${id}" disabled><span class="sw" style="background:#d9d2bd"></span><b>???</b><small>Segredo: 100 km</small></button>`;
+    if (preco < 0 && !tem) return `<button class="item caro" data-id="${id}" disabled><span class="sw" style="background:#d9d2bd"></span><b>???</b><small>???</small></button>`;
     const acao = usa ? 'Usando' : tem ? 'Usar' : prev ? (preco > LOJA.moedas ? `Faltam ${preco - LOJA.moedas}` : `Comprar · ${preco}`) : `${preco} pinhões`;
     return `<button class="item${usa ? ' usa' : ''}${prev ? ' prev' : ''}${!tem && preco > LOJA.moedas ? ' caro' : ''}" data-id="${id}"><span class="sw" style="background:linear-gradient(135deg,${hex(cor2)} 50%,${hex(cor)} 50%)"></span><b>${nome}</b><small>${acao}</small></button>`;
   }).join('');
@@ -3669,6 +3671,7 @@ function stepHudKm(dt) {
   const km = G.dist / 1000; $('kmNow').textContent = kmTxt(km);
   const rec = Math.max(bestKm, 0); $('kmRec').textContent = rec > 0 ? 'recorde ' + kmTxt(rec) + ' km' : 'primeira corrida';
   $('hudKm').classList.toggle('novo', bestKm > 0 && km > bestKm);
+  $('hudMoe').textContent = LOJA.moedas.toLocaleString('pt-BR') + (LOJA.moedas === 1 ? ' pinhão' : ' pinhões');
 }
 function salvaRecordeKm(km) { if (km > bestKm) { bestKm = km; try { localStorage.setItem('jetski-cwb-km', String(km)); } catch (e) {} } }
 
