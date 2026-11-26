@@ -882,6 +882,135 @@ for x in (-3.8, 3.8):
     for y in (-1.25, 1.25): p.append(cyl(PRETO, (x, y, 0.55), 0.55, 0.3, 10, rot=(math.pi / 2, 0, 0)))
 asset('ligeirinho', p)
 
+# ================= abertura: parque de diversões do Barigui alagado =================
+ROSA = 0xe05a9a
+
+# roda-gigante: base (pernas em A, plataforma e escada); eixo do giro a 14 m de altura
+p = []
+for sy in (-2.4, 2.4):
+    for sx in (-6.5, 6.5): p.append(between(BRANCO, (sx, sy, 0), (0, sy * 0.45, 14), 0.32, 8))
+    p.append(between(BRANCO, (-4.2, sy, 4.5), (4.2, sy, 4.5), 0.16, 6))
+    p.append(between(BRANCO, (-2.6, sy * 0.7, 9.0), (2.6, sy * 0.7, 9.0), 0.14, 6))
+p.append(box(CINZA, (0, 0, 0.4), (16, 7, 0.8)))
+p.append(box(LIMA, (0, -4.2, 1.4), (5, 1.6, 0.2)))
+for k in range(5): p.append(box(CINZA_ESC, (0, -5.2 - k * 0.5, 0.2 + k * 0.25), (3, 0.5, 0.15)))
+p.append(cyl(CINZA_ESC, (0, 0, 14), 0.5, 6.2, 10, rot=(math.pi / 2, 0, 0)))
+asset('rg_base', p)
+
+# roda-gigante: a roda (gira no eixo Y do Blender; origem no cubo)
+p = []
+for sy in (-1.1, 1.1):
+    prim('torus', BRANCO, (0, sy, 0), (math.pi / 2, 0, 0), major_radius=12, minor_radius=0.14, major_segments=32, minor_segments=4); p.append(bpy.context.active_object)
+    prim('torus', BRANCO, (0, sy, 0), (math.pi / 2, 0, 0), major_radius=9.6, minor_radius=0.09, major_segments=28, minor_segments=4); p.append(bpy.context.active_object)
+    for k in range(16):
+        a = k / 16 * math.tau
+        p.append(between(BRANCO, (0, sy, 0), (math.cos(a) * 12, sy, math.sin(a) * 12), 0.07, 4))
+        a2 = (k + 0.5) / 16 * math.tau
+        p.append(between(BRANCO, (math.cos(a) * 9.6, sy, math.sin(a) * 9.6), (math.cos(a2) * 12, sy, math.sin(a2) * 12), 0.05, 4))
+for k in range(16):
+    a = k / 16 * math.tau
+    p.append(between(BRANCO, (math.cos(a) * 12, -1.1, math.sin(a) * 12), (math.cos(a) * 12, 1.1, math.sin(a) * 12), 0.06, 4))
+p.append(cyl(CINZA, (0, 0, 0), 1.3, 2.6, 16, rot=(math.pi / 2, 0, 0)))
+p.append(cyl(BRANCO, (0, -1.35, 0), 1.0, 0.1, 16, rot=(math.pi / 2, 0, 0)))
+asset('rg_roda', p)
+
+# gôndola: pendurada no ponto de giro (origem); o jogo tinge por instância
+p = [box(0xeeeeee, (0, 0, -0.35), (1.9, 1.9, 0.25), bevel=0.05)]
+for sx in (-0.85, 0.85):
+    for sy in (-0.85, 0.85): p.append(cyl(0xcfcfcf, (sx, sy, -1.2), 0.05, 1.6, 4))
+p.append(box(0xdedede, (0, 0, -1.95), (1.9, 1.9, 0.7)))
+p.append(box(0x9fd3e0, (0, 0, -1.25), (1.7, 1.7, 0.9)))
+p.append(cyl(0xcfcfcf, (0, 0, -0.1), 0.06, 0.4, 4))
+asset('rg_gondola', p)
+
+# kamikaze (pêndulo): base de pernas brancas, eixo a 20 m
+p = [box(CINZA, (0, 0, 0.3), (18, 12, 0.6))]
+for sy in (-3.2, 3.2):
+    for sx in (-7.5, 7.5): p.append(between(BRANCO, (sx, sy * 1.7, 0.6), (0, sy, 20), 0.42, 8))
+    p.append(between(BRANCO, (-4.5, sy * 1.35, 9), (4.5, sy * 1.35, 9), 0.18, 6))
+p.append(cyl(CINZA_ESC, (0, 0, 20), 0.7, 7.4, 10, rot=(math.pi / 2, 0, 0)))
+asset('pend_base', p)
+
+# kamikaze: braço que balança (origem no eixo; azul em cima, amarelo, rosa e o anel de assentos vermelhos embaixo)
+p = [box(BRANCO, (0, 0, 2.4), (1.6, 1.6, 2.4), bevel=0.08), box(0xfff2c4, (0, -0.82, 2.6), (1.2, 0.05, 1.6))]
+p.append(cyl(JEANS, (0, 0, -3), 0.75, 6, 10))
+p.append(cyl(AMARELO, (0, 0, -8.5), 0.75, 5, 10))
+p.append(cyl(ROSA, (0, 0, -12.5), 0.85, 3, 10))
+p.append(cyl(CINZA_ESC, (0, 0, -14.4), 4.2, 0.4, 20))
+for k in range(16):
+    a = k / 16 * math.tau
+    p.append(box(VERMELHO, (math.cos(a) * 3.6, math.sin(a) * 3.6, -15.0), (0.9, 0.7, 0.9), rot=(0, 0, a), bevel=0.05))
+    p.append(between(ROSA, (0, 0, -14.2), (math.cos(a) * 4.0, math.sin(a) * 4.0, -14.6), 0.06, 4))
+p.append(cyl(ROSA, (0, 0, -15.6), 1.2, 1.0, 12, r2=0.3))
+asset('pend_braco', p)
+
+# portal do parque: duas torres de castelo com telhado cônico e a faixa da entrada
+p = []
+for sx in (-4.6, 4.6):
+    for k in range(5): p.append(cyl(LARANJA if k % 2 == 0 else AMARELO, (sx, 0, 0.6 + k * 1.2), 1.3, 1.2, 10))
+    p.append(cyl(LILAS, (sx, 0, 6.8), 1.55, 0.4, 10))
+    p.append(cyl(LILAS, (sx, 0, 8.4), 1.6, 2.8, 10, r2=0.05))
+    p.append(cyl(AMARELO, (sx, 0, 9.9), 0.05, 0.6, 4))
+    p.append(box(VERMELHO, (sx + 0.25, 0, 10.1), (0.5, 0.04, 0.3)))
+p.append(box(LARANJA, (0, 0, 5.6), (8.2, 0.4, 1.6), bevel=0.06))
+p.append(box(AMARELO, (0, -0.22, 5.6), (7.8, 0.05, 1.3)))
+for k in range(6): p.append(box([VERMELHO, JEANS, LIMA][k % 3], (-3.2 + k * 1.28, -0.26, 5.6), (0.8, 0.04, 0.6)))
+asset('portal_parque', p)
+
+# bilheteria: quiosque onde a capivara espera a água subir (telhado plano a 3 m)
+p = [box(AMARELO, (0, 0, 1.4), (3.2, 3.2, 2.8)), box(VERMELHO, (0, 0, 2.95), (3.8, 3.8, 0.3), bevel=0.05)]
+p.append(box(JEANS, (0, 0, 2.75), (3.3, 3.3, 0.2)))
+p.append(box(VIDRO, (0, -1.62, 1.6), (1.8, 0.06, 1.0)))
+for k in range(5): p.append(box([LIMA, ROSA, LARANJA][k % 3], (-1.2 + k * 0.6, -1.64, 0.7), (0.5, 0.04, 0.5)))
+asset('bilheteria', p)
+
+# barraca de doces com toldo listrado
+p = [box(BRANCO, (0, 0, 1.0), (3, 2.4, 2.0))]
+for k in range(8):
+    a0, a1 = k / 8 * math.tau, (k + 1) / 8 * math.tau
+    p.append(mesh_from([(0, 0, 4.0), (math.cos(a0) * 2.4, math.sin(a0) * 2.4, 2.4), (math.cos(a1) * 2.4, math.sin(a1) * 2.4, 2.4)], [(0, 1, 2)], VERMELHO if k % 2 else BRANCO))
+p.append(sphere(AMARELO, (0, 0, 4.1), 0.2, seg=6, rings=4))
+asset('barraca', p)
+
+# palmeira
+p = []
+pts_ = [(0, 0, 0), (0.3, 0, 2.5), (0.8, 0, 5), (1.2, 0, 7.2)]
+for a, b in zip(pts_, pts_[1:]): p.append(between(MADEIRA, a, b, 0.32, 7, r2=0.26))
+top = pts_[-1]
+for k in range(8):
+    a = k / 8 * math.tau
+    tip = (top[0] + math.cos(a) * 3.2, top[1] + math.sin(a) * 3.2, top[2] - 1.4)
+    mid = (top[0] + math.cos(a) * 1.8, top[1] + math.sin(a) * 1.8, top[2] + 0.4)
+    p.append(between(FOLHA if k % 2 else FOLHA_ESC, top, mid, 0.35, 4, r2=0.3))
+    p.append(between(FOLHA if k % 2 else FOLHA_ESC, mid, tip, 0.3, 4, r2=0.05))
+asset('palmeira', p)
+
+# cerca branca (4 m no eixo X)
+p = [box(BRANCO, (0, 0, 0.55), (4, 0.08, 0.1)), box(BRANCO, (0, 0, 0.95), (4, 0.08, 0.1))]
+for k in range(9): p.append(box(BRANCO, (-1.8 + k * 0.45, 0, 0.6), (0.18, 0.06, 1.2)))
+asset('cerca', p)
+
+# cacho de balões
+p = []
+for k, (c, x, y, z) in enumerate([(VERMELHO, 0, 0, 3.2), (AMARELO, 0.6, 0.2, 3.6), (JEANS, -0.5, 0.3, 3.7), (LIMA, 0.2, -0.5, 4.1), (ROSA, -0.3, -0.3, 3.0)]):
+    p.append(sphere(c, (x, y, z), 0.45, (1, 1, 1.2), seg=8, rings=6))
+    p.append(between(0xdddddd, (0, 0, 0.2), (x, y, z - 0.5), 0.015, 3))
+asset('baloes', p)
+
+# capivara heroína em pé (com colete lima e a laranja na cabeça), frente +Y
+p = [sphere(CAPI, (0, 0, 0.8), 1, (0.45, 0.8, 0.45), seg=10, rings=7)]
+p.append(cyl(LIMA, (0, 0.05, 0.85), 0.5, 0.75, 10, rot=(math.pi / 2, 0, 0)))
+p.append(box(LARANJA, (0, 0.05, 1.36), (0.2, 0.7, 0.05)))
+p.append(box(CAPI, (0, 0.82, 1.12), (0.44, 0.64, 0.44), rot=(0.25, 0, 0), bevel=0.08))
+p.append(box(CAPI_ESC, (0, 1.12, 1.02), (0.36, 0.1, 0.27), bevel=0.04))
+for s_ in (-1, 1):
+    p.append(sphere(PRETO, (s_ * 0.21, 0.96, 1.24), 0.05, seg=6, rings=4))
+    p.append(sphere(CAPI_ESC, (s_ * 0.16, 0.58, 1.38), 0.07, (1, 0.6, 1), seg=6, rings=4))
+    for y in (-0.42, 0.42): p.append(cyl(CAPI_ESC, (s_ * 0.23, y, 0.27), 0.1, 0.54, 6))
+p.append(sphere(LARANJA, (0, 0.76, 1.47), 0.14, seg=8, rings=6))
+p.append(box(FOLHA_ESC, (0.05, 0.76, 1.63), (0.14, 0.05, 0.03), rot=(0, 0.5, 0)))
+asset('capivara_heroi', p)
+
 # ---------------- material de cor por vértice (para o preview e o exportador) ----------------
 mat = bpy.data.materials.new('VC'); mat.use_nodes = True
 nt = mat.node_tree; bsdf = nt.nodes.get('Principled BSDF')
@@ -942,6 +1071,7 @@ def render(path, names, spacing, cam_loc, cam_rot, ortho, target=None):
 
 if '--preview' in sys.argv:
     render(os.path.join(OUT, 'preview_piloto.png'), ['jetski', 'capivara'], {'jetski': 0, 'capivara': 0}, (4.5, 5.5, 3.2), (0, 0, 0), 4.6, target=(0, 0.1, 1.1))
+    render(os.path.join(OUT, 'preview_parque.png'), ['capivara_heroi', 'baloes', 'cerca', 'barraca', 'bilheteria', 'palmeira', 'portal_parque', 'rg_base', 'pend_base'], {'capivara_heroi': 4, 'baloes': 4, 'cerca': 6, 'barraca': 7, 'bilheteria': 8, 'palmeira': 10, 'portal_parque': 18, 'rg_base': 22, 'pend_base': 4}, (0, -110, 14), (math.radians(82), 0, 0), 105)
     render(os.path.join(OUT, 'preview_bi.png'), ['bi_frente', 'bi_meio', 'bi_tras'], {'bi_frente': 3.1, 'bi_meio': 3.1, 'bi_tras': 3.1}, (-12, -14, 5), (0, 0, 0), 16, target=(3.1, 0, 0))
     render(os.path.join(OUT, 'preview_v2_a.png'), ['relogio_flores', 'farol_saber', 'memorial_ucraniano', 'rua_24h', 'paco_liberdade', 'catedral'], {'relogio_flores': 14, 'farol_saber': 16, 'memorial_ucraniano': 26, 'rua_24h': 34, 'paco_liberdade': 30, 'catedral': 4}, (0, -130, 22), (math.radians(80), 0, 0), 150)
     render(os.path.join(OUT, 'preview_v2_b.png'), ['jardim_botanico', 'opera_arame', 'museu_olho', 'torre_panoramica'], {'jardim_botanico': 34, 'opera_arame': 40, 'museu_olho': 40, 'torre_panoramica': 4}, (0, -150, 30), (math.radians(78), 0, 0), 150)

@@ -67,6 +67,7 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-a
 @media (prefers-reduced-motion:reduce){#alerta{transition:none}}
 #botHud{position:fixed;left:8px;top:8px;z-index:60;font:11px/1.45 ui-monospace,Menlo,Consolas,monospace;
   color:#dff3e2;background:rgba(10,28,22,.82);padding:7px 9px;border-radius:7px;pointer-events:none;letter-spacing:.2px}
+#skip{bottom:calc(env(safe-area-inset-bottom,0px) + 22px);left:50%;transform:translateX(-50%);font-weight:800;font-size:13px;color:#fff;background:rgba(30,94,52,.55);padding:6px 14px;border-radius:999px}
 #toast.mid{top:58%;font-size:46px;padding:2px 8px} /* contagem regressiva no meio da tela */
 #overlay,#result,#pausa,#creditos{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:rgba(244,246,234,.55);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow:auto}
 .card{max-width:540px;display:grid;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 12px 40px rgba(30,94,52,.25)}
@@ -151,6 +152,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 <div class="hud" id="toast"></div>
 <div class="hud" id="alerta" role="alert" aria-hidden="true"><svg viewBox="0 0 48 44" aria-hidden="true"><path d="M24 3 L45 40 H3 Z" fill="#f2c230" stroke="#f2c230" stroke-width="5" stroke-linejoin="round"/><rect x="21.6" y="14" width="4.8" height="15" rx="2.4" fill="#1e3a2e"/><circle cx="24" cy="34.5" r="2.7" fill="#1e3a2e"/></svg><div><div class="al-top"><b>Alerta de Apagão</b><span id="alertaHora"></span></div><p>A luz vai cair. Liga o farol!</p></div></div>
 <div class="hud" id="flash"></div>
+<div class="hud" id="skip" hidden>Toque para pular</div>
 <div id="botHud" hidden></div>
 
 <div id="overlay" class="screen">
@@ -2265,7 +2267,8 @@ function startRun() {
   resetGen(); GEN.bag = []; GEN.s = 170; resetChunks(); startMusic(); setStarLook(false); // na contagem a capivara já anda ~75 m: os obstáculos começam depois disso
   { const [x, z, dx, dz] = trackAt(0); camPos.set(x - dx * 12, 7, z - dz * 12); camDir.set(dx, 0, dz); }
   $('overlay').hidden = true; $('result').hidden = true; $('pausa').hidden = true;
-  $('hint').hidden = false;
+  $('hint').hidden = true;
+  G.state = 'intro'; resetIntro();
 }
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
 function endRun(zerou) {
@@ -2384,10 +2387,12 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyB') toggleMusic();
   if (e.code === 'Escape' || e.code === 'KeyP' || e.code === 'Space') setPaused(!G.paused); // esc, P ou barra de espaço
   if (e.code === 'Enter' && G.state === 'title' && !$('start').hidden) $('start').click();
+  if ((e.code === 'Enter' || e.code === 'Space') && G.state === 'intro') INTRO.t = Math.max(INTRO.t, INTRO.dur - 0.3);
 });
 let ptr = null;
 canvas.addEventListener('pointerdown', e => { ptr = {x: e.clientX, y: e.clientY}; initAudio(); });
 canvas.addEventListener('pointerup', e => {
+  if (G.state === 'intro') { ptr = null; INTRO.t = Math.max(INTRO.t, INTRO.dur - 0.3); return; }
   if (!ptr) return;
   const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y; ptr = null;
   if (Math.abs(dx) > 24 && Math.abs(dx) > Math.abs(dy)) moveLane(dx > 0 ? 1 : -1);
@@ -2451,6 +2456,122 @@ $('loading').hidden = true; $('start').hidden = false; $('start').focus();
 const go = () => { initAudio(); if (audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume(); startRun(); };
 $('start').addEventListener('click', go);
 $('retry').addEventListener('click', go);
+
+// ======================= ABERTURA: o Barigui alagou e a capivara foge de jet ski =======================
+// cena própria (o parque de diversões do Barigui debaixo d'água), tocada antes de cada corrida; um toque pula
+const INTRO = {t: 0, dur: 6.4, built: false, landed: false, revved: false};
+const iScene = new THREE.Scene(), iCam = new THREE.PerspectiveCamera(60, SW() / SH(), 0.3, 900);
+const iWaveT = {value: 0}, iLevel = {value: 0.3};
+let iWheel, iGond, iArm, iHero, iSki, iSkiRider, iSplash, iBalloons = [];
+const I_WHEEL_POS = new THREE.Vector3(-26, 0, -38), I_ROOF = new THREE.Vector3(-7, 3.1, 4), I_SKI = new THREE.Vector3(5, 0, 7);
+function buildIntro() {
+  if (INTRO.built) return; INTRO.built = true;
+  iScene.background = new THREE.Color(0xbfe1ef);
+  iScene.fog = new THREE.Fog(0xcfe3e6, 70, 280);
+  iScene.add(new THREE.HemisphereLight(0xeaf6ff, 0x6a8a4a, 1.4));
+  const sunI = new THREE.DirectionalLight(0xfff4dc, 2.2); sunI.position.set(60, 120, 80); iScene.add(sunI);
+  // água barrenta subindo
+  const wg = new THREE.PlaneGeometry(520, 520, 104, 104); wg.rotateX(-Math.PI / 2);
+  iScene.add(new THREE.Mesh(wg, new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false,
+    uniforms: {uT: iWaveT, uL: iLevel, uFog: {value: new THREE.Color(0xcfe3e6)}},
+    vertexShader: `uniform float uT, uL; varying vec3 vW; varying float vD;
+      void main(){ vec3 p = position; p.y = uL + sin(p.x*.15+uT*1.3)*.15 + sin(p.z*.2-uT*1.6)*.12; vW = p; vec4 mv = modelViewMatrix*vec4(p,1.); vD = -mv.z; gl_Position = projectionMatrix*mv; }`,
+    fragmentShader: `uniform vec3 uFog; varying vec3 vW; varying float vD;
+      void main(){ vec3 n = normalize(cross(dFdx(vW), dFdy(vW))); if(n.y<0.) n=-n; vec3 v = normalize(cameraPosition - vW);
+        float fr = pow(1.-max(dot(n,v),0.),3.);
+        vec3 c = mix(vec3(.30,.50,.40), vec3(.82,.90,.93), fr*.8); c = mix(c, vec3(.55,.45,.32), .22);
+        gl_FragColor = vec4(mix(pow(c, vec3(2.2)), uFog, smoothstep(70.,280.,vD)), .93); }`
+  })));
+  const add = (k, x, z, ry = 0, sc = 1, y = 0) => { const m = new THREE.Mesh(GEO[k], VC); m.position.set(x, y, z); m.rotation.y = ry; m.scale.setScalar(sc); iScene.add(m); return m; };
+  // roda-gigante: base fixa, roda girando e gôndolas sempre em pé
+  const rg = new THREE.Group(); rg.position.copy(I_WHEEL_POS); rg.rotation.y = 0.35; iScene.add(rg);
+  rg.add(new THREE.Mesh(GEO.rg_base, VC));
+  iWheel = new THREE.Mesh(GEO.rg_roda, VC); iWheel.position.set(0, 14, 0); rg.add(iWheel);
+  iGond = new THREE.InstancedMesh(GEO.rg_gondola, VC, 16);
+  const gc = [0xf2c230, 0xb5cc2e, 0xf39a2b, 0xffffff]; for (let k = 0; k < 16; k++) iGond.setColorAt(k, new THREE.Color(gc[k % 4]));
+  rg.add(iGond);
+  // kamikaze: o braço balança de um lado para o outro
+  const pd = new THREE.Group(); pd.position.set(28, 0, -30); pd.rotation.y = -0.4; iScene.add(pd);
+  pd.add(new THREE.Mesh(GEO.pend_base, VC));
+  iArm = new THREE.Mesh(GEO.pend_braco, VC); iArm.position.set(0, 20, 0); pd.add(iArm);
+  // entrada, quiosques, palmeiras, cercas e balões soltos
+  add('portal_parque', 0, -12);
+  add('bilheteria', I_ROOF.x, I_ROOF.z, 0.2);
+  add('barraca', 14, -6, 0.5); add('barraca', -17, -9, -0.3);
+  for (const [x, z, r] of [[-13, 15, 0.4], [19, 11, 2.2], [-31, -4, 1.1], [36, -12, 3], [9, -26, 0.2], [-4, -30, 4]]) add('palmeira', x, z, r, 1.1);
+  for (let x = -34; x <= 34; x += 4) if (Math.abs(x) > 7) add('cerca', x, -10, 0, 1, 0);
+  for (const [x, z] of [[3, -3], [-12, -2], [20, 2]]) iBalloons.push(add('baloes', x, z, Math.random() * 6, 1.3));
+  // a capivara em cima da bilheteria e o jet ski boiando ao lado
+  iHero = add('capivara_heroi', I_ROOF.x, I_ROOF.z, -Math.PI / 2, 1.5, I_ROOF.y);
+  iSki = new THREE.Group(); iSki.scale.setScalar(1.45); iScene.add(iSki);
+  iSki.add(new THREE.Mesh(GEO.jetski, VC));
+  iSkiRider = new THREE.Mesh(GEO.capivara, VC); iSki.add(iSkiRider);
+  const rg2 = new THREE.RingGeometry(0.6, 1.0, 24); rg2.rotateX(-Math.PI / 2);
+  iSplash = new THREE.Mesh(rg2, new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false})); iScene.add(iSplash);
+}
+function resetIntro() {
+  buildIntro();
+  Object.assign(INTRO, {t: 0, landed: false, revved: false});
+  iHero.visible = true; iSkiRider.visible = false; iSplash.material.opacity = 0;
+  iHero.position.copy(I_ROOF); iHero.rotation.set(0, -Math.PI / 2, 0);
+  iSki.position.set(I_SKI.x, 0.6, I_SKI.z); iSki.rotation.set(0, Math.PI / 2, 0);
+  iCam.aspect = SW() / SH(); iCam.updateProjectionMatrix();
+  $('skip').hidden = false;
+  setTimeout(() => { if (G.state === 'intro') toast('O Parque Barigui alagou!', 1.6); }, 150);
+}
+const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+function runIntro(dt) {
+  const T = INTRO.t += dt; iWaveT.value += dt;
+  if (BOT.on) INTRO.t = INTRO.dur;
+  // a água sobe durante a cena inteira
+  iLevel.value = 0.3 + 1.6 * ease(T / 4);
+  const L = iLevel.value;
+  // brinquedos funcionando mesmo alagados
+  const ang = T * 0.3; iWheel.rotation.z = ang;
+  for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2 + ang; tmpM.makeTranslation(Math.cos(a) * 12, 14 + Math.sin(a) * 12, 0); iGond.setMatrixAt(k, tmpM); }
+  iGond.instanceMatrix.needsUpdate = true;
+  iArm.rotation.z = Math.sin(T * 1.1) * 1.05;
+  iBalloons.forEach((b, i) => { b.position.y = L - 0.3 + Math.sin(T * 1.5 + i) * 0.25 + T * 0.4; b.rotation.y += dt * 0.3; });
+  // capivara: aflita no telhado, depois pula no jet ski
+  const jumpA = 3.0, jumpB = 3.7;
+  if (T < jumpA) {
+    iHero.position.set(I_ROOF.x, I_ROOF.y + Math.abs(Math.sin(T * 7)) * 0.18, I_ROOF.z);
+    iHero.rotation.y = T < 2.4 ? -Math.PI / 2 + Math.sin(T * 5) * 0.6 : -Math.PI / 2; // olha para os lados, depois mira o jet ski
+  } else if (T < jumpB) {
+    const k = (T - jumpA) / (jumpB - jumpA), to = new THREE.Vector3(I_SKI.x, L + 1.2, I_SKI.z);
+    iHero.position.lerpVectors(I_ROOF, to, k); iHero.position.y += Math.sin(k * Math.PI) * 3.2;
+    iHero.rotation.set(0, -Math.PI / 2, -k * Math.PI * 2); // cambalhota
+  } else if (!INTRO.landed) {
+    INTRO.landed = true; iHero.visible = false; iSkiRider.visible = true;
+    iSplash.position.set(I_SKI.x, L + 0.05, I_SKI.z); iSplash.material.opacity = 0.9; iSplash.scale.setScalar(1);
+    splash(0, 1.1); blip([523, 784], 0.07, 'triangle', 0.12);
+  }
+  if (iSplash.material.opacity > 0) { iSplash.scale.multiplyScalar(1 + dt * 3); iSplash.material.opacity = Math.max(0, iSplash.material.opacity - dt * 1.2); }
+  // jet ski: balança, vira para a câmera e arranca
+  let sz = I_SKI.z, ry = Math.PI / 2;
+  if (T > 3.8) ry = Math.PI / 2 + (Math.PI / 2) * ease((T - 3.8) / 0.5);
+  if (T > 4.3) { const k = T - 4.3; sz = I_SKI.z + 9 * k * k + 6 * k; if (!INTRO.revved) { INTRO.revved = true; blip([110, 165, 220, 330], 0.06, 'sawtooth', 0.08); } }
+  iSki.position.set(I_SKI.x - (T > 4.3 ? (T - 4.3) * 1.5 : 0), L + 0.35 + Math.sin(T * 3) * 0.08 + (INTRO.landed && T < 4 ? -0.15 : 0), sz);
+  iSki.rotation.set(T > 4.3 ? -0.12 : 0, ry, Math.sin(T * 2.4) * 0.05);
+  // câmera: plano geral do parque, plano médio na bilheteria e perseguição do jet ski
+  if (T < 2.0) { const k = ease(T / 2); iCam.position.set(0, 18 - 6 * k, 58 - 18 * k); iCam.lookAt(0, 9 - 4 * k, -20 + 12 * k); }
+  else if (T < 4.3) { iCam.position.set(-0.5, 4.2 + L * 0.5, 17.5); iCam.lookAt(-0.5, 2.6 + L * 0.3, 4.5); }
+  else { iCam.position.set(I_SKI.x + 7, L + 3.4, Math.max(sz + 11, 20)); iCam.lookAt(iSki.position.x, iSki.position.y + 1, iSki.position.z); }
+  // clarão no fim e começa a corrida
+  if (T > INTRO.dur - 0.45) G.flash = Math.max(G.flash || 0, (T - (INTRO.dur - 0.45)) / 0.45);
+  { const f = (G.flash || 0).toFixed(2); if (f !== flashDOM) { flashDOM = f; elFlash.style.opacity = f; } }
+  if (toastT > 0) { toastT -= dt; if (toastT <= 0) $('toast').classList.remove('on'); }
+  musicTick();
+  if (T >= INTRO.dur) { G.state = 'count'; G.flash = 1; $('skip').hidden = true; $('hint').hidden = false; }
+}
+const rPass = composer.passes[0];
+function renderIntro() {
+  rPass.scene = iScene; rPass.camera = iCam;
+  const ssrOn = ssrPass.enabled; ssrPass.enabled = false; outPass.enabled = true;
+  composer.render();
+  rPass.scene = scene; rPass.camera = camera; ssrPass.enabled = ssrOn; outPass.enabled = !ssrOn;
+}
 
 // ---------- loop ----------
 const clock = new THREE.Clock();
@@ -2802,8 +2923,8 @@ window.__G = G; window.__S = S; window.__LMP = LM_PASS; window.__LMK = LMK; wind
 let ssrCheck = 8;
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
-  if (!G.paused) { uTime.value += dt; step(dt); }
-  composer.render();
+  if (!G.paused) { uTime.value += dt; if (G.state === 'intro') runIntro(dt); else step(dt); }
+  if (G.state === 'intro') renderIntro(); else composer.render();
   // rede de segurança: se a placa de vídeo reclamar de algo nos primeiros quadros, desliga o reflexo em vez de deixar a tela preta
   if (ssrCheck > 0) { ssrCheck--; const gl = renderer.getContext(); if (gl.getError() !== gl.NO_ERROR && ssrPass.enabled) { ssrPass.enabled = false; outPass.enabled = true; console.warn('Reflexo na água desligado: erro do WebGL'); } }
   requestAnimationFrame(frame);
@@ -2812,6 +2933,7 @@ addEventListener('resize', () => {
   renderer.setPixelRatio(ps2Ratio()); composer.setPixelRatio(ps2Ratio());
   renderer.setSize(SW(), SH()); composer.setSize(SW(), SH()); syncPs2();
   camera.aspect = SW() / SH(); camera.updateProjectionMatrix();
+  iCam.aspect = SW() / SH(); iCam.updateProjectionMatrix();
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden && G.state === 'race') setPaused(true); });
 frame();
