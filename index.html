@@ -191,11 +191,16 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 .mn-links button:hover,.mn-links button:focus-visible{background:#fff;outline:none}
 .mn-links button:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.28)}
 #overlay.menu .pw{grid-template-columns:repeat(3,1fr);gap:8px}
-#overlay.menu .pw .row{grid-template-columns:1fr;justify-items:center;text-align:center;background:rgba(238,232,213,.1);border:0;border-radius:16px;padding:8px 4px;gap:2px}
+#overlay.menu .pw .row{font:inherit;color:inherit;cursor:pointer;width:100%;transition:background .15s,transform .1s;grid-template-columns:1fr;justify-items:center;text-align:center;background:rgba(238,232,213,.1);border:0;border-radius:16px;padding:8px 4px;gap:2px}
+#overlay.menu .pw .row:hover{background:rgba(238,232,213,.18)}
+#overlay.menu .pw .row[aria-expanded="true"]{background:var(--mn-paper)}#overlay.menu .pw .row[aria-expanded="true"] b{color:var(--mn-ink)}
+#overlay.menu .pw .row:active{transform:scale(.96)}
+.pw-desc{margin:0;font:700 14px/1.4 var(--f-display);color:var(--mn-ink);background:var(--mn-paper);border-radius:16px;padding:10px 14px}
+.pw-desc b{font-weight:900}
 #overlay.menu .pw img{width:42px;height:42px}
 #overlay.menu .pw b{font:800 12px/1.2 var(--f-display);color:var(--mn-paper)}
 #overlay.menu .pw div span{display:none}
-@media (max-height:640px){.mn-sub{display:none}#overlay.menu .pw{display:none}}
+@media (max-height:640px){.mn-sub{display:none}#overlay.menu .pw,.pw-desc{display:none!important}}
 @media (prefers-reduced-motion:reduce){.mn-onda,.mn-capi{animation:none}}
 /* as outras telas na mesma estética: papel, um pouco de cheia embaixo, cartão creme arredondado */
 #result,#pausa,#creditos,#cardView,#loja,#placar{background:#eee8d5 linear-gradient(#1d4a3c,#1d4a3c) bottom/100% 22% no-repeat}
@@ -259,6 +264,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
       <button class="mn-go" id="start" hidden>Salve-se quem puder!</button>
       <div class="mn-links"><button id="lojaBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg>Loja</button><button id="placarBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke-width="2"/><path d="M10 14h4v3h2v3H8v-3h2z"/></svg>Placar</button><button id="credBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Créditos</button></div>
       <div class="pw" id="pw" role="list"></div>
+      <p class="pw-desc" id="pwDesc" aria-live="polite" hidden></p>
     </div>
   </div>
 </div>
@@ -2897,7 +2903,16 @@ $('hint').querySelector('span').textContent = matchMedia('(pointer:coarse)').mat
     }
     renderer.setRenderTarget(null); renderer.setClearColor(oc, oa); rt.dispose();
   }
-  $('pw').innerHTML = POWER.map(([, name, what], i) => `<div class="row" role="listitem">${urls[i] ? `<img src="${urls[i]}" alt="">` : '<span></span>'}<div><b>${name}</b><span>${what}</span></div></div>`).join('');
+  $('pw').innerHTML = POWER.map(([, name, what], i) => `<button class="row" role="listitem" data-i="${i}" aria-expanded="false">${urls[i] ? `<img src="${urls[i]}" alt="">` : '<span></span>'}<div><b>${name}</b><span>${what}</span></div></button>`).join('');
+  // tocar num power-up mostra o que ele faz; tocar de novo esconde
+  $('pw').onclick = e => {
+    const b = e.target.closest('.row'); if (!b) return;
+    const aberto = b.getAttribute('aria-expanded') === 'true';
+    for (const x of $('pw').querySelectorAll('.row')) x.setAttribute('aria-expanded', 'false');
+    if (aberto) { $('pwDesc').hidden = true; return; }
+    b.setAttribute('aria-expanded', 'true'); const [, name, what] = POWER[+b.dataset.i];
+    $('pwDesc').innerHTML = `<b>${name}:</b> ${what}`; $('pwDesc').hidden = false;
+  };
 }
 $('loading').hidden = true; $('start').hidden = false; $('start').focus();
 queueMicrotask(() => { menuCapi(); menuRecorde(); srvConecta(); });
