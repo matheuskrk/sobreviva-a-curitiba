@@ -158,54 +158,70 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 @keyframes dedo{0%,100%{transform:translateX(-16px)}50%{transform:translateX(16px)}}
 @media (prefers-reduced-motion:reduce){#hint .dedo{animation:none}}
 @media (prefers-reduced-motion:reduce){#toast{transition:none}}
-/* menu principal "Marca d'Água": papel cru em cima, a cheia embaixo, régua de nível na lateral */
-#overlay.menu{--mn-w:min(100vw,calc(100vh * 9 / 16));display:block;place-items:initial;padding:0;background:#eee8d5;overflow:hidden;--mn-paper:#eee8d5;--mn-ink:#1d4a3c;--mn-lime:#b5cc2e;--mn-mono:"DM Mono",ui-monospace,monospace;--mn-cond:"Big Shoulders Display","Arial Narrow",sans-serif}
-.mn-ar{position:absolute;left:24px;right:84px;top:calc(env(safe-area-inset-top,0px) + 30px);display:grid;gap:10px}
-.mn-tag{margin:0;font:400 11px/1 var(--mn-mono);letter-spacing:.14em;color:var(--mn-ink)}
-.mn-tag span{opacity:.5;margin:0 4px}
-.mn-titulo{margin:0;font:900 clamp(44px,calc(var(--mn-w) * .158),96px)/.84 var(--mn-cond);text-transform:uppercase;color:var(--mn-ink);letter-spacing:-.01em}
-.mn-sub{margin:0;font:400 13px/1.45 var(--mn-mono);color:var(--mn-ink);opacity:.8;max-width:30ch}
-.mn-rec{margin:4px 0 0;font:500 12px/1 var(--mn-mono);letter-spacing:.08em;color:var(--mn-ink)}
-.mn-rec::before{content:"";display:inline-block;width:10px;height:10px;background:var(--mn-lime);margin-right:8px;vertical-align:-1px}
-/* régua: blocos alternados, como as pintadas nos pilares de ponte */
-.mn-regua{--c:var(--mn-ink);position:absolute;right:22px;top:calc(env(safe-area-inset-top,0px) + 30px);bottom:52%;width:40px;border:2px solid var(--c);border-bottom:0;
+/* menu principal: papel em cima, a cheia embaixo, régua de nível na lateral; fonte arredondada (Nunito) e cantos macios */
+#overlay.menu{--mn-w:min(100vw,calc(100vh * 9 / 16));display:block;place-items:initial;padding:0;background:#eee8d5;overflow:hidden;--mn-paper:#eee8d5;--mn-ink:#1d4a3c;--mn-lime:#b5cc2e}
+.mn-ar{position:absolute;left:24px;right:84px;top:calc(env(safe-area-inset-top,0px) + 34px);display:grid;gap:12px}
+.mn-titulo{margin:0;font:900 clamp(42px,calc(var(--mn-w) * .135),78px)/.92 var(--f-display);color:var(--mn-ink);letter-spacing:-.01em;text-wrap:balance}
+.mn-titulo span{color:var(--leaf)}
+.mn-sub{margin:0;font:700 15px/1.4 var(--f-display);color:var(--mn-ink);opacity:.85;max-width:26ch}
+.mn-rec{justify-self:start;margin:2px 0 0;font:800 13px/1 var(--f-display);color:var(--mn-ink);background:#fff;border-radius:999px;padding:7px 12px 7px 10px;box-shadow:0 2px 0 rgba(29,74,60,.15)}
+.mn-rec::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--mn-lime);margin-right:7px;vertical-align:-1px}
+.mn-regua{--c:var(--mn-ink);position:absolute;right:22px;top:calc(env(safe-area-inset-top,0px) + 30px);bottom:52%;width:40px;border:3px solid var(--c);border-bottom:0;border-radius:14px 14px 0 0;
   background:repeating-linear-gradient(to top,var(--c) 0 5px,transparent 5px 10px) left/45% 100% no-repeat,
              repeating-linear-gradient(to top,var(--c) 0 3px,transparent 3px 50px) left/100% 100% no-repeat}
-.mn-regua.agua{--c:var(--mn-paper);top:0;bottom:22px;border-top:0;border-bottom:2px solid var(--c);z-index:3;opacity:.85;
+.mn-regua.agua{--c:var(--mn-paper);top:0;bottom:22px;border-top:0;border-bottom:3px solid var(--c);border-radius:0 0 14px 14px;z-index:3;opacity:.85;
   background:repeating-linear-gradient(to bottom,var(--c) 0 5px,transparent 5px 10px) left/45% 100% no-repeat,
              repeating-linear-gradient(to bottom,var(--c) 0 3px,transparent 3px 50px) left/100% 100% no-repeat}
-.mn-marca{position:absolute;left:-14px;right:-6px;height:4px;background:var(--mn-lime)}
+.mn-marca{position:absolute;left:-14px;right:-6px;height:5px;border-radius:3px;background:var(--mn-lime)}
 .mn-marca::before{content:"";position:absolute;left:-10px;top:-6px;border:8px solid transparent;border-left:10px solid var(--mn-lime);border-right:0}
 .mn-agua{position:absolute;left:0;right:0;bottom:0;height:52%;background:var(--mn-ink);color:var(--mn-paper)}
 .mn-onda{position:absolute;left:0;top:-12px;width:200%;height:24px;fill:var(--mn-ink);animation:mn-mar 6s linear infinite}
-.mn-onda+.mn-miolo::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--mn-lime)}
 @keyframes mn-mar{to{transform:translateX(-50%)}}
-.mn-capi{position:absolute;right:76px;bottom:calc(52% - 30px);width:min(44%,230px);transform:none;pointer-events:none;animation:mn-boia 3.2s ease-in-out infinite;z-index:1}
+.mn-capi{position:absolute;right:76px;bottom:calc(52% - 30px);width:min(44%,230px);pointer-events:none;animation:mn-boia 3.2s ease-in-out infinite;z-index:1}
 @keyframes mn-boia{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-7px) rotate(1.5deg)}}
-.mn-miolo{position:absolute;inset:0;padding:44px 84px calc(env(safe-area-inset-bottom,0px) + 22px) 24px;display:grid;align-content:center;gap:16px;z-index:2}
-#overlay.menu #loading{font:400 12px var(--mn-mono);letter-spacing:.06em;color:var(--mn-paper);opacity:.8}
-.mn-go{justify-self:start;font:900 26px/1 var(--mn-cond);text-transform:uppercase;letter-spacing:.02em;color:var(--mn-ink);background:var(--mn-lime);border:0;border-radius:4px;padding:16px 22px 14px;cursor:pointer;box-shadow:6px 6px 0 rgba(0,0,0,.25);transition:transform .12s,box-shadow .12s}
-.mn-go:hover,.mn-go:focus-visible{transform:translate(-2px,-2px);box-shadow:8px 8px 0 rgba(0,0,0,.25);outline:none}
-.mn-go:active{transform:translate(3px,3px);box-shadow:2px 2px 0 rgba(0,0,0,.25)}
-.mn-links{display:flex;flex-wrap:wrap;gap:6px 18px}
-.mn-links button{font:500 13px/1 var(--mn-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mn-paper);background:none;border:0;border-bottom:2px solid rgba(238,232,213,.35);padding:6px 0;cursor:pointer}
-.mn-links button:hover,.mn-links button:focus-visible{border-bottom-color:var(--mn-lime);outline:none}
-.mn-links small{font-size:10px;opacity:.7;letter-spacing:.04em;margin-left:4px;text-transform:none}
-#overlay.menu .pw{grid-template-columns:repeat(3,1fr);gap:6px}
-#overlay.menu .pw .row{grid-template-columns:1fr;justify-items:center;text-align:center;background:rgba(238,232,213,.08);border:1px solid rgba(238,232,213,.22);border-radius:4px;padding:8px 4px;gap:2px}
-#overlay.menu .pw img{width:40px;height:40px}
-#overlay.menu .pw b{font:500 11px/1.2 var(--mn-mono);letter-spacing:.04em;color:var(--mn-paper)}
-#overlay.menu .pw span span,#overlay.menu .pw div span{display:none}
-@media (max-height:640px){.mn-titulo{font-size:52px}.mn-sub{display:none}#overlay.menu .pw{display:none}}
+.mn-miolo{position:absolute;inset:0;padding:40px 84px calc(env(safe-area-inset-bottom,0px) + 22px) 24px;display:grid;align-content:center;gap:16px;z-index:2}
+#overlay.menu #loading{font:700 14px var(--f-display);color:var(--mn-paper);opacity:.85}
+.mn-go{justify-self:stretch;font:900 24px/1 var(--f-display);color:var(--mn-ink);background:var(--mn-lime);border:0;border-radius:999px;padding:18px 24px;cursor:pointer;box-shadow:0 6px 0 #7f9418;transition:transform .12s,box-shadow .12s}
+.mn-go:hover,.mn-go:focus-visible{transform:translateY(-2px);box-shadow:0 8px 0 #7f9418;outline:none}
+.mn-go:active{transform:translateY(4px);box-shadow:0 2px 0 #7f9418}
+.mn-links{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mn-links button{display:grid;justify-items:center;gap:2px;font:900 17px/1.1 var(--f-display);color:var(--mn-ink);background:var(--mn-paper);border:0;border-radius:18px;padding:13px 6px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.mn-links button:hover,.mn-links button:focus-visible{background:#fff;outline:none}
+.mn-links button:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.mn-links small{font:800 11px/1 var(--f-display);opacity:.7}
+#overlay.menu .pw{grid-template-columns:repeat(3,1fr);gap:8px}
+#overlay.menu .pw .row{grid-template-columns:1fr;justify-items:center;text-align:center;background:rgba(238,232,213,.1);border:0;border-radius:16px;padding:8px 4px;gap:2px}
+#overlay.menu .pw img{width:42px;height:42px}
+#overlay.menu .pw b{font:800 12px/1.2 var(--f-display);color:var(--mn-paper)}
+#overlay.menu .pw div span{display:none}
+@media (max-height:640px){.mn-sub{display:none}#overlay.menu .pw{display:none}}
 @media (prefers-reduced-motion:reduce){.mn-onda,.mn-capi{animation:none}}
-/* HUD: distância e recorde no canto de cima à direita */
-#hudKm{top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;display:grid;justify-items:end;gap:2px;background:rgba(238,232,213,.92);border-left:4px solid #b5cc2e;border-radius:4px;padding:6px 10px 7px;color:#1d4a3c;box-shadow:0 3px 10px rgba(0,0,0,.12)}
-#hudKm b{font:900 30px/1 "Big Shoulders Display","Arial Narrow",sans-serif;font-variant-numeric:tabular-nums}
-#hudKm b small{font-size:15px;margin-left:2px}
-#hudKm > span{font:500 10px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.08em;opacity:.75}
-#hudKm.novo{border-left-color:#f0892a}#hudKm.novo > span{color:#c25e0e;opacity:1}
+/* as outras telas na mesma estética: papel, um pouco de cheia embaixo, cartão creme arredondado */
+#result,#pausa,#creditos,#cardView,#loja,#placar{background:#eee8d5 linear-gradient(#1d4a3c,#1d4a3c) bottom/100% 22% no-repeat}
+#result::before,#pausa::before,#creditos::before,#cardView::before,#loja::before,#placar::before{content:"";position:absolute;left:0;right:0;bottom:22%;height:6px;background:#b5cc2e}
+.screen:not(.menu) .card{position:relative;background:#fbf7ea;border-radius:30px;box-shadow:0 8px 0 rgba(29,74,60,.18),0 18px 40px rgba(29,74,60,.18);border:3px solid #1d4a3c;width:min(100%,520px)}
+.screen:not(.menu) .card header{background:none;padding:22px 24px 4px}
+.screen:not(.menu) .card h1{color:#1d4a3c;font-size:clamp(32px,9vw,46px)}
+.screen:not(.menu) .card h1 span{color:var(--leaf)}
+.screen:not(.menu) .card .body{padding:12px 24px 24px}
+.screen:not(.menu) button.go{background:#b5cc2e;color:#1d4a3c;border:0;border-radius:999px;box-shadow:0 5px 0 #7f9418;font-weight:900}
+.screen:not(.menu) .acoes button{font-size:17px;padding:14px 22px}
+.screen:not(.menu) button.sec{border:3px solid #1d4a3c;color:#1d4a3c;background:#fff;border-radius:999px;box-shadow:0 4px 0 rgba(29,74,60,.2)}
+.screen:not(.menu) button.x{border-radius:50%}
+#cardView .cardbox p{color:#1d4a3c}
+/* HUD: a distância num pinhãozinho, com o recorde embaixo */
+#hudKm{top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;display:grid;justify-items:end;gap:4px}
+#hudKm .pinhao{position:relative;display:flex;align-items:baseline;gap:2px;color:#fff3dc;background:#9a5a2e;border:3px solid #5e3418;border-radius:999px 70% 70% 999px / 999px 45% 45% 999px;padding:6px 34px 7px 16px;transform:rotate(-4deg);box-shadow:0 3px 0 rgba(0,0,0,.2)}
+/* a ponta clara do pinhão, afinando para a direita */
+#hudKm .pinhao::after{content:"";position:absolute;right:-3px;top:50%;width:26px;height:70%;transform:translateY(-50%);border-radius:40% 999px 999px 40% / 50% 999px 999px 50%;background:#f1d9b0;border:3px solid #5e3418;border-left:0}
+#hudKm .pinhao::before{content:"";position:absolute;left:14px;right:30px;top:5px;height:3px;border-radius:2px;background:rgba(255,243,220,.25)}
+#hudKm b{font:900 26px/1 var(--f-display);font-variant-numeric:tabular-nums}
+#hudKm .pinhao small{font:900 13px/1 var(--f-display)}
+#hudKm > span{font:800 11px/1 var(--f-display);color:#1d4a3c;background:rgba(255,255,255,.88);border-radius:999px;padding:4px 9px}
+#hudKm.novo > span{background:#f0892a;color:#fff}
 .grade .item.prev{border-color:#f0892a;background:#fff6ec}
 #lojaDica{margin:0;font-size:13px;font-weight:700;color:#c25e0e;min-height:1em}
+
 </style>
 
 <div id="stage">
@@ -219,7 +235,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 <div class="hud" id="wavefx"></div>
 <div class="hud" id="hint" hidden><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M8 20h48M8 20l7-6M8 20l7 6M56 20l-7-6M56 20l-7 6" fill="none" stroke="#1e5e34" stroke-width="3" stroke-linecap="round"/><circle class="dedo" cx="32" cy="20" r="6" fill="#f39a2b" stroke="#fff" stroke-width="2"/></svg><span>Deslize para os lados para trocar de faixa</span></div>
 <div class="hud" id="toast"></div>
-<div class="hud" id="hudKm" hidden><b><span id="kmNow">0,0</span><small>KM</small></b><span id="kmRec">PRIMEIRA CORRIDA</span></div>
+<div class="hud" id="hudKm" hidden><div class="pinhao"><b id="kmNow">0,0</b><small>km</small></div><span id="kmRec">primeira corrida</span></div>
 <div class="hud" id="alerta" role="alert" aria-hidden="true"><svg viewBox="0 0 48 44" aria-hidden="true"><path d="M24 3 L45 40 H3 Z" fill="#f2c230" stroke="#f2c230" stroke-width="5" stroke-linejoin="round"/><rect x="21.6" y="14" width="4.8" height="15" rx="2.4" fill="#1e3a2e"/><circle cx="24" cy="34.5" r="2.7" fill="#1e3a2e"/></svg><div><div class="al-top"><b>Alerta de Apagão</b><span id="alertaHora"></span></div><p>A luz vai cair. Liga o farol!</p></div></div>
 <div class="hud" id="flash"></div>
 <div class="hud" id="skip" hidden>Toque para pular</div>
@@ -227,9 +243,8 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 
 <div id="overlay" class="screen menu">
   <div class="mn-ar">
-    <p class="mn-tag">COTA DA CHEIA <span>·</span> PARQUE BARIGUI</p>
-    <h1 class="mn-titulo">Sobreviva<br>a Curitiba!</h1>
-    <p class="mn-sub">O Barigui alagou. Foge da onda e acha um lugar seco.</p>
+    <h1 class="mn-titulo">Sobreviva a <span>Curitiba!</span></h1>
+    <p class="mn-sub">Fuja da onda para curtir o fim de semana num lugar seco.</p>
     <p class="mn-rec" id="best"></p>
   </div>
   <div class="mn-regua" aria-hidden="true"><i class="mn-marca" id="mnMarca" hidden></i></div>
@@ -2555,10 +2570,10 @@ function destinoPara(km) {
 }
 function destinoNome(km) { let d = null; for (const x of DESTINOS) if (km >= x[0]) d = x; return d ? d[1] : 'a outra margem do lago'; }
 // capivara no jet ski desenhada pelo próprio renderizador do jogo, com fundo transparente
-function heroShot(S = 640, capiGeo = null) {
+function heroShot(S = 640, capiGeo = null, opt = {}) {
   const rt = new THREE.WebGLRenderTarget(S, S); rt.texture.colorSpace = THREE.SRGBColorSpace;
   const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x99aa88, 1.6)); const dl = new THREE.DirectionalLight(0xffffff, 2); dl.position.set(3, 5, 4); sc.add(dl);
-  const g = new THREE.Group(), rider = new THREE.Mesh(capiGeo || SKIN.capi, VC); g.add(new THREE.Mesh(SKIN.jet, VC), rider); setHat(rider, SKIN.hat); g.rotation.set(0.1, 2.5, 0); sc.add(g);
+  const g = new THREE.Group(), rider = new THREE.Mesh(capiGeo || SKIN.capi, VC); g.add(new THREE.Mesh(SKIN.jet, VC), rider); setHat(rider, opt.hat !== undefined ? opt.hat : SKIN.hat); for (const x of opt.extras || []) rider.add(new THREE.Mesh(x, VC)); g.rotation.set(0.1, 2.5, 0); sc.add(g);
   const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 2.3, 5.4); cam.lookAt(0, 1.05, 0);
   const oc = renderer.getClearColor(new THREE.Color()), oa = renderer.getClearAlpha();
   renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(sc, cam);
@@ -2569,19 +2584,24 @@ function heroShot(S = 640, capiGeo = null) {
   cx.putImageData(img, 0, 0); return cv;
 }
 async function makeCard(km, score, rec) {
-  if (km >= 100) return makeShinyCard(km, score, rec);
+  const FER = km >= 100; // passou de 100 km: edição de férias, mesma régua com outras cores
   // "Cota de Cheia": o card é uma régua de nível de rio; a água sobe até a distância da partida (escala logarítmica)
   const BS = '"Big Shoulders Display", "Arial Narrow", sans-serif', MONO = '"DM Mono", ui-monospace, monospace';
   try { await Promise.all([document.fonts.load(`900 300px ${BS}`), document.fonts.load(`700 60px ${BS}`), document.fonts.load(`400 26px ${MONO}`), document.fonts.load(`500 34px ${MONO}`)]); } catch (e) {}
   const W = 1080, H = 1920, M = 80, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-  const PAPER = '#eee8d5', INK = '#1d4a3c', LIME = '#b5cc2e', ORANGE = '#f0892a';
+  const [PAPER, INK, LIME, ORANGE] = FER ? ['#ffe6c2', '#0b5f6a', '#ff5c8a', '#ffb000'] : ['#eee8d5', '#1d4a3c', '#b5cc2e', '#f0892a'];
   const nf = (v, d = 1) => v.toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
   // escala da régua
   const Y0 = 1620, Y1 = 930, yOf = k => Y0 - (Math.log10(Math.min(100, Math.max(0.5, k)) / 0.5) / Math.log10(200)) * (Y0 - Y1);
   const level = yOf(km);
   g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
+  if (FER) { // sol de fim de tarde atrás da capivara, com as faixas de pôr do sol
+    const sx = W - 300, sy = level - 210;
+    g.fillStyle = '#ffb347'; g.beginPath(); g.arc(sx, sy, 200, 0, Math.PI * 2); g.fill();
+    g.fillStyle = PAPER; for (let k = 0; k < 5; k++) g.fillRect(sx - 210, sy + 30 + k * 34, 420, 8 + k * 3);
+  }
   // capivara no jet ski boiando na linha d'água (a água desenhada depois cobre o casco)
-  try { const S = Math.min(440, level + 92 - 668), cy = level - S + S * 0.21; g.drawImage(heroShot(), M - 40, cy, S, S); } catch (e) {} // menor só quando a água sobe até perto do título
+  try { if (FER) { const S = 500; g.drawImage(heroFerias(), W - 560, level - S + S * 0.21, S, S); } else { const S = Math.min(440, level + 92 - 668), cy = level - S + S * 0.21; g.drawImage(heroShot(), M - 40, cy, S, S); } } catch (e) {} // menor só quando a água sobe até perto do título
   g.fillStyle = INK; g.fillRect(0, level, W, H - level);
   // tudo que pode ficar em cima ou embaixo d'água é desenhado duas vezes: tinta sobre o papel, papel sobre a água
   const dual = fn => {
@@ -2617,11 +2637,11 @@ async function makeCard(km, score, rec) {
   dual(col => {
     g.fillStyle = col; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
     g.font = `400 24px ${MONO}`; const dt = new Date();
-    g.fillText(`COTA DA CHEIA  ·  ${String(dt.getDate()).padStart(2, '0')}.${String(dt.getMonth() + 1).padStart(2, '0')}.${dt.getFullYear()}`, M, 128);
+    g.fillText(`${FER ? 'EDIÇÃO FÉRIAS  ·  +100 KM' : 'COTA DA CHEIA'}  ·  ${String(dt.getDate()).padStart(2, '0')}.${String(dt.getMonth() + 1).padStart(2, '0')}.${dt.getFullYear()}`, M, 128);
     g.font = `900 76px ${BS}`; g.fillText('SOBREVIVA A CURITIBA!', M - 3, 210);
     g.font = `900 300px ${BS}`; const num = nf(km); g.fillText(num, M - 10, 490);
     const nw = g.measureText(num).width; g.font = `700 96px ${BS}`; g.fillText('KM', M + nw + 6, 490);
-    g.font = `400 24px ${MONO}`; g.fillText('DAVA PRA IR DO BARIGUI ATÉ', M, 566);
+    g.font = `400 24px ${MONO}`; g.fillText(FER ? 'DE FÉRIAS: DO BARIGUI ATÉ' : 'DAVA PRA IR DO BARIGUI ATÉ', M, 566);
     g.font = `700 58px ${BS}`; g.fillText(destinoNome(km).toUpperCase(), M - 2, 630);
   });
   // rodapé: pontos e link
@@ -3461,7 +3481,7 @@ skiMeshes.splice(0, skiMeshes.length, SKI_JET, SKI_CAPI); // antes pegava o grup
 function setHat(rider, hatGeo) {
   if (rider.userData.hat) { rider.remove(rider.userData.hat); rider.userData.hat = null; }
   if (!hatGeo) return;
-  const h = new THREE.Mesh(hatGeo, VC); h.position.copy(ORANGE_HEAD).y += 0.08; rider.add(h); rider.userData.hat = h;
+  const h = new THREE.Mesh(hatGeo, VC); h.position.copy(ORANGE_HEAD).y += 0.04; h.scale.setScalar(1.55); rider.add(h); rider.userData.hat = h;
 }
 function applySkin() {
   const old = [SKIN.capi, SKIN.jet];
@@ -3593,7 +3613,7 @@ function stepHudKm(dt) {
   $('hudKm').hidden = !on; if (!on) return;
   hudKmT -= dt; if (hudKmT > 0) return; hudKmT = 0.1;
   const km = G.dist / 1000; $('kmNow').textContent = kmTxt(km);
-  const rec = Math.max(bestKm, 0); $('kmRec').textContent = rec > 0 ? 'RECORDE ' + kmTxt(rec) + ' KM' : 'PRIMEIRA CORRIDA';
+  const rec = Math.max(bestKm, 0); $('kmRec').textContent = rec > 0 ? 'recorde ' + kmTxt(rec) + ' km' : 'primeira corrida';
   $('hudKm').classList.toggle('novo', bestKm > 0 && km > bestKm);
 }
 function salvaRecordeKm(km) { if (km > bestKm) { bestKm = km; try { localStorage.setItem('jetski-cwb-km', String(km)); } catch (e) {} } }
@@ -3601,7 +3621,7 @@ function salvaRecordeKm(km) { if (km > bestKm) { bestKm = km; try { localStorage
 // ---------- menu principal ----------
 function menuCapi() { try { $('mnCapi').src = heroShot(520).toDataURL(); } catch (e) {} }
 function menuRecorde() {
-  $('best').textContent = bestKm > 0 ? `RECORDE ${kmTxt(bestKm)} KM` + (best ? ` · ${Math.round(best).toLocaleString('pt-BR')} PTS` : '') : 'SEM RECORDE AINDA';
+  $('best').textContent = bestKm > 0 ? `Recorde: ${kmTxt(bestKm)} km` + (best ? ` · ${Math.round(best).toLocaleString('pt-BR')} pontos` : '') : 'Sem recorde ainda';
   $('mnPinhoes').textContent = LOJA.moedas.toLocaleString('pt-BR');
   // a marca do recorde na régua (mesma escala do card: 0,5 a 100 km)
   const y = bestKm > 0 ? Math.min(1, Math.max(0, Math.log10(Math.max(0.5, bestKm) / 0.5) / Math.log10(200))) : 0;
@@ -3680,81 +3700,10 @@ function stepVida(dt) {
 function resetVida() { for (const b of BARCOS) scene.remove(b.g); BARCOS.length = 0; proxBarco = rnd(700, 1100); }
 
 
-// card especial de quem passa dos 100 km: carta holográfica "shiny", com a capivara em cores raras
-function heroShiny(S) {
-  const capi = recolor(SKIN.capi, [[0x8a5a2b, 0xf0b8d8], [0x6e4520, 0xd889b6], [0x3a2618, 0x8a3e6a]], false);
-  try { return heroShot(S, capi); } finally { capi.dispose(); }
-}
-async function makeShinyCard(km, score, rec) {
-  const BS = '"Big Shoulders Display", "Arial Narrow", sans-serif', MONO = '"DM Mono", ui-monospace, monospace';
-  try { await Promise.all([document.fonts.load(`900 200px ${BS}`), document.fonts.load(`700 60px ${BS}`), document.fonts.load(`400 26px ${MONO}`), document.fonts.load(`500 34px ${MONO}`)]); } catch (e) {}
-  const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-  const nf = (v, d = 1) => v.toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
-  const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
-  const rand = (() => { let s = Math.floor(km * 1000) % 2147483647 || 7; return () => (s = s * 16807 % 2147483647) / 2147483647; })();
-  // fundo: noite funda com brilho violeta
-  g.fillStyle = '#120b26'; g.fillRect(0, 0, W, H);
-  let gr = g.createRadialGradient(W / 2, 760, 60, W / 2, 760, 1100); gr.addColorStop(0, 'rgba(126,72,214,.55)'); gr.addColorStop(1, 'rgba(18,11,38,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
-  for (let i = 0; i < 160; i++) { g.fillStyle = `rgba(255,255,255,${0.15 + rand() * 0.5})`; const r = rand() * 1.8 + 0.4; g.beginPath(); g.arc(rand() * W, rand() * H, r, 0, 7); g.fill(); }
-  // a carta
-  const CX = 90, CY = 170, CW = W - 180, CH = 1400;
-  g.save(); g.shadowColor = 'rgba(190,140,255,.55)'; g.shadowBlur = 60; rr(CX, CY, CW, CH, 46); g.fillStyle = '#000'; g.fill(); g.restore();
-  // moldura dourada com reflexo
-  gr = g.createLinearGradient(CX, CY, CX + CW, CY + CH);
-  for (const [k, col] of [[0, '#fff3c4'], [0.18, '#e7b54a'], [0.35, '#fff7da'], [0.55, '#c98d26'], [0.75, '#ffe9a8'], [1, '#b87a1c']]) gr.addColorStop(k, col);
-  rr(CX, CY, CW, CH, 46); g.fillStyle = gr; g.fill();
-  // miolo holográfico: arco-íris em diagonal, faixas finas e losangos
-  const IX = CX + 26, IY = CY + 26, IW = CW - 52, IH = CH - 52;
-  g.save(); rr(IX, IY, IW, IH, 30); g.clip();
-  gr = g.createLinearGradient(IX, IY + IH, IX + IW, IY);
-  for (const [k, col] of [[0, '#ff9ad5'], [0.2, '#ffd27a'], [0.4, '#a8f0c6'], [0.6, '#8fd3ff'], [0.8, '#c3a2ff'], [1, '#ff9ad5']]) gr.addColorStop(k, col);
-  g.fillStyle = gr; g.fillRect(IX, IY, IW, IH);
-  g.globalAlpha = 0.18; g.strokeStyle = '#fff'; g.lineWidth = 2;
-  for (let d = -IH; d < IW; d += 18) { g.beginPath(); g.moveTo(IX + d, IY + IH); g.lineTo(IX + d + IH, IY); g.stroke(); }
-  g.globalAlpha = 0.12; for (let y = IY; y < IY + IH; y += 44) for (let x = IX + ((y / 44) % 2) * 22; x < IX + IW; x += 44) { g.beginPath(); g.moveTo(x, y - 10); g.lineTo(x + 10, y); g.lineTo(x, y + 10); g.lineTo(x - 10, y); g.closePath(); g.fillStyle = '#fff'; g.fill(); }
-  g.globalAlpha = 1;
-  // brilho de reflexo em faixa larga
-  gr = g.createLinearGradient(IX, IY, IX + IW, IY + IH); gr.addColorStop(0.3, 'rgba(255,255,255,0)'); gr.addColorStop(0.42, 'rgba(255,255,255,.55)'); gr.addColorStop(0.5, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(IX, IY, IW, IH);
-  g.restore();
-  // cabeçalho da carta
-  g.fillStyle = '#2a1650'; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
-  g.font = `400 24px ${MONO}`; g.fillText('✦ LENDÁRIA · SHINY', IX + 34, IY + 58);
-  g.font = `900 78px ${BS}`; g.fillText('CAPIVARA DA CHEIA', IX + 30, IY + 138);
-  g.textAlign = 'right'; g.font = `900 62px ${BS}`; g.fillText(nf(km) + ' KM', IX + IW - 32, IY + 136); g.textAlign = 'left';
-  // janela da arte: céu de aurora e a capivara rosa-shiny
-  const AX = IX + 34, AY = IY + 170, AW = IW - 68, AH = 690;
-  g.save(); rr(AX, AY, AW, AH, 18); g.clip();
-  gr = g.createLinearGradient(0, AY, 0, AY + AH); gr.addColorStop(0, '#2b1a6b'); gr.addColorStop(0.55, '#7a4fd0'); gr.addColorStop(0.56, '#3ec1c9'); gr.addColorStop(1, '#165a74'); g.fillStyle = gr; g.fillRect(AX, AY, AW, AH);
-  gr = g.createRadialGradient(AX + AW / 2, AY + AH * 0.5, 10, AX + AW / 2, AY + AH * 0.5, AW * 0.6); gr.addColorStop(0, 'rgba(255,230,160,.9)'); gr.addColorStop(0.35, 'rgba(255,170,220,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(AX, AY, AW, AH);
-  for (let i = 0; i < 6; i++) { g.strokeStyle = `rgba(255,255,255,${0.35 - i * 0.05})`; g.lineWidth = 3; g.beginPath(); const y = AY + AH * 0.6 + i * 34; for (let x = AX; x <= AX + AW; x += 12) g.lineTo(x, y + Math.sin(x / 40 + i) * 6); g.stroke(); }
-  try { const S = 620; g.drawImage(heroShiny(S), AX + AW / 2 - S / 2, AY + AH - S + 30, S, S); } catch (e) {}
-  // brilhos de shiny em volta
-  const brilho = (x, y, r, a = 1) => { g.save(); g.translate(x, y); g.globalAlpha = a; g.fillStyle = '#fff'; g.shadowColor = '#fff3b0'; g.shadowBlur = r; g.beginPath(); for (let k = 0; k < 8; k++) { const rad = k % 2 ? r * 0.18 : r, an = k * Math.PI / 4; g.lineTo(Math.cos(an) * rad, Math.sin(an) * rad); } g.closePath(); g.fill(); g.restore(); };
-  for (const [x, y, r] of [[0.2, 0.25, 46], [0.82, 0.2, 34], [0.86, 0.55, 52], [0.14, 0.62, 30], [0.68, 0.1, 22], [0.32, 0.12, 18], [0.5, 0.06, 26]]) brilho(AX + AW * x, AY + AH * y, r);
-  g.restore();
-  g.strokeStyle = '#fff7da'; g.lineWidth = 6; rr(AX, AY, AW, AH, 18); g.stroke();
-  // faixa de legenda
-  g.fillStyle = 'rgba(42,22,80,.9)'; g.font = `400 22px ${MONO}`; g.textAlign = 'center';
-  g.fillText(`Nº ${String(Math.floor(km)).padStart(3, '0')} · FUGIU DO BARIGUI E PASSOU DE ${destinoNome(km).toUpperCase()}`, W / 2, AY + AH + 44);
-  // habilidades
-  const hab = (y, nome, txt, val) => {
-    g.textAlign = 'left'; g.fillStyle = '#2a1650'; g.font = `700 50px ${BS}`; g.fillText(nome, IX + 40, y);
-    g.textAlign = 'right'; g.font = `900 54px ${BS}`; g.fillText(val, IX + IW - 40, y);
-    g.textAlign = 'left'; g.font = `400 24px ${MONO}`; g.fillStyle = 'rgba(42,22,80,.82)'; g.fillText(txt, IX + 40, y + 40);
-  };
-  hab(AY + AH + 140, 'FUGA DA CHEIA', 'Mais de 100 km sem a onda alcançar.', nf(km) + ' km');
-  g.fillStyle = 'rgba(42,22,80,.25)'; g.fillRect(IX + 40, AY + AH + 214, IW - 80, 2);
-  hab(AY + AH + 290, 'PINHÃO DOURADO', rec ? 'Novo recorde pessoal.' : 'Pontos da corrida.', score.toLocaleString('pt-BR'));
-  // selo shiny no canto
-  g.save(); g.translate(CX + CW - 74, CY + CH - 74); g.rotate(-0.2);
-  gr = g.createLinearGradient(-60, -60, 60, 60); gr.addColorStop(0, '#fff3c4'); gr.addColorStop(0.5, '#e7b54a'); gr.addColorStop(1, '#fff7da');
-  g.fillStyle = gr; g.beginPath(); for (let k = 0; k < 24; k++) { const r = k % 2 ? 50 : 62, a = k * Math.PI / 12; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill();
-  g.fillStyle = '#2a1650'; g.font = `900 30px ${BS}`; g.textAlign = 'center'; g.fillText('SHINY', 0, 4); g.font = `400 16px ${MONO}`; g.fillText('+100 KM', 0, 26); g.restore();
-  // rodapé fora da carta
-  g.textAlign = 'center'; g.fillStyle = '#fff'; g.font = `900 60px ${BS}`; g.fillText('SOBREVIVA A CURITIBA!', W / 2, CY + CH + 120);
-  g.font = `400 26px ${MONO}`; g.fillStyle = 'rgba(255,255,255,.75)'; g.fillText('JOGUE: ' + GAME_URL.replace('https://', '').replace(/\/$/, '').toUpperCase(), W / 2, CY + CH + 176);
-  for (const [x, y, r] of [[120, 110, 20], [960, 95, 26], [1000, 1730, 22], [70, 1700, 16]]) brilho(x, y, r, 0.9);
-  return c;
+// capivara de férias (card de quem passa dos 100 km): colete coral, chapéu de palha, óculos escuros e colar de flores
+function heroFerias(S = 640) {
+  const capi = recolor(GEO.capivara, [[0xb5cc2e, 0xff8c3a]], true);
+  try { return heroShot(S, capi, {hat: GEO.chapeu_palha, extras: [GEO.oculos, GEO.colar_flores]}); } finally { capi.dispose(); }
 }
 
 function frame() {

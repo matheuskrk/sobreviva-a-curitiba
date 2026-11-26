@@ -1074,6 +1074,21 @@ for k in range(5):
     p.append(sphere([VERMELHO, JEANS, LIMA][k % 3], (math.cos(a) * 0.22, math.sin(a) * 0.22, 0.08), 0.035, seg=6, rings=4))
 asset('chapeu_coroa', p)
 
+# ---------------- férias: óculos escuros e colar de flores (mesmo referencial da capivarinha piloto) ----------------
+p = [box(PRETO, (0, 0.74, 2.2), (0.66, 0.05, 0.05))]
+for s_ in (-1, 1):
+    p.append(box(0x1b1b2a, (s_ * 0.3, 0.72, 2.1), (0.05, 0.26, 0.17), bevel=0.02))      # lente de cada lado (olhos na lateral)
+    p.append(box(0xff5c8a, (s_ * 0.3, 0.86, 2.1), (0.06, 0.03, 0.19)))                    # armação rosa
+    p.append(box(PRETO, (s_ * 0.3, 0.42, 2.16), (0.03, 0.36, 0.03)))                     # haste
+asset('oculos', p)
+p = []
+for k in range(14):
+    a = k / 14 * math.tau
+    x, y = math.cos(a) * 0.4, 0.42 + math.sin(a) * 0.36
+    z = 1.74 + (y - 0.42) * -0.3
+    p.append(sphere([0xff5c8a, AMARELO, BRANCO, 0xff8c3a][k % 4], (x, y, z), 0.085, seg=6, rings=4))
+asset('colar_flores', p)
+
 # ---------------- moradores boiando numa boia, acenando (frente +Y) ----------------
 for nome, boia, camisa in [('pessoa_boia', VERMELHO, JEANS), ('pessoa_boia2', AMARELO, ROSA)]:
     p = [prim('torus', boia, (0, 0, 0.12), major_radius=0.55, minor_radius=0.2, major_segments=12, minor_segments=6)]
