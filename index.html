@@ -100,7 +100,7 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-a
 .grade .item.usa{border-color:var(--leaf);background:#f1f7df}.grade .item.caro{opacity:.55}
 .grade .sw{width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(0,0,0,.14)}
 .nuvem{display:grid;gap:8px;border-top:2px dashed #dfe6cf;padding-top:12px}.nuvem b{font-family:var(--f-display);letter-spacing:.04em}button.sec.mini{padding:5px 12px;font-size:13px}
-.envio{display:flex;gap:8px;flex-wrap:wrap}.envio input{flex:1;min-width:140px;font:700 15px var(--f-display);padding:11px 14px;border-radius:999px;border:2px solid var(--leaf);color:var(--ink)}
+.envio{display:flex;gap:8px;flex-wrap:wrap}.envio input{flex:1;min-width:140px;font:700 16px var(--f-display);padding:11px 14px;border-radius:999px;border:2px solid var(--leaf);color:var(--ink)}
 ol.placar{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:60vh;overflow:auto}
 ol.placar li{display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:8px 10px;border-radius:10px;background:#f4f7ea;font-family:var(--f-display);font-weight:800;color:var(--ink)}
 ol.placar li.eu{background:var(--lime);color:#fff}ol.placar li.vazio{display:block;background:none;font-weight:600}
@@ -2616,12 +2616,12 @@ async function makeCard(km, score, rec) {
   // cabeçalho comum: "Fugi por:", os km com 3 casas e o destino
   const cabecalho = col => {
     g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = col;
-    g.font = `900 64px ${BS}`; g.fillText('Fugi por:', M - 2, 140);
-    if (rec) { const sv = g.fillStyle; g.font = `900 34px ${BS}`; const t = 'Novo recorde!', rw = g.measureText(t).width + 48; g.fillStyle = ORANGE; rr(W - M - rw, 84, rw, 64, 32); g.fill(); g.fillStyle = FER ? '#0b5f6a' : '#fff'; g.textBaseline = 'middle'; g.fillText(t, W - M - rw + 24, 117); g.textBaseline = 'alphabetic'; g.fillStyle = sv; }
-    const num = nf(km, 3); let fs = 230; g.font = `900 ${fs}px ${BS}`; while (g.measureText(num).width > 700 && fs > 110) { fs -= 6; g.font = `900 ${fs}px ${BS}`; }
-    g.fillText(num, M - 8, 370); const nw = g.measureText(num).width; g.font = `900 84px ${BS}`; g.fillText('km', M + nw + 10, 370);
-    g.font = `800 44px ${BS}`; g.fillText(FER ? 'De férias: do Barigui até' : 'Dava pra ir do Barigui até', M, 462);
-    g.font = `900 74px ${BS}`; const dn = destinoNome(km); g.fillText(dn.charAt(0).toUpperCase() + dn.slice(1), M - 2, 548);
+    g.font = `900 64px ${BS}`; g.fillText('Fugi por:', M - 2, 290);
+    if (rec) { const sv = g.fillStyle; g.font = `900 34px ${BS}`; const t = 'Novo recorde!', rw = g.measureText(t).width + 48; g.fillStyle = ORANGE; rr(W - M - rw, 234, rw, 64, 32); g.fill(); g.fillStyle = FER ? '#0b5f6a' : '#fff'; g.textBaseline = 'middle'; g.fillText(t, W - M - rw + 24, 267); g.textBaseline = 'alphabetic'; g.fillStyle = sv; }
+    const num = nf(km, 3); let fs = 200; g.font = `900 ${fs}px ${BS}`; while (g.measureText(num).width > 700 && fs > 110) { fs -= 6; g.font = `900 ${fs}px ${BS}`; }
+    g.fillText(num, M - 8, 500); const nw = g.measureText(num).width; g.font = `900 84px ${BS}`; g.fillText('km', M + nw + 10, 500);
+    g.font = `800 44px ${BS}`; g.fillText(FER ? 'De férias: do Barigui até' : 'Dava pra ir do Barigui até', M, 588);
+    g.font = `900 74px ${BS}`; const dn = destinoNome(km); g.fillText(dn.charAt(0).toUpperCase() + dn.slice(1), M - 2, 670);
   };
   // rodapé comum: título do jogo, chamada e o link numa pílula
   const rodape = (y0, col, pill, pillTxt, titulo) => {
@@ -2645,16 +2645,16 @@ async function makeCard(km, score, rec) {
     for (let k = 0; k < 4; k++) { g.beginPath(); const y = HZ + 40 + k * 46; for (let x = 40 + (k % 2) * 60; x < W - 40; x += 180) { g.moveTo(x, y); g.quadraticCurveTo(x + 30, y - 12, x + 60, y); } g.stroke(); }
     g.fillStyle = '#f3cf8e'; g.beginPath(); g.moveTo(0, HZ + 230); for (let x = 0; x <= W; x += 30) g.lineTo(x, HZ + 230 + Math.sin(x / 70) * 8); g.lineTo(W, H); g.lineTo(0, H); g.closePath(); g.fill();
     cabecalho(INK);
-    try { const S = 820; g.drawImage(feriasShot(S), W / 2 - S / 2 + 40, 1500 - S, S, S); } catch (e) {}
-    rodape(1640, INK, INK, PAPER, 'Sobrevivi');
+    try { const S = 740; g.drawImage(feriasShot(S), W / 2 - S / 2 + 40, 1420 - S, S, S); } catch (e) {}
+    rodape(1470, INK, INK, PAPER, 'Sobrevivi');
     return c;
   }
 
   // régua de nível (escala logarítmica de 0,5 a 100 km), mais para cima para sobrar espaço embaixo
-  const Y0 = 1330, Y1 = 660, yOf = k => Y0 - (Math.log10(Math.min(100, Math.max(0.5, k)) / 0.5) / Math.log10(200)) * (Y0 - Y1);
+  const Y0 = 1360, Y1 = 790, yOf = k => Y0 - (Math.log10(Math.min(100, Math.max(0.5, k)) / 0.5) / Math.log10(200)) * (Y0 - Y1);
   const level = yOf(km);
   g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
-  try { const S = Math.max(220, Math.min(440, level + 92 - 600)), cy = level - S + S * 0.21; g.drawImage(heroShot(), M - 40, cy, S, S); } catch (e) {}
+  try { const S = Math.max(220, Math.min(420, level + 92 - 720)), cy = level - S + S * 0.21; g.drawImage(heroShot(), M - 40, cy, S, S); } catch (e) {}
   g.fillStyle = INK; g.fillRect(0, level, W, H - level);
   const dual = fn => {
     g.save(); g.beginPath(); g.rect(0, 0, W, level); g.clip(); fn(INK); g.restore();
@@ -2681,7 +2681,7 @@ async function makeCard(km, score, rec) {
   g.fillStyle = LIME; rr(-10, level - 5, W + 20, 10, 5); g.fill();
   g.beginPath(); g.moveTo(GX - 4, level); g.lineTo(GX - 28, level - 16); g.lineTo(GX - 28, level + 16); g.closePath(); g.fill();
   dual(cabecalho);
-  rodape(1560, PAPER, PAPER, INK, 'Sobreviva');
+  rodape(1490, PAPER, PAPER, INK, 'Sobreviva');
   return c;
 }
 // capivara de férias numa cadeira de praia, com coco, chapéu de palha, óculos escuros e colar de flores
@@ -2737,7 +2737,7 @@ function endRun(zerou) {
   $('resGanho').textContent = 'Contando pinhões…';
   const tinhaLaranja = LOJA.tem.includes('chapeu:laranja');
   ULTIMA.fim = srvTermina(G.dist / 1000, G.pin, score).then(r => { $('resGanho').textContent = `+${r.ganho} pinhões para a loja (total ${r.total.toLocaleString('pt-BR')})` + (!tinhaLaranja && LOJA.tem.includes('chapeu:laranja') ? ' · Você achou um segredo! Veja na loja.' : ''); })
-    .catch(() => { $('resGanho').textContent = 'Sem conexão: os pinhões desta partida não foram contados.'; });
+    .catch(e => { $('resGanho').textContent = e && e.semPartida ? 'Esta partida não chegou a ser registrada no servidor, então os pinhões não foram contados.' : 'Sem conexão: os pinhões desta partida não foram contados.'; });
   $('placarEnvio').hidden = !SRV.ok || G.dist < 200; $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Enviar pro placar';
   try { $('apelido').value = localStorage.getItem('jetski-cwb-nome') || ''; } catch (e) {}
   menuRecorde();
@@ -3658,7 +3658,15 @@ async function srvConecta() {
   try { aplicaEstado(await rpc('estado', {p_codigo: SAVE_COD, p_moedas: LOJA.moedas, p_best: Math.round(best || 0)})); SRV.ok = true; applySkin(); menuCapi(); menuRecorde(); }
   catch (e) { SRV.ok = false; console.warn('servidor', e); }
 }
-function srvInicia() { SRV.partida = null; if (SRV.ok) rpc('iniciar_partida', {p_codigo: SAVE_COD}).then(id => { SRV.partida = id; }).catch(() => {}); }
+let srvTent = 0;
+async function srvInicia() {
+  SRV.partida = null; const minha = ++srvTent;
+  if (!SRV.ok && placarOk()) await srvConecta(); // tocou em jogar antes do servidor responder
+  for (let k = 0; k < 3 && SRV.ok && minha === srvTent; k++) {
+    try { const id = await rpc('iniciar_partida', {p_codigo: SAVE_COD}); if (minha === srvTent) SRV.partida = id; return; }
+    catch (e) { await new Promise(r => setTimeout(r, 1500)); }
+  }
+}
 // fim da partida: devolve uma promessa com {ganho, total}
 async function srvTermina(km, pin, pontos) {
   const local = Math.round(km * 3) + pin * 10;
@@ -3667,7 +3675,7 @@ async function srvTermina(km, pin, pontos) {
     const d = await rpc('terminar_partida', {p_codigo: SAVE_COD, p_id: id, p_km: Math.round(km * 100) / 100, p_pinhoes: pin, p_pontos: pontos});
     aplicaEstado(d); return {ganho: d.ganho, total: LOJA.moedas};
   }
-  if (SRV.ok) throw new Error('partida não registrada');
+  if (SRV.ok) { const e = new Error('partida não registrada'); e.semPartida = true; throw e; }
   if (km >= 100 && !LOJA.tem.includes('chapeu:laranja')) LOJA.tem.push('chapeu:laranja');
   LOJA.moedas += local; salvaLoja(); return {ganho: local, total: LOJA.moedas};
 }
