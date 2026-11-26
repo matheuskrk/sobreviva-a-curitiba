@@ -217,15 +217,15 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 #cardView .cardbox p{color:#1d4a3c}
 /* HUD: a distância num pinhãozinho, com o recorde embaixo */
 #hudKm{top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;display:grid;justify-items:end;gap:4px}
-#hudKm .pinhao{position:relative;isolation:isolate;display:flex;align-items:baseline;gap:2px;color:#6b3418;width:150px;height:60px;box-sizing:border-box;padding:16px 0 0 34px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18));transform:rotate(-6deg)}
+#hudKm .pinhao{position:relative;isolation:isolate;display:flex;align-items:baseline;gap:2px;color:#6b3418;width:196px;height:78px;box-sizing:border-box;justify-content:center;align-items:center;padding:0 8px 2px 0;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18));transform:rotate(-6deg)}
 #hudKm .pinhao::before{content:"";position:absolute;inset:0;z-index:-1;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20200%2080%27%3E%3Cpath%20d%3D%27M40%206C12%206%203%2026%203%2041c0%2020%2018%2033%2044%2033c62%200%20120-15%20150-30C168%2026%20102%206%2040%206Z%27%20fill%3D%27%23e7a465%27/%3E%3Cpath%20d%3D%27M60%2015c-22%200-29%2014-29%2025c0%2015%2013%2025%2032%2025c52%200%2096-11%20120-21C160%2031%20110%2015%2060%2015Z%27%20fill%3D%27%23efb88c%27/%3E%3C/svg%3E") center/100% 100% no-repeat}
 /* o do recorde: menor, com a ponta para o outro lado, como dois pinhões soltos */
-#hudKm .pinhao.rec{width:146px;height:50px;padding:16px 0 0 38px;margin-right:22px;transform:rotate(5deg)}
+#hudKm .pinhao.rec{width:172px;height:62px;padding:0 0 2px 10px;margin-right:22px;transform:rotate(5deg)}
 #hudKm .pinhao.rec::before{transform:scaleX(-1)}
-#hudKm .pinhao.rec span{font:900 11.5px/1.05 var(--f-display);color:#6b3418;white-space:nowrap}
+#hudKm .pinhao.rec span{font:900 14px/1.05 var(--f-display);color:#6b3418;white-space:nowrap}
 #hudKm.novo .pinhao.rec::before{filter:hue-rotate(-18deg) saturate(1.8) brightness(1.05)}
-#hudKm b{font:900 26px/1 var(--f-display);font-variant-numeric:tabular-nums}
-#hudKm .pinhao small{font:900 13px/1 var(--f-display)}
+#hudKm b{font:900 32px/1 var(--f-display);font-variant-numeric:tabular-nums}
+#hudKm .pinhao small{font:900 16px/1 var(--f-display);margin-left:2px}
 .grade .item.prev{border-color:#f0892a;background:#fff6ec}
 #lojaDica{margin:0;font-size:13px;font-weight:700;color:#c25e0e;min-height:1em}
 
@@ -2721,7 +2721,8 @@ function endRun(zerou) {
   salvaRecordeKm(G.dist / 1000);
   Object.assign(ULTIMA, {km: G.dist / 1000, pontos: score, enviada: false, partida: null});
   $('resGanho').textContent = 'Contando pinhões…';
-  ULTIMA.fim = srvTermina(G.dist / 1000, G.pin, score).then(r => { $('resGanho').textContent = `+${r.ganho} pinhões para a loja (total ${r.total.toLocaleString('pt-BR')})`; })
+  const tinhaLaranja = LOJA.tem.includes('chapeu:laranja');
+  ULTIMA.fim = srvTermina(G.dist / 1000, G.pin, score).then(r => { $('resGanho').textContent = `+${r.ganho} pinhões para a loja (total ${r.total.toLocaleString('pt-BR')})` + (!tinhaLaranja && LOJA.tem.includes('chapeu:laranja') ? ' · Segredo liberado: a laranja na cabeça! Veja na loja.' : ''); })
     .catch(() => { $('resGanho').textContent = 'Sem conexão: os pinhões desta partida não foram contados.'; });
   $('placarEnvio').hidden = !SRV.ok || G.dist < 200; $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Enviar pro placar';
   try { $('apelido').value = localStorage.getItem('jetski-cwb-nome') || ''; } catch (e) {}
@@ -3499,17 +3500,19 @@ function stepSpeedWind(dt) {
 // ---------- loja: coletes, chapéus e jet skis, pagos com os pinhões juntados nas partidas ----------
 const LOJA_ITENS = {
   colete: [['lima', 'Lima', 0xb5cc2e, 0], ['laranja', 'Laranja', 0xf39a2b, 30], ['rosa', 'Rosa', 0xe05a9a, 40], ['jeans', 'Azul-jeans', 0x3a6fd9, 40], ['roxo', 'Ipê roxo', 0xa05ab8, 60], ['ouro', 'Dourado', 0xf2c230, 150]],
-  chapeu: [['laranja', 'Laranja', null, 0], ['touca', 'Touca de lã', 'chapeu_touca', 50], ['capacete', 'Capacete de obra', 'chapeu_capacete', 60], ['bone', 'Boné', 'chapeu_bone', 60], ['palha', 'Chapéu de palha', 'chapeu_palha', 80], ['coroa', 'Coroa', 'chapeu_coroa', 200]],
+  chapeu: [['nenhum', 'Sem chapéu', null, 0], ['laranja', 'Laranja', 'laranja', -1], ['touca', 'Touca de lã', 'chapeu_touca', 50], ['capacete', 'Capacete de obra', 'chapeu_capacete', 60], ['bone', 'Boné', 'chapeu_bone', 60], ['palha', 'Chapéu de palha', 'chapeu_palha', 80], ['coroa', 'Coroa', 'chapeu_coroa', 200]],
   jet: [['classico', 'Clássico', [0xf4f4ec, 0xb5cc2e], 0], ['tubo', 'Estação-tubo', [0xd8dde0, 0x3a6fd9], 60], ['biarticulado', 'Biarticulado', [0xd93a3a, 0xf4f4ec], 80], ['araucaria', 'Araucária', [0x3f8a46, 0xe7c77a], 80], ['noite', 'Noite', [0x2a2f2c, 0xf39a2b], 120]],
 };
 const LOJA_ABAS = [['colete', 'Coletes'], ['chapeu', 'Chapéus'], ['jet', 'Jet skis']];
-const LOJA = {moedas: 0, tem: ['colete:lima', 'chapeu:laranja', 'jet:classico'], usa: {colete: 'lima', chapeu: 'laranja', jet: 'classico'}, aba: 'colete'};
+const LOJA = {moedas: 0, tem: ['colete:lima', 'chapeu:nenhum', 'jet:classico'], usa: {colete: 'lima', chapeu: 'nenhum', jet: 'classico'}, aba: 'colete'};
 try { const sv = JSON.parse(localStorage.getItem('jetski-cwb-loja') || 'null'); if (sv) Object.assign(LOJA, sv, {aba: 'colete'}); } catch (e) {}
+// a laranja na cabeça virou segredo de 100 km; o padrão agora é sem chapéu
+if (!LOJA.tem.includes('chapeu:nenhum')) { LOJA.tem = LOJA.tem.filter(k => k !== 'chapeu:laranja').concat('chapeu:nenhum'); if (LOJA.usa.chapeu === 'laranja') LOJA.usa.chapeu = 'nenhum'; }
 const salvaLoja = () => { try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {} };
 const itemDe = (cat, id) => LOJA_ITENS[cat].find(i => i[0] === id) || LOJA_ITENS[cat][0];
 // troca cores de vértice (comparando na cor linear do glTF) e, se pedido, esconde a laranja da cabeça
 const ORANGE_HEAD = new THREE.Vector3(0, 2.3, -0.4);
-function recolor(geo, pairs, hideOrange) {
+function recolor(geo, pairs, hideOrange, yMin = 2.2) {
   const g = geo.clone(), col = g.attributes.color, pos = g.attributes.position;
   if (!col) return g;
   g.setAttribute('color', col.clone()); g.setAttribute('position', pos.clone());
@@ -3517,7 +3520,7 @@ function recolor(geo, pairs, hideOrange) {
   const laranja = new THREE.Color(0xf39a2b), folha = new THREE.Color(0x3f8a46);
   const near = (i, c) => Math.abs(C.getX(i) - c.r) + Math.abs(C.getY(i) - c.g) + Math.abs(C.getZ(i) - c.b) < 0.06;
   for (let i = 0; i < C.count; i++) {
-    if (hideOrange && P.getY(i) > 2.2 && (near(i, laranja) || near(i, folha))) { P.setXYZ(i, ORANGE_HEAD.x, ORANGE_HEAD.y, ORANGE_HEAD.z); continue; }
+    if (hideOrange && P.getY(i) > yMin && (near(i, laranja) || near(i, folha))) { P.setXYZ(i, ORANGE_HEAD.x, ORANGE_HEAD.y, ORANGE_HEAD.z); continue; }
     for (const [a, b] of src) if (near(i, a)) { C.setXYZ(i, b.r, b.g, b.b); break; }
   }
   return g;
@@ -3533,11 +3536,13 @@ function setHat(rider, hatGeo) {
 function applySkin() {
   const old = [SKIN.capi, SKIN.jet];
   const ve = itemDe('colete', LOJA.usa.colete), ch = itemDe('chapeu', LOJA.usa.chapeu), jt = itemDe('jet', LOJA.usa.jet);
-  SKIN.capi = recolor(GEO.capivara, [[0xb5cc2e, ve[2]]], !!ch[2]);
+  const laranja = ch[0] === 'laranja';
+  SKIN.capi = recolor(GEO.capivara, [[0xb5cc2e, ve[2]]], !laranja);
   SKIN.jet = recolor(GEO.jetski, [[0xf4f4ec, jt[2][0]], [0xb5cc2e, jt[2][1]]], false);
-  SKIN.hat = ch[2] ? GEO[ch[2]] : null;
+  SKIN.hat = ch[2] && !laranja ? GEO[ch[2]] : null;
   SKI_JET.geometry = SKIN.jet; SKI_CAPI.geometry = SKIN.capi; setHat(SKI_CAPI, SKIN.hat);
-  if (INTRO.built) { iSki.children[0].geometry = SKIN.jet; iSkiRider.geometry = SKIN.capi; setHat(iSkiRider, SKIN.hat); }
+  if (INTRO.built) { iSki.children[0].geometry = SKIN.jet; iSkiRider.geometry = SKIN.capi; setHat(iSkiRider, SKIN.hat);
+    const hg = recolor(GEO.capivara_heroi, [[0xb5cc2e, ve[2]]], !laranja, 1.3); if (iHero.geometry !== GEO.capivara_heroi) iHero.geometry.dispose(); iHero.geometry = hg; }
   for (const g of old) if (g !== GEO.capivara && g !== GEO.jetski) g.dispose();
 }
 applySkin();
@@ -3548,8 +3553,9 @@ function lojaRender() {
   $('lojaAbas').innerHTML = LOJA_ABAS.map(([k, n]) => `<button class="${k === LOJA.aba ? 'on' : ''}" data-aba="${k}">${n}</button>`).join('');
   $('lojaGrade').innerHTML = LOJA_ITENS[LOJA.aba].map(([id, nome, v, preco]) => {
     const key = LOJA.aba + ':' + id, tem = LOJA.tem.includes(key), usa = LOJA.usa[LOJA.aba] === id, prev = LOJA.prev === key;
-    const cor = LOJA.aba === 'colete' ? v : LOJA.aba === 'jet' ? v[1] : ({touca: 0xc23b3b, capacete: 0xf2c230, bone: 0x3a6fd9, palha: 0xe7c77a, coroa: 0xf2c230}[id] || 0xf39a2b);
+    const cor = LOJA.aba === 'colete' ? v : LOJA.aba === 'jet' ? v[1] : ({nenhum: 0xeee8d5, laranja: 0xf39a2b, touca: 0xc23b3b, capacete: 0xf2c230, bone: 0x3a6fd9, palha: 0xe7c77a, coroa: 0xf2c230}[id] || 0xf39a2b);
     const cor2 = LOJA.aba === 'jet' ? v[0] : cor, hex = c => '#' + c.toString(16).padStart(6, '0');
+    if (preco < 0 && !tem) return `<button class="item caro" data-id="${id}" disabled><span class="sw" style="background:#d9d2bd"></span><b>???</b><small>Segredo: 100 km</small></button>`;
     const acao = usa ? 'Usando' : tem ? 'Usar' : prev ? (preco > LOJA.moedas ? `Faltam ${preco - LOJA.moedas}` : `Comprar · ${preco}`) : `${preco} pinhões`;
     return `<button class="item${usa ? ' usa' : ''}${prev ? ' prev' : ''}${!tem && preco > LOJA.moedas ? ' caro' : ''}" data-id="${id}"><span class="sw" style="background:linear-gradient(135deg,${hex(cor2)} 50%,${hex(cor)} 50%)"></span><b>${nome}</b><small>${acao}</small></button>`;
   }).join('');
@@ -3628,7 +3634,7 @@ function aplicaEstado(d) {
   if (!d) return;
   const ok = k => { const [cat, id] = String(k).split(':'); return LOJA_ITENS[cat] && LOJA_ITENS[cat].some(i => i[0] === id); };
   LOJA.moedas = Math.max(0, Math.floor(Number(d.moedas) || 0));
-  LOJA.tem = [...new Set(['colete:lima', 'chapeu:laranja', 'jet:classico', ...(d.tem || []).filter(ok)])];
+  LOJA.tem = [...new Set(['colete:lima', 'chapeu:nenhum', 'jet:classico', ...(d.tem || []).filter(ok)])];
   for (const cat of Object.keys(LOJA_ITENS)) { const id = d.usa && d.usa[cat]; LOJA.usa[cat] = LOJA.tem.includes(cat + ':' + id) ? id : LOJA_ITENS[cat][0][0]; }
   if (d.best > (best || 0)) { best = Math.floor(d.best); try { localStorage.setItem('jetski-cwb-score', String(best)); } catch (e) {} }
   try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {}
@@ -3648,6 +3654,7 @@ async function srvTermina(km, pin, pontos) {
     aplicaEstado(d); return {ganho: d.ganho, total: LOJA.moedas};
   }
   if (SRV.ok) throw new Error('partida não registrada');
+  if (km >= 100 && !LOJA.tem.includes('chapeu:laranja')) LOJA.tem.push('chapeu:laranja');
   LOJA.moedas += local; salvaLoja(); return {ganho: local, total: LOJA.moedas};
 }
 

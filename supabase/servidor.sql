@@ -12,8 +12,8 @@
 create table if not exists public.jogador (
   codigo text primary key check (codigo ~ '^[A-Z0-9]{12}$'),
   moedas integer not null default 0 check (moedas >= 0),
-  tem text[] not null default array['colete:lima', 'chapeu:laranja', 'jet:classico'],
-  usa jsonb not null default '{"colete":"lima","chapeu":"laranja","jet":"classico"}',
+  tem text[] not null default array['colete:lima', 'chapeu:nenhum', 'jet:classico'],
+  usa jsonb not null default '{"colete":"lima","chapeu":"nenhum","jet":"classico"}',
   best integer not null default 0,
   criado timestamptz not null default now()
 );
@@ -30,7 +30,7 @@ create index if not exists partida_codigo on public.partida (codigo, inicio desc
 create table if not exists public.preco (item text primary key, valor integer not null);
 insert into public.preco (item, valor) values
   ('colete:lima', 0), ('colete:laranja', 30), ('colete:rosa', 40), ('colete:jeans', 40), ('colete:roxo', 60), ('colete:ouro', 150),
-  ('chapeu:laranja', 0), ('chapeu:touca', 50), ('chapeu:capacete', 60), ('chapeu:bone', 60), ('chapeu:palha', 80), ('chapeu:coroa', 200),
+  ('chapeu:nenhum', 0), ('chapeu:laranja', 999999), ('chapeu:touca', 50), ('chapeu:capacete', 60), ('chapeu:bone', 60), ('chapeu:palha', 80), ('chapeu:coroa', 200),
   ('jet:classico', 0), ('jet:tubo', 60), ('jet:biarticulado', 80), ('jet:araucaria', 80), ('jet:noite', 120)
 on conflict (item) do update set valor = excluded.valor;
 
@@ -80,7 +80,9 @@ begin
   v_ganho := round(v_km * 3)::int + v_pin * 10;
   update partida set fim = now(), km = round(v_km, 2), pontos = v_pts where id = p_id;
   update jogador set moedas = moedas + v_ganho, best = greatest(best, v_pts) where codigo = p_codigo;
-  return _estado(p_codigo) || jsonb_build_object('ganho', v_ganho, 'km', round(v_km, 2));
+  -- segredo: 100 km numa partida libera a laranja na cabeça
+  if v_km >= 100 then update jogador set tem = array_append(tem, 'chapeu:laranja') where codigo = p_codigo and not ('chapeu:laranja' = any (tem)); end if;
+  return _estado(p_codigo) || jsonb_build_object('ganho', v_ganho, 'km', round(v_km, 2), 'laranja', v_km >= 100);
 end $$;
 
 create or replace function public.comprar(p_codigo text, p_item text) returns jsonb
@@ -114,3 +116,5 @@ revoke all on function public.estado(text, integer, integer), public.iniciar_par
   public.comprar(text, text), public.enviar_placar(text, uuid, text) from public;
 grant execute on function public.estado(text, integer, integer), public.iniciar_partida(text), public.terminar_partida(text, uuid, numeric, integer, integer),
   public.comprar(text, text), public.enviar_placar(text, uuid, text) to anon;
+
+-- (a laranja na cabeça é segredo de quem faz 100 km: ver supabase/laranja.sql)
