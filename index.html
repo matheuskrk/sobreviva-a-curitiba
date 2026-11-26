@@ -123,6 +123,20 @@ button.x:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .soc .sb:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .soc .sb[aria-disabled="true"]{background:#9aa894;cursor:default}
 .soc .sb.nome{cursor:default;padding:9px 16px}
+#polaroids{display:flex;justify-content:center;gap:14px;padding:6px 0}
+#polaroids[hidden]{display:none}
+#polaroids figure{margin:0;width:min(42%,132px);padding:7px 7px 5px;background:#fff;box-shadow:0 5px 14px rgba(29,74,60,.35);transform:rotate(-5deg)}
+#polaroids figure:nth-child(2){transform:rotate(4deg) translateY(6px)}
+#polaroids figure{position:relative;cursor:pointer}
+#polaroids figure:focus-visible{outline:3px solid #f0892a;outline-offset:3px}
+#polaroids figure[aria-pressed="true"]{outline:4px solid #b5cc2e;outline-offset:2px}
+#polaroids figure[aria-pressed="true"]::after{content:"✓";position:absolute;top:-10px;right:-10px;width:28px;height:28px;border-radius:50%;background:#b5cc2e;color:#1d4a3c;font:900 18px/28px Nunito,sans-serif;text-align:center}
+#fotoDica{text-align:center}
+#polaroids img{display:block;width:100%;aspect-ratio:1;background:#0e1a16}
+#polaroids figcaption{margin-top:6px;text-align:center;font:italic 700 12px/1.3 "Bradley Hand","Segoe Print",cursive;color:#1d4a3c}
+/* tela de fim: se não couber, começa pelo topo e rola; com as polaroids, o card dos stories fica menor */
+#result{align-items:safe center;align-content:safe center;overflow-y:auto}
+#result:has(#polaroids:not([hidden])) #resCard{width:84px}
 #resCard{width:132px;aspect-ratio:9/16;border-radius:12px;box-shadow:0 4px 14px rgba(30,94,52,.25);justify-self:center;cursor:pointer;background:#eee8d5}
 #cardView{z-index:12;background:rgba(14,40,24,.82)}
 .cardbox{display:grid;gap:12px;justify-items:center;text-align:center;max-width:100%}
@@ -151,7 +165,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 #bar .tick{position:absolute;top:-3px;width:4px;height:14px;margin-left:-2px;border-radius:2px;background:var(--leaf)}
 #barme{position:absolute;top:-5px;left:0;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--orange);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);z-index:1}
 #mini{width:104px;height:104px}#tl{padding:8px 12px}#score{font-size:24px}#speed{font-size:28px}#turbo{width:120px}#street{max-width:62%;font-size:15px}#credit{font-size:9px}
-#ctl{top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;display:flex;gap:8px;pointer-events:auto}
+#ctl{bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:calc(env(safe-area-inset-left,0px) + 12px);display:flex;gap:8px;pointer-events:auto}
 #ctl button{width:40px;height:40px;border-radius:50%;border:0;background:var(--panel);box-shadow:0 3px 10px rgba(30,94,52,.2);display:grid;place-items:center;cursor:pointer;padding:0}
 #ctl button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 #ctl svg{width:20px;height:20px;fill:var(--ink);stroke:var(--ink)}
@@ -222,6 +236,23 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 .screen:not(.menu) button.sec{border:3px solid #1d4a3c;color:#1d4a3c;background:#fff;border-radius:999px;box-shadow:0 4px 0 rgba(29,74,60,.2)}
 .screen:not(.menu) button.x{border-radius:50%}
 #cardView .cardbox p{color:#1d4a3c}
+/* tela de fim: "Jogar de novo" e "Voltar ao menu principal" dividem a mesma linha */
+.screen:not(.menu)#result .acoes #retry,.screen:not(.menu)#result .acoes #resMenu{flex:1 1 calc(50% - 5px);min-width:0;padding:12px 10px;font-size:16px;line-height:1.2;align-self:stretch}
+/* apelido e "Enviar pro placar" numa barra única */
+.envio[hidden]{display:none}
+.screen:not(.menu)#result .envio{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;padding:4px;background:#fff;border:3px solid #1d4a3c;border-radius:999px;box-shadow:0 4px 0 rgba(29,74,60,.2)}
+.screen:not(.menu)#result .envio:focus-within{outline:3px solid #f0892a;outline-offset:2px}
+.screen:not(.menu)#result .envio svg{flex:none;width:20px;height:20px;margin-left:10px;fill:none;stroke:#5a9a4a;stroke-width:2.4;stroke-linecap:round}
+.screen:not(.menu)#result .envio #apelido{flex:1;width:0;min-width:0;border:0;outline:0;background:transparent;padding:10px 2px;border-radius:0}
+.screen:not(.menu)#result .envio #enviaBtn{flex:none;margin:0;border:0;border-radius:999px;background:#b5cc2e;color:#1d4a3c;box-shadow:none;padding:11px 14px;font-size:15px;font-weight:900;white-space:nowrap}
+.screen:not(.menu)#result .envio #enviaBtn:focus-visible{outline:3px solid #1d4a3c;outline-offset:-5px}
+.screen:not(.menu)#result .envio #enviaBtn:disabled{background:#dde5b8;cursor:default}
+@media (max-width:440px){#enviaBtn .longo{display:none}} /* celular: sobra espaço para o apelido */
+/* pausa sem imagem de fundo: o jogo fica visível exatamente onde parou */
+#pausa{background:transparent}
+#pausa::before{display:none}
+/* na pausa, os botões de pausa e som ficam por cima da tela pausada e continuam clicáveis */
+body:has(#pausa:not([hidden])) #ctl{z-index:11}
 /* HUD: a distância num pinhãozinho, com o recorde embaixo */
 #hudKm{top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;display:grid;justify-items:end;gap:4px}
 #hudInfo{bottom:calc(env(safe-area-inset-bottom,0px) + 14px);right:10px;display:grid;justify-items:end;gap:2px}
@@ -246,7 +277,6 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 
 <div class="hud" id="ctl">
   <button id="bPause" aria-label="Pausar"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="4" width="3.4" height="12" rx="1"/><rect x="11.6" y="4" width="3.4" height="12" rx="1"/></svg></button>
-  <button id="bCred" aria-label="Créditos"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke-width="1.8"/><rect x="9" y="8.6" width="2" height="6" rx="1"/><circle cx="10" cy="5.8" r="1.2"/></svg></button>
   <button id="bSom" aria-label="Desligar som"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3.5v11L6 12H3z"/><path class="onda1" d="M13 7.5a3.5 3.5 0 0 1 0 5" fill="none" stroke-width="1.8"/><path class="onda2" d="M15.2 5.2a6.6 6.6 0 0 1 0 9.6" fill="none" stroke-width="1.8"/></svg></button>
 </div>
 <div class="hud" id="wavefx"></div>
@@ -273,7 +303,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
     <div class="mn-miolo">
       <div id="loading">Esperando o Ligeirinho (pode demorar)…</div>
       <button class="mn-go" id="start" hidden>Salve-se quem puder!</button>
-      <div class="mn-links"><button id="lojaBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg>Loja</button><button id="placarBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke-width="2"/><path d="M10 14h4v3h2v3H8v-3h2z"/></svg>Placar</button><button id="credBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Créditos</button></div>
+      <div class="mn-links"><button id="lojaBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg>Lojinha</button><button id="placarBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v6a5 5 0 0 1-10 0z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke-width="2"/><path d="M10 14h4v3h2v3H8v-3h2z"/></svg>Placar</button><button id="credBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Créditos</button></div>
       <div class="pw" id="pw" role="list"></div>
       <p class="pw-desc" id="pwDesc" aria-live="polite" hidden></p>
     </div>
@@ -282,7 +312,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 <div id="pausa" class="screen" hidden>
   <div class="card">
     <header><h1>Pausado</h1></header>
-    <div class="body"><div class="acoes"><button class="go" id="continuar">Continuar</button><button class="sec" id="recomecar">Recomeçar</button><button class="sec" id="credPausa">Créditos</button><button class="sec" id="menuPausa">Menu principal</button></div></div>
+    <div class="body"><div class="acoes"><button class="go" id="continuar">Continuar</button><button class="sec" id="recomecar">Recomeçar</button><button class="sec" id="soMusica" aria-pressed="true">Música: ligada</button><button class="sec" id="credPausa">Créditos</button><button class="sec" id="menuPausa">Voltar ao menu principal</button></div></div>
   </div>
 </div>
 <div id="creditos" class="screen" hidden>
@@ -310,7 +340,7 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
 </div>
 <div id="loja" class="screen" hidden>
   <div class="card">
-    <header class="hx"><h1>Loja</h1><button class="x" id="lojaFecha" aria-label="Fechar loja"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke-width="2.4" stroke-linecap="round"/></svg></button></header>
+    <header class="hx"><h1>Lojinha</h1><button class="x" id="lojaFecha" aria-label="Fechar lojinha"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke-width="2.4" stroke-linecap="round"/></svg></button></header>
     <div class="body">
       <div class="lojatopo"><img id="lojaPrev" alt="Sua capivara com a roupa escolhida"><p class="moedas"><b id="lojaMoedas">0</b> pinhões<br><small>3 por km e 10 por pinhão pego</small></p></div>
       <div class="abas" id="lojaAbas" role="tablist"></div>
@@ -333,9 +363,11 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
       <p id="resText"></p>
       <p class="meta" id="resScore"></p>
       <p class="meta" id="resGanho"></p>
+      <div id="polaroids" hidden></div>
+      <p class="meta" id="fotoDica" hidden>Toque na foto que vai para o card dos stories.</p>
       <img id="resCard" alt="Card com a sua distância e pontuação">
-      <div class="envio" id="placarEnvio" hidden><input id="apelido" maxlength="16" placeholder="Seu apelido" autocomplete="nickname" aria-label="Apelido para o placar"><button class="sec" id="enviaBtn">Enviar pro placar</button></div>
-      <div class="acoes"><button class="go" id="retry">Jogar de novo</button><button class="sec" id="shareBtn">Compartilhar nos stories</button><button class="sec" id="lojaRes">Loja</button></div>
+      <div class="envio" id="placarEnvio" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><input id="apelido" maxlength="16" placeholder="Seu apelido" autocomplete="nickname" aria-label="Apelido para o placar"><button class="sec" id="enviaBtn">Enviar<span class="longo"> pro placar</span></button></div>
+      <div class="acoes"><button class="go" id="retry">Jogar de novo</button><button class="sec" id="resMenu">Voltar ao menu principal</button><button class="sec" id="shareBtn">Compartilhar nos stories</button><button class="sec" id="lojaRes">Lojinha</button></div>
     </div>
   </div>
 </div>
@@ -1728,7 +1760,6 @@ const WEATHER = [
   {id: 'sol', name: 'Sol', dur: 35, fog: 0xe4edd2, top: 0x8ec5e6, near: 120, far: 1100, rain: 0, light: 1, amp: 1, sun: 2.2, hemi: 1.3, night: 0, msg: 'Abriu o sol'},
   {id: 'garoa', name: 'Garoa', dur: 25, fog: 0xc9d3cc, top: 0xa7b6bf, near: 90, far: 700, rain: 800, light: .86, amp: 1.1, sun: 1.3, hemi: 1.1, night: .2, msg: 'Garoa chegando'},
   {id: 'temporal', name: 'Temporal', dur: 30, fog: 0x8d9a99, top: 0x5f6d73, near: 50, far: 480, rain: 2600, light: .62, amp: 1.35, sun: .5, hemi: .8, night: .75, msg: 'Temporal! Cuidado com os galhos'},
-  {id: 'granizo', name: 'Granizo', dur: 18, fog: 0xb3bec2, top: 0x7d8b91, near: 60, far: 520, rain: 400, light: .74, amp: 1.25, sun: .7, hemi: 1, night: .5, hail: 1, msg: 'Granizo! Os galhos caem mais rápido'},
   {id: 'neblina', name: 'Neblina', dur: 25, fog: 0xdfe3df, top: 0xdfe3df, near: 15, far: 230, rain: 0, light: .9, amp: .8, sun: 1, hemi: 1.2, night: .3, msg: 'Neblina no centro'},
 ];
 WEATHER.forEach(w => { w.fogC = new THREE.Color(w.fog); w.topC = new THREE.Color(w.top); });
@@ -1882,7 +1913,7 @@ const STAR_MAT = new THREE.PointsMaterial({size: 6, color: 0xffffff, transparent
     fragmentShader: `uniform float uTime; varying vec2 vUv;
       void main(){ float s = fract(vUv.x*0.12 - uTime*0.9 + sin(vUv.y*6.28)*0.15); float m = smoothstep(.0,.15,s)*smoothstep(.45,.2,s);
         float edge = smoothstep(0.,.25,vUv.y)*smoothstep(1.,.75,vUv.y);
-        gl_FragColor = vec4(vec3(.92,.97,1.), (0.12 + m*0.5)*edge); }`
+        gl_FragColor = vec4(vec3(.8,.9,.93), (0.07 + m*0.25)*edge); }`
   })));
 }
 
@@ -2118,7 +2149,7 @@ function dnbReese(midi, t, dur, vol) {
 }
 // ---------- trilha drum & bass em seções (≈2 min antes de repetir) ----------
 // introdução, A (melodia do hino), B (melodia + arpejo e baixo sincopado), respiro (sem bateria, crescendo até a volta),
-// drop (melodia uma oitava acima, dobrada, com ride e arpejo) e A' (melodia com eco); viradas a cada 4 e 8 compassos
+// drop (melodia uma oitava acima, dobrada, com ride e arpejo) e A' (melodia em triângulo); viradas a cada 4 e 8 compassos
 const SONG = [['intro', 4], ['A', 20], ['B', 20], ['respiro', 8], ['drop', 20], ['A2', 20]];
 const SONG_LEN = SONG.reduce((a, s) => a + s[1], 0);
 function songAt(bar) { let b = bar % SONG_LEN; for (const [name, len] of SONG) { if (b < len) return {name, i: b, len}; b -= len; } return {name: 'A', i: 0, len: 20}; }
@@ -2158,7 +2189,7 @@ function dnbTick(ac) {
         if (nm === 'A') chipNote('square', base, t, dur, 0.06);
         else if (nm === 'B') { chipNote('square', base, t, dur, 0.05); chipNote('triangle', base - 12, t, dur, 0.035); }
         else if (nm === 'drop') { chipNote('square', base + 12, t, dur, 0.045); chipNote('triangle', base, t, dur, 0.06); }
-        else { chipNote('triangle', base, t, dur, 0.07); chipNote('square', base + 12, t + sx * 3, dur * 0.6, 0.022); } // A': com eco
+        else chipNote('triangle', base, t, dur, 0.07); // A'
       }
     }
     // baixo reese: padrão muda por seção
@@ -2170,7 +2201,7 @@ function dnbTick(ac) {
     // acordes longos
     if ((nm === 'intro' || nm === 'B' || nm === 'respiro' || nm === 'A2') && s16 === 0 && bi % 2 === 0) dnbPad(root, t, sx * 32, nm === 'respiro' ? 0.05 : 0.03);
     // arpejo em semicolcheias
-    if ((nm === 'B' && bi >= 4) || nm === 'drop') { const arp = [24, 31, 36, 31, 24, 31, 39, 31]; chipNote('square', root + arp[s16 % 8] - 12, t, sx * 0.8, nm === 'drop' ? 0.024 : 0.018); }
+    if ((nm === 'B' && bi >= 4) || nm === 'drop') { const arp = [24, 31, 36, 31, 24, 31, 36, 31]; chipNote('square', root + arp[s16 % 8] - 12, t, sx * 0.8, nm === 'drop' ? 0.024 : 0.018); } // só tônica e quinta: não briga com a terça da melodia
     // bateria
     if (main) {
       const kicks = v < 0.4 ? [0, 10] : v < 0.7 ? [0, 6, 10] : [0, 10, 11];
@@ -2201,9 +2232,18 @@ function setMusicStyle(st) {
   for (const id of ['musicaBtn', 'musicaPausa']) { const b = document.getElementById(id); if (b) b.textContent = 'Música: ' + (st === 'dnb' ? 'Drum & Bass' : 'Original'); }
   if (MUSIC.playing && audio.ctx) Object.assign(MUSIC, {next: audio.ctx.currentTime + 0.05, step: 0, li: 0, lLeft: 0}); // recomeça do início da música
 }
+// liga e desliga só a trilha (efeitos, motor e chuva continuam); a escolha fica salva no aparelho
+let musicaLigada = true;
+try { musicaLigada = localStorage.getItem('jetski-cwb-musica') !== 'nao'; } catch (e) {}
+function mostraMusica() { const b = document.getElementById('soMusica'); b.textContent = 'Música: ' + (musicaLigada ? 'ligada' : 'desligada'); b.setAttribute('aria-pressed', musicaLigada); }
+function alternaMusica() {
+  musicaLigada = !musicaLigada; if (MUSIC.gain) MUSIC.gain.gain.value = musicaLigada ? 1.0 : 0;
+  try { localStorage.setItem('jetski-cwb-musica', musicaLigada ? 'sim' : 'nao'); } catch (e) {}
+  mostraMusica(); if (audio.on) somBotao(musicaLigada);
+}
 function startMusic() {
   if (!audio.ctx) return;
-  if (!MUSIC.gain) { MUSIC.gain = audio.ctx.createGain(); MUSIC.gain.gain.value = 1.0; MUSIC.gain.connect(audio.master);
+  if (!MUSIC.gain) { MUSIC.gain = audio.ctx.createGain(); MUSIC.gain.gain.value = musicaLigada ? 1.0 : 0; MUSIC.gain.connect(audio.master);
     // ronco grave da onda, que sobe quando ela chega perto
     const src = audio.ctx.createBufferSource(); src.buffer = audio.nb; src.loop = true;
     const lp = audio.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 140;
@@ -2235,7 +2275,7 @@ function musicTick() {
 }
 
 // ---------- obstáculos ----------
-const swirlG = new THREE.CircleGeometry(3.0, 36); swirlG.rotateX(-Math.PI / 2);
+const swirlG = new THREE.CircleGeometry(2.3, 36); swirlG.rotateX(-Math.PI / 2);
 const swirlMat = new THREE.ShaderMaterial({
   transparent: true, depthWrite: false, uniforms: {uTime},
   vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
@@ -2251,6 +2291,8 @@ const swirlMat = new THREE.ShaderMaterial({
 
 const holeG = new THREE.CircleGeometry(1.7, 16); holeG.rotateX(-Math.PI / 2);
 const rimG = new THREE.RingGeometry(1.7, 2.2, 16); rimG.rotateX(-Math.PI / 2);
+// borda irregular para a cratera não parecer um bueiro sem tampa (o buraco e a borda usam a mesma deformação)
+for (const g of [holeG, rimG]) { const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i), a = Math.atan2(z, x), f = 1 + 0.09 * Math.sin(3 * a + 1) + 0.06 * Math.sin(5 * a + 2.5); p.setX(i, x * f); p.setZ(i, z * f); } }
 const holeMat = new THREE.MeshBasicMaterial({color: 0x0e1a16}), rimMat = new THREE.MeshBasicMaterial({color: 0x6b5a44});
 const shadowG = new THREE.CircleGeometry(2.2, 20); shadowG.rotateX(-Math.PI / 2);
 const TRASH_COLORS = [0xd93a3a, 0x3a6fd9, 0x3f8a46, 0xf2c230, 0x8a5a2b];
@@ -2272,8 +2314,8 @@ function makeObstacle(type, s, lanes) {
       o.shadow.scale.set(1, 1, 2.6); scene.add(o.shadow); o.mesh.visible = false;
     }
   } else if (type === 'cratera') {
-    o.len = 3.6; const h = mk(holeG, holeMat), r = mk(rimG, rimMat); h.position.y = 0.36; r.position.y = 0.37; o.root.add(h, r);
-    const c = mk(GEO.cone); c.position.set(1.9, 0.2, 0); c.rotation.z = -0.4; o.root.add(c);
+    o.len = 3.0; const h = mk(holeG, holeMat), r = mk(rimG, rimMat); h.scale.set(0.82, 1, 0.82); r.scale.copy(h.scale); h.position.y = 0.36; r.position.y = 0.37; h.rotation.y = r.rotation.y = Math.random() * Math.PI * 2; o.root.add(h, r); // cada cratera vira para um lado
+    const c = mk(GEO.cone); c.position.set(1.56, 0.2, 0); c.scale.setScalar(0.82); o.root.add(c);
   } else if (type === 'cones') {
     o.len = 2.6; for (const [x, z] of [[-0.9, 0.6], [0.9, 0.6], [0, -0.7]]) { const c = mk(GEO.cone); c.position.set(x, 0.15, z); o.root.add(c); }
   } else if (type === 'tapume') {
@@ -2282,9 +2324,10 @@ function makeObstacle(type, s, lanes) {
     o.len = 1.6; o.state = 'wait'; o.side = lanes.includes(1) ? 1 : -1;
     o.mesh = mk(GEO.poste); o.root.add(o.mesh);
   } else if (type === 'bueiro') {
-    o.len = 4.2; const d = mk(swirlG, swirlMat); d.position.y = 0.37; o.root.add(d);
-    // placa amarela de perigo boiando ao lado, para se ver de longe
-    const pl = mk(GEO.cone); pl.position.set(1.7, 0.1, -1.4); pl.scale.setScalar(1.3); o.root.add(pl);
+    o.len = 3.2; const d = mk(swirlG, swirlMat); d.position.y = 0.37; o.root.add(d);
+    // conezinho preso no redemoinho: inclinado para o centro e dando voltas junto com a água
+    const c = mk(GEO.cone); c.position.set(0.65, 0.2, 0); c.rotation.z = 0.45; c.scale.setScalar(0.8);
+    o.swirlCone = new THREE.Group(); o.swirlCone.add(c); o.root.add(o.swirlCone);
   } else if (type === 'onibus') {
     o.len = 29; o.state = 'wait'; o.secs = ['bi_frente', 'bi_meio', 'bi_tras'].map(k => { const m = mk(GEO[k]); scene.add(m); return m; });
   }
@@ -2327,7 +2370,7 @@ function genUntil(limit) {
     const bus = busLanesStreet(s), r = Math.random(), one = () => [Math.floor(Math.random() * 3) - 1];
     let type, lanes;
     if (bus && r < .3) { type = 'onibus'; lanes = one(); }
-    else if (r < (WX.id === 'granizo' ? .4 : .2)) { type = 'galho_cai'; lanes = one(); }
+    else if (r < .2) { type = 'galho_cai'; lanes = one(); }
     else if (r < .32) { type = 'galho'; lanes = one(); }
     else if (r < .45) { type = 'cratera'; lanes = one(); }
     else if (r < .58) { type = 'cones'; lanes = one(); }
@@ -2593,8 +2636,8 @@ function destinoNome(km) { let d = null; for (const x of DESTINOS) if (km >= x[0
 function heroShot(S = 640, capiGeo = null, opt = {}) {
   const rt = new THREE.WebGLRenderTarget(S, S); rt.texture.colorSpace = THREE.SRGBColorSpace;
   const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x99aa88, 1.6)); const dl = new THREE.DirectionalLight(0xffffff, 2); dl.position.set(3, 5, 4); sc.add(dl);
-  const g = new THREE.Group(), rider = new THREE.Mesh(capiGeo || SKIN.capi, VC); g.add(new THREE.Mesh(SKIN.jet, VC), rider); setHat(rider, opt.hat !== undefined ? opt.hat : SKIN.hat); for (const x of opt.extras || []) rider.add(new THREE.Mesh(x, VC)); g.rotation.set(0.1, 2.5, 0); sc.add(g);
-  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 2.3, 5.4); cam.lookAt(0, 1.05, 0);
+  const g = new THREE.Group(), rider = new THREE.Mesh(capiGeo || SKIN.capi, VC); g.add(new THREE.Mesh(SKIN.jet, VC), rider); rider.visible = !opt.soJet; setHat(rider, opt.hat !== undefined ? opt.hat : SKIN.hat); for (const x of opt.extras || []) rider.add(new THREE.Mesh(x, VC)); g.rotation.set(0.1, 2.5, 0); sc.add(g);
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, opt.soJet ? 3.2 : opt.inteiro ? 2.5 : 2.3, opt.soJet ? 8.4 : opt.inteiro ? 7.4 : 5.4); cam.lookAt(0, opt.soJet ? 0.6 : opt.inteiro ? 0.95 : 1.05, 0); // 'inteiro' e 'soJet' afastam a câmera para o jet ski não sair cortado
   const oc = renderer.getClearColor(new THREE.Color()), oa = renderer.getClearAlpha();
   renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(sc, cam);
   const px = new Uint8Array(S * S * 4); renderer.readRenderTargetPixels(rt, 0, 0, S, S, px);
@@ -2603,7 +2646,17 @@ function heroShot(S = 640, capiGeo = null, opt = {}) {
   for (let y = 0; y < S; y++) img.data.set(px.subarray((S - 1 - y) * S * 4, (S - y) * S * 4), y * S * 4);
   cx.putImageData(img, 0, 0); return cv;
 }
-async function makeCard(km, score, rec) {
+// a foto escolhida pelo jogador, desenhada como polaroid dentro do card
+function polaroidNoCard(g, foto, x, y, w, ang, fonte) {
+  const b = w * 0.055, foot = w * 0.17, h = w - 2 * b + b + foot;
+  g.save(); g.translate(x + w / 2, y + h / 2); g.rotate(ang);
+  g.shadowColor = 'rgba(0,0,0,.32)'; g.shadowBlur = 36; g.shadowOffsetY = 16; g.fillStyle = '#fff'; g.fillRect(-w / 2, -h / 2, w, h);
+  g.shadowColor = 'transparent'; g.drawImage(foto.cv, -w / 2 + b, -h / 2 + b, w - 2 * b, w - 2 * b);
+  g.fillStyle = '#1d4a3c'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `800 ${Math.round(w * 0.065)}px ${fonte}`; g.fillText(legendaFoto(foto), 0, h / 2 - foot / 2);
+  g.restore();
+}
+const legendaFoto = f => `Curitiba, km ${f.km.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1})}`;
+async function makeCard(km, score, rec, foto) {
   // estética do menu: papel, cheia, régua de nível, letra arredondada; acima de 100 km vira o card de férias
   const BS = 'Nunito, "Arial Rounded MT Bold", sans-serif';
   try { await Promise.all([document.fonts.load(`900 200px ${BS}`), document.fonts.load(`800 40px ${BS}`), document.fonts.load(`700 24px ${BS}`)]); } catch (e) {}
@@ -2613,13 +2666,16 @@ async function makeCard(km, score, rec) {
   const FER = km >= 100;
   const [PAPER, INK, LIME, ORANGE, LEAF] = FER ? ['#ffe6c2', '#0b5f6a', '#ff5c8a', '#ffb000', '#ff5c8a'] : ['#eee8d5', '#1d4a3c', '#b5cc2e', '#f0892a', '#5a9a4a'];
   const link = GAME_URL.replace('https://', '').replace(/\/$/, '');
-  // cabeçalho comum: "Fugi por:", os km com 3 casas e o destino
+  // cabeçalho comum: "Fugi da enchente por:", os km com 3 casas e o destino
   const cabecalho = col => {
     g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = col;
-    g.font = `900 64px ${BS}`; g.fillText('Fugi por:', M - 2, 290);
-    if (rec) { const sv = g.fillStyle; g.font = `900 34px ${BS}`; const t = 'Novo recorde!', rw = g.measureText(t).width + 48; g.fillStyle = ORANGE; rr(W - M - rw, 234, rw, 64, 32); g.fill(); g.fillStyle = FER ? '#0b5f6a' : '#fff'; g.textBaseline = 'middle'; g.fillText(t, W - M - rw + 24, 267); g.textBaseline = 'alphabetic'; g.fillStyle = sv; }
-    const num = nf(km, 3); let fs = 200; g.font = `900 ${fs}px ${BS}`; while (g.measureText(num).width > 700 && fs > 110) { fs -= 6; g.font = `900 ${fs}px ${BS}`; }
+    g.font = `900 64px ${BS}`; g.fillText('Fugi da enchente por:', M - 2, 290);
+    // o selo de recorde fica na linha dos km, à direita; o número diminui o quanto precisar para não encostar nele
+    g.font = `900 34px ${BS}`; const selo = 'Novo recorde!', rw = g.measureText(selo).width + 48;
+    g.font = `900 84px ${BS}`; const vaga = rec ? W - 2 * M - rw - 28 - 10 - g.measureText('km').width : 700;
+    const num = nf(km, 3); let fs = 200; g.font = `900 ${fs}px ${BS}`; while (g.measureText(num).width > Math.min(700, vaga) && fs > 90) { fs -= 4; g.font = `900 ${fs}px ${BS}`; }
     g.fillText(num, M - 8, 500); const nw = g.measureText(num).width; g.font = `900 84px ${BS}`; g.fillText('km', M + nw + 10, 500);
+    if (rec) { const sv = g.fillStyle; g.font = `900 34px ${BS}`; g.fillStyle = ORANGE; rr(W - M - rw, 438, rw, 64, 32); g.fill(); g.fillStyle = FER ? '#0b5f6a' : '#fff'; g.textBaseline = 'middle'; g.fillText(selo, W - M - rw + 24, 471); g.textBaseline = 'alphabetic'; g.fillStyle = sv; }
     g.font = `800 44px ${BS}`; g.fillText(FER ? 'De férias: do Barigui até' : 'Dava pra ir do Barigui até', M, 588);
     g.font = `900 74px ${BS}`; const dn = destinoNome(km); g.fillText(dn.charAt(0).toUpperCase() + dn.slice(1), M - 2, 670);
   };
@@ -2645,7 +2701,11 @@ async function makeCard(km, score, rec) {
     for (let k = 0; k < 4; k++) { g.beginPath(); const y = HZ + 40 + k * 46; for (let x = 40 + (k % 2) * 60; x < W - 40; x += 180) { g.moveTo(x, y); g.quadraticCurveTo(x + 30, y - 12, x + 60, y); } g.stroke(); }
     g.fillStyle = '#f3cf8e'; g.beginPath(); g.moveTo(0, HZ + 230); for (let x = 0; x <= W; x += 30) g.lineTo(x, HZ + 230 + Math.sin(x / 70) * 8); g.lineTo(W, H); g.lineTo(0, H); g.closePath(); g.fill();
     cabecalho(INK);
-    try { const S = 740; g.drawImage(feriasShot(S), W / 2 - S / 2 + 40, 1420 - S, S, S); } catch (e) {}
+    if (foto) polaroidNoCard(g, foto, W / 2 - 280, 735, 560, -0.06, BS);
+    else try {
+      g.drawImage(heroShot(640, null, {soJet: true}), -20, 820, 620, 620); // o jet ski da skin, estacionado no mar
+      const S = 740; g.drawImage(feriasShot(S), W / 2 - S / 2 + 100, 1420 - S, S, S);
+    } catch (e) {}
     rodape(1470, INK, INK, PAPER, 'Sobrevivi');
     return c;
   }
@@ -2654,7 +2714,6 @@ async function makeCard(km, score, rec) {
   const Y0 = 1360, Y1 = 790, yOf = k => Y0 - (Math.log10(Math.min(100, Math.max(0.5, k)) / 0.5) / Math.log10(200)) * (Y0 - Y1);
   const level = yOf(km);
   g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
-  try { const S = Math.max(220, Math.min(420, level + 92 - 720)), cy = level - S + S * 0.21; g.drawImage(heroShot(), M - 40, cy, S, S); } catch (e) {}
   g.fillStyle = INK; g.fillRect(0, level, W, H - level);
   const dual = fn => {
     g.save(); g.beginPath(); g.rect(0, 0, W, level); g.clip(); fn(INK); g.restore();
@@ -2681,33 +2740,39 @@ async function makeCard(km, score, rec) {
   g.fillStyle = LIME; rr(-10, level - 5, W + 20, 10, 5); g.fill();
   g.beginPath(); g.moveTo(GX - 4, level); g.lineTo(GX - 28, level - 16); g.lineTo(GX - 28, level + 16); g.closePath(); g.fill();
   dual(cabecalho);
+  // sem foto: card padrão, com a capivara e o jet ski nas roupas escolhidas (heroShot usa SKIN), por cima da faixa e da linha
+  if (!foto) try { const S = 560; g.drawImage(heroShot(640, null, {inteiro: true}), M - 70, Math.max(690, level - S * 0.66), S, S); } catch (e) {}
+  if (foto) polaroidNoCard(g, foto, M - 20, 735, 460, -0.07, BS); // por cima da água e da régua, à esquerda dos nomes
   rodape(1490, PAPER, PAPER, INK, 'Sobreviva');
   return c;
 }
-// capivara de férias numa cadeira de praia, com coco, chapéu de palha, óculos escuros e colar de flores
+// capivara de férias numa cadeira de praia, com coco, óculos escuros e colar de flores; colete e chapéu são os da skin escolhida
 function feriasShot(S = 820) {
-  const capi = recolor(GEO.capivara, [[0xb5cc2e, 0xff8c3a]], true);
   const rt = new THREE.WebGLRenderTarget(S, S); rt.texture.colorSpace = THREE.SRGBColorSpace;
   const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0xc9a26a, 1.7)); const dl = new THREE.DirectionalLight(0xfff0d8, 2.2); dl.position.set(3, 5, 4); sc.add(dl);
-  const g = new THREE.Group(), rider = new THREE.Mesh(capi, VC);
-  g.add(new THREE.Mesh(GEO.cadeira_praia, VC), rider); setHat(rider, GEO.chapeu_palha);
+  const g = new THREE.Group(), rider = new THREE.Mesh(SKIN.capi, VC);
+  g.add(new THREE.Mesh(GEO.cadeira_praia, VC), rider); setHat(rider, SKIN.hat);
   for (const x of [GEO.oculos, GEO.colar_flores, GEO.coco]) rider.add(new THREE.Mesh(x, VC));
   g.rotation.set(0.05, 2.75, 0); sc.add(g);
   const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); cam.position.set(0, 2.0, 6.6); cam.lookAt(0, 1.25, 0);
   const oc = renderer.getClearColor(new THREE.Color()), oa = renderer.getClearAlpha();
   renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(sc, cam);
   const px = new Uint8Array(S * S * 4); renderer.readRenderTargetPixels(rt, 0, 0, S, S, px);
-  renderer.setRenderTarget(null); renderer.setClearColor(oc, oa); rt.dispose(); capi.dispose();
+  renderer.setRenderTarget(null); renderer.setClearColor(oc, oa); rt.dispose();
   const cv = document.createElement('canvas'); cv.width = cv.height = S; const cx = cv.getContext('2d'), img = cx.createImageData(S, S);
   for (let y = 0; y < S; y++) img.data.set(px.subarray((S - 1 - y) * S * 4, (S - y) * S * 4), y * S * 4);
   cx.putImageData(img, 0, 0); return cv;
 }
-let cardBlob = null, cardText = '';
+let cardBlob = null, cardText = '', cardArgs = null, cardVez = 0, fotoSel = -1;
 async function prepareCard(km, score, rec) {
-  const c = await makeCard(km, score, rec);
+  cardArgs = [km, score, rec]; const vez = ++cardVez; cardBlob = null; $('shareBtn').disabled = true;
+  const c = await makeCard(km, score, rec, FOTOS[fotoSel]);
+  if (vez !== cardVez) return; // o jogador trocou de foto no meio: vale só o último pedido
   const url = c.toDataURL('image/png');
   $('resCard').src = url; $('cardBig').src = url;
-  cardBlob = await new Promise(r => c.toBlob(r, 'image/png'));
+  const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+  if (vez !== cardVez) return;
+  cardBlob = blob; $('shareBtn').disabled = false;
   cardText = `Fiz ${km.toLocaleString('pt-BR', {maximumFractionDigits: 1})} km fugindo da onda no Sobreviva a Curitiba! ${GAME_URL}`;
 }
 async function shareCard() {
@@ -2735,10 +2800,11 @@ function endRun(zerou) {
   salvaRecordeKm(G.dist / 1000);
   Object.assign(ULTIMA, {km: G.dist / 1000, pontos: score, enviada: false, partida: null});
   $('resGanho').textContent = 'Contando pinhões…';
+  mostraPolaroids();
   const tinhaLaranja = LOJA.tem.includes('chapeu:laranja');
-  ULTIMA.fim = srvTermina(G.dist / 1000, G.pin, score).then(r => { $('resGanho').textContent = `+${r.ganho} pinhões para a loja (total ${r.total.toLocaleString('pt-BR')})` + (!tinhaLaranja && LOJA.tem.includes('chapeu:laranja') ? ' · Você achou um segredo! Veja na loja.' : ''); })
+  ULTIMA.fim = srvTermina(G.dist / 1000, G.pin, score).then(r => { $('resGanho').textContent = `+${r.ganho} pinhões para a lojinha (total ${r.total.toLocaleString('pt-BR')})` + (!tinhaLaranja && LOJA.tem.includes('chapeu:laranja') ? ' · Você achou um segredo! Veja na lojinha.' : ''); })
     .catch(e => { $('resGanho').textContent = e && e.semPartida ? 'Esta partida não chegou a ser registrada no servidor, então os pinhões não foram contados.' : 'Sem conexão: os pinhões desta partida não foram contados.'; });
-  $('placarEnvio').hidden = !SRV.ok || G.dist < 200; $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Enviar pro placar';
+  $('placarEnvio').hidden = !SRV.ok || G.dist < 200; $('enviaBtn').disabled = false; $('enviaBtn').innerHTML = 'Enviar<span class="longo"> pro placar</span>';
   try { $('apelido').value = localStorage.getItem('jetski-cwb-nome') || ''; } catch (e) {}
   menuRecorde();
   prepareCard(G.dist / 1000, score, rec).catch(e => console.warn('card', e));
@@ -2822,18 +2888,32 @@ function moveLane(d) {
   if (n !== G.lane) { G.lane = n; G.lastSwitch = G.t; blip([520 + d * 60], 0.04, 'triangle', 0.06); if (G.hint > 0) { G.hint = 0; $('hint').hidden = true; } }
 }
 function setPaused(p) {
-  if (G.state !== 'race' && G.state !== 'count') return;
+  if (G.state !== 'intro' && G.state !== 'race' && G.state !== 'count') return;
   G.paused = p; $('pausa').hidden = !p;
   if (audio.ctx) { if (p) audio.ctx.suspend(); else audio.ctx.resume(); }
   if (!p) clock.getDelta();
 }
-// recomeçar: sai da pausa (religando o som) e começa uma partida nova, com contagem
+// recomeçar: sai da pausa (religando o som) e começa uma partida nova direto na contagem, sem repetir a abertura
 function restartRun() {
   if (G.paused) { G.paused = false; if (audio.ctx) audio.ctx.resume(); clock.getDelta(); }
   startRun();
+  G.state = 'count'; $('skip').hidden = true; $('hint').hidden = false;
+}
+// "plim" do botão de som: sai num contexto de áudio separado, para tocar mesmo com o jogo pausado (áudio suspenso) ou ao silenciar
+let uiAc = null;
+function somBotao(ligou) {
+  try {
+    uiAc = uiAc || new (window.AudioContext || window.webkitAudioContext)(); if (uiAc.state === 'suspended') uiAc.resume();
+    (ligou ? [660, 990] : [520, 350]).forEach((f, i) => { // sobe ao ligar, desce ao desligar
+      const t = uiAc.currentTime + 0.01 + i * 0.07, o = uiAc.createOscillator(), g = uiAc.createGain(); o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.14, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+      o.connect(g); g.connect(uiAc.destination); o.start(t); o.stop(t + 0.1);
+    });
+  } catch (e) {}
 }
 function toggleSound() {
-  initAudio(); audio.on = !audio.on;
+  initAudio(); audio.on = !audio.on; somBotao(audio.on);
+  if (G.paused && audio.ctx) audio.ctx.suspend(); // se o áudio nasceu agora, continua parado até sair da pausa
   if (audio.master) audio.master.gain.value = audio.on ? 0.5 : 0;
   $('bSom').classList.toggle('off', !audio.on); $('bSom').setAttribute('aria-label', audio.on ? 'Desligar som' : 'Ligar som');
 }
@@ -2846,14 +2926,14 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyR' && G.state !== 'title') restartRun();
   if (e.code === 'KeyC') camMode = (camMode + 1) % 2;
   if (e.code === 'KeyM') toggleSound();
-  if (e.code === 'Escape' || e.code === 'KeyP' || e.code === 'Space') setPaused(!G.paused); // esc, P ou barra de espaço
+  if (e.code === 'Escape' || e.code === 'KeyP' || (e.code === 'Space' && G.state !== 'intro')) setPaused(!G.paused); // esc, P ou barra de espaço (na abertura, o espaço pula)
   if (e.code === 'Enter' && G.state === 'title' && !$('start').hidden) $('start').click();
-  if ((e.code === 'Enter' || e.code === 'Space') && G.state === 'intro') INTRO.t = Math.max(INTRO.t, INTRO.dur - 0.3);
+  if ((e.code === 'Enter' || e.code === 'Space') && G.state === 'intro' && !G.paused && !(e.target.closest && e.target.closest('button'))) INTRO.t = Math.max(INTRO.t, INTRO.dur - 0.3);
 });
 let ptr = null;
 canvas.addEventListener('pointerdown', e => { ptr = {x: e.clientX, y: e.clientY}; initAudio(); });
 canvas.addEventListener('pointerup', e => {
-  if (G.state === 'intro') { ptr = null; INTRO.t = Math.max(INTRO.t, INTRO.dur - 0.3); return; }
+  if (G.state === 'intro') { ptr = null; if (!G.paused) INTRO.t = Math.max(INTRO.t, INTRO.dur - 0.3); return; }
   if (!ptr) return;
   const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y; ptr = null;
   if (Math.abs(dx) > 24 && Math.abs(dx) > Math.abs(dy)) moveLane(dx > 0 ? 1 : -1);
@@ -2862,6 +2942,7 @@ canvas.addEventListener('pointerup', e => {
 canvas.addEventListener('pointercancel', () => { ptr = null; });
 $('bPause').addEventListener('click', () => setPaused(!G.paused));
 $('bSom').addEventListener('click', toggleSound);
+$('soMusica').addEventListener('click', alternaMusica); mostraMusica();
 // créditos: abrem do menu, do HUD (pausando) e da pausa
 const GITHUB_URL = 'https://github.com/matheuskrk/sobreviva-a-curitiba'; // endereço do repositório; enquanto vazio, o botão fica como "em breve"
 if (GITHUB_URL) $('gitBtn').href = GITHUB_URL; else { $('gitBtn').setAttribute('aria-disabled', 'true'); $('gitBtn').querySelector('span').textContent = 'GitHub (em breve)'; }
@@ -2871,7 +2952,6 @@ $('credBtn').addEventListener('click', () => openCredits('overlay'));
 $('credPausa').addEventListener('click', () => openCredits('pausa'));
 $('recomecar').addEventListener('click', restartRun);
 const toggleMusic = () => setMusicStyle(MUSIC.style === 'dnb' ? 'orig' : 'dnb');
-$('bCred').addEventListener('click', () => { if (G.state === 'race' || G.state === 'count') { setPaused(true); openCredits('pausa'); } else openCredits(G.state === 'title' ? 'overlay' : null); });
 $('credVoltar').addEventListener('click', () => { $('creditos').hidden = true; if (credFrom) $(credFrom).hidden = false; });
 $('continuar').addEventListener('click', () => setPaused(false));
 $('shareBtn').addEventListener('click', shareCard);
@@ -2934,6 +3014,7 @@ queueMicrotask(() => { menuCapi(); menuRecorde(); srvConecta(); });
 const go = () => { initAudio(); if (audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume(); startRun(); };
 $('start').addEventListener('click', go);
 $('retry').addEventListener('click', go);
+$('resMenu').addEventListener('click', () => { $('result').hidden = true; voltaMenu(); });
 
 // ======================= ABERTURA: o Barigui alagou e a capivara foge de jet ski =======================
 // Cena própria tocada antes de cada corrida (um toque pula). Usa a mesma água e o mesmo céu do jogo, então o reflexo
@@ -3295,14 +3376,15 @@ function step(dt) {
   const live = G.state === 'race';
   for (const o of OBS) {
     const ds = o.s - G.s;
+    if (o.swirlCone) o.swirlCone.rotation.y -= dt * 7 / 3; // mesma velocidade e sentido dos braços de espuma
     if (o.type === 'galho_cai') {
       if (o.state === 'wait' && ds < 62 && live) { o.state = 'warn'; o.t = 0; o.wh = treeWhistle(); const [sx, sz] = trackAt(o.s, laneOff(o.lanes[0])); o.shadow.position.set(sx, 0.36, sz); o.shadow.rotation.y = headingOf(...trackAt(o.s).slice(2)); }
-      if (o.state === 'warn') { o.t += dt * (WX.id === 'granizo' ? 1.8 : 1); const k = Math.min(1, o.t / 0.8); o.shadow.material.opacity = 0.15 + 0.4 * k; o.shadow.scale.set(0.4 + k * 0.6, 1, (0.4 + k * 0.6) * 2.6); if (k >= 1) {
+      if (o.state === 'warn') { o.t += dt; const k = Math.min(1, o.t / 0.8); o.shadow.material.opacity = 0.15 + 0.4 * k; o.shadow.scale.set(0.4 + k * 0.6, 1, (0.4 + k * 0.6) * 2.6); if (k >= 1) {
         o.state = 'fall'; o.t = 0; o.k = 0; o.mesh.visible = true;
         // começa acima da borda de cima da tela: altura do topo do campo de visão nessa distância, com folga para o tamanho do galho
         const wp = o.root.position, hd = Math.hypot(wp.x - camera.position.x, wp.z - camera.position.z);
         o.h0 = Math.max(18, camera.position.y + Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * hd * 1.25 + 6);
-        o.dur = Math.min(0.85, 0.4 * Math.sqrt(o.h0 / 13)) * (WX.id === 'granizo' ? 0.7 : 1); // queda como em gravidade: de mais alto, demora um pouco mais
+        o.dur = Math.min(0.85, 0.4 * Math.sqrt(o.h0 / 13)); // queda como em gravidade: de mais alto, demora um pouco mais
         if (o.wh) { o.wh.drop(o.dur); o.wh = null; } // o assovio termina junto com o galho na água
         o.mesh.position.set(0, o.h0, 0);
       } }
@@ -3316,7 +3398,7 @@ function step(dt) {
     if (o.type === 'poste') {
       if (o.state === 'wait' && ds < 70 && live) { o.state = 'fall'; o.t = 0; crack(); }
       if (o.state === 'fall') { o.t += dt; const k = Math.min(1, o.t / 0.9); o.mesh.rotation.z = o.side * k * k * 1.5; if (k >= 1) { o.state = 'down'; electricZap(); } }
-      if (o.state === 'down' && ds > -20 && ds < 90 && !(G.umb > 0)) for (const l of o.lanes) { const [sx, sz] = trackAt(o.s + rnd(-0.5, 0.5), laneOff(l) + rnd(-1.4, 1.4)); spawnSpark(sx, 0.6, sz); }
+      if (o.state === 'down' && ds > -20 && ds < 90) for (const l of o.lanes) { const [sx, sz] = trackAt(o.s + rnd(-0.5, 0.5), laneOff(l) + rnd(-1.4, 1.4)); spawnSpark(sx, 0.6, sz); }
     }
     if (o.type === 'onibus') {
       if (o.state === 'wait' && ds < 150 && live) { o.state = 'move'; busHorn(); toast('Olha o biarticulado!', 1.2); }
@@ -3575,7 +3657,7 @@ function lojaRender() {
   }).join('');
   if (LOJA.prev) { const [c, i] = LOJA.prev.split(':'); skinCom(c, i); } else applySkin();
   try { $('lojaPrev').src = heroShot(360).toDataURL(); } catch (e) {}
-  $('lojaDica').textContent = LOJA.prev ? 'Prévia. Toque de novo para comprar.' : (SRV.ok ? '' : 'Sem conexão com o servidor: a loja está só neste aparelho.');
+  $('lojaDica').textContent = LOJA.prev ? 'Prévia. Toque de novo para comprar.' : (SRV.ok ? '' : 'Sem conexão com o servidor: a lojinha está só neste aparelho.');
 }
 async function lojaClica(id) {
   const cat = LOJA.aba, key = cat + ':' + id, it = itemDe(cat, id);
@@ -3736,46 +3818,117 @@ function falaEstacao() {
   } catch (e) {}
 }
 
-// ---------- granizo: pedrinhas de gelo caindo em volta da câmera ----------
-const HAIL_N = 260, HAIL = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.09, 0), new THREE.MeshBasicMaterial({color: 0xf2f7fa}), HAIL_N);
-HAIL.frustumCulled = false; HAIL.count = 0; scene.add(HAIL);
-const HAIL_P = Array.from({length: HAIL_N}, () => ({x: 0, y: -1, z: 0, v: 0}));
-let hailK = 0, hailClink = 0;
-function stepHail(dt) {
-  hailK += (((WEATHER[WX.i].hail || 0) * (G.state === 'race' ? 1 : 0)) - hailK) * Math.min(1, dt * 0.8);
-  const n = Math.floor(HAIL_N * hailK); HAIL.count = n; if (!n) return;
-  const cx = camera.position.x, cz = camera.position.z, fx = -Math.sin(camera.rotation.y), fz = -Math.cos(camera.rotation.y);
-  for (let i = 0; i < n; i++) {
-    const p = HAIL_P[i];
-    if (p.y < 0.3) { const a = rnd(-22, 22), b = rnd(2, 45); p.x = cx + fx * b - fz * a; p.z = cz + fz * b + fx * a; p.y = rnd(14, 26); p.v = rnd(24, 32); }
-    p.y -= p.v * dt; swV.set(p.x, p.y, p.z); swS.set(1, 1.6, 1); swM.compose(swV, swQ, swS); HAIL.setMatrixAt(i, swM);
-  }
-  HAIL.instanceMatrix.needsUpdate = true;
-  hailClink -= dt; if (hailClink <= 0 && audio.ctx) { hailClink = rnd(0.03, 0.09) / Math.max(0.2, hailK); sfxNoise(0, 0.03, 0.05 * hailK, 'bandpass', rnd(3500, 6500), rnd(3000, 6000), 6); }
-}
-
 // ---------- gente boiando nas boias, acenando, e a Linha Turismo virou barco ----------
 const BARCOS = []; let proxBarco = 900;
+// o barco só ocupa um lugar se o casco inteiro (3,2 x 10,5 m, com folga) ficar fora dos prédios, marcos e outros trechos da pista
+function barcoLivre(s, off) {
+  const [x, z, dx, dz] = trackAt(s, off);
+  if (routeNear(x, z) < VIA_LIVRE) return false;
+  for (let c = -6; c <= 6; c += 2) for (const l of [-2, 0, 2]) {
+    const px = x + dx * c - dz * l, pz = z + dz * c + dx * l;
+    if (insideAny(px, pz, 0.8) || nearLandmark(px, pz, 1)) return false;
+  }
+  return true;
+}
 function stepVida(dt) {
   const t = uTime.value;
   for (const o of ANIM) { const u = o.userData; o.position.y = u.y0 + Math.sin(t * 1.8 + u.ph) * 0.12; o.rotation.z = Math.sin(t * 1.3 + u.ph) * 0.08; o.rotation.x = Math.sin(t * 1.1 + u.ph * 2) * 0.06; }
   if (G.state !== 'race') return;
   if (G.s > proxBarco && G.s + 260 < TRK.len) {
+    let side = Math.random() < 0.5 ? 1 : -1;
+    if (!barcoLivre(G.s + 240, side * 7.6)) side = -side;
+    if (!barcoLivre(G.s + 240, side * 7.6)) proxBarco = G.s + 25; // sem espaço dos dois lados: tenta mais adiante
+    else {
     proxBarco = G.s + rnd(1300, 2000);
-    const g = new THREE.Group(), side = Math.random() < 0.5 ? 1 : -1;
+    const g = new THREE.Group();
     const pont = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.5, 10.5), new THREE.MeshLambertMaterial({color: 0xf4f4ec})); pont.position.y = 0.1; g.add(pont);
     const bus = new THREE.Mesh(GEO.linha_turismo, VC); bus.position.y = 0.35; bus.rotation.y = Math.PI / 2; g.add(bus);
-    scene.add(g); BARCOS.push({g, s: G.s + 240, off: side * 7.6});
+    scene.add(g); BARCOS.push({g, s: G.s + 240, off: side * 7.6, turistas: criaTuristas(bus), fotos: 0, espera: 0});
+    }
   }
   for (let i = BARCOS.length - 1; i >= 0; i--) {
-    const b = BARCOS[i]; b.s += 6 * dt;
+    const b = BARCOS[i]; if (barcoLivre(b.s + 6 * dt, b.off)) b.s += 6 * dt; // se o caminho fecha, o barco para ali
     if (b.s < G.s - 40 || b.s > TRK.len - 5) { scene.remove(b.g); b.g.children[0].geometry.dispose(); BARCOS.splice(i, 1); continue; }
     placeOnTrack(b.g, b.s, b.off); b.g.position.y = wave(b.g.position.x, b.g.position.z, t) * 0.8; b.g.rotation.z = Math.sin(t * 1.2 + i) * 0.03;
+    stepTuristas(b, dt);
   }
 }
-function resetVida() { for (const b of BARCOS) scene.remove(b.g); BARCOS.length = 0; proxBarco = rnd(700, 1100); }
-
-
+// três turistas no teto da Linha Turismo, tirando foto de quem passa
+const TUR_G = {perna: new THREE.BoxGeometry(0.18, 0.6, 0.22), tronco: new THREE.BoxGeometry(0.62, 0.7, 0.38), cabeca: new THREE.BoxGeometry(0.4, 0.4, 0.38),
+  bone: new THREE.BoxGeometry(0.46, 0.14, 0.44), braco: new THREE.BoxGeometry(0.14, 0.14, 0.46), camera: new THREE.BoxGeometry(0.42, 0.27, 0.18), lente: new THREE.BoxGeometry(0.15, 0.15, 0.1)};
+const turMat = cor => new THREE.MeshLambertMaterial({color: cor});
+const TUR_PELE = turMat(0xd9a06f), TUR_CALCA = turMat(0x2f4a6b), TUR_CAM = turMat(0x222428), TUR_LENTE = turMat(0x9fc4d8);
+const TUR_ROUPA = [turMat(0xe0533d), turMat(0xf2c230), turMat(0x8e5bb5)];
+function criaTuristas(bus) {
+  return [-3.2, 0, 3.2].map((x, i) => {
+    const t = new THREE.Group(), add = (g, m, px, py, pz) => { const o = new THREE.Mesh(g, m); o.position.set(px, py, pz); t.add(o); };
+    for (const l of [-0.15, 0.15]) add(TUR_G.perna, TUR_CALCA, l, 0.3, 0);
+    add(TUR_G.tronco, TUR_ROUPA[i], 0, 0.95, 0); add(TUR_G.cabeca, TUR_PELE, 0, 1.5, 0); add(TUR_G.bone, TUR_ROUPA[(i + 1) % 3], 0, 1.75, 0);
+    for (const l of [-0.28, 0.28]) add(TUR_G.braco, TUR_PELE, l, 1.2, 0.3);
+    add(TUR_G.camera, TUR_CAM, 0, 1.38, 0.52); add(TUR_G.lente, TUR_LENTE, 0, 1.38, 0.65);
+    const luz = new THREE.Sprite(new THREE.SpriteMaterial({map: window.__glowTex, color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false}));
+    luz.position.set(0, 1.55, 0.75); luz.scale.setScalar(5); t.add(luz);
+    t.position.set(x, 4.43, 0); t.scale.setScalar(1.15); bus.add(t);
+    return {t, luz};
+  });
+}
+// viram para o jogador e, quando ele chega perto, cada um dispara um flash (no máximo 3 por ônibus, com 0,6 s entre eles)
+const turV = new THREE.Vector3();
+function stepTuristas(b, dt) {
+  const [px, pz] = trackAt(G.s, G.off); turV.set(px, 0, pz); b.g.updateMatrixWorld(); b.g.worldToLocal(turV);
+  for (const q of b.turistas) {
+    q.t.rotation.y = Math.atan2(turV.x, turV.z + q.t.position.x) - Math.PI / 2; // o ônibus está girado 90° dentro do grupo
+    q.luz.material.opacity = Math.max(0, q.luz.material.opacity - dt * 3.5);
+  }
+  b.espera -= dt;
+  const ds = b.s - G.s;
+  if (b.fotos < b.turistas.length && b.espera <= 0 && ds < 48 && ds > -4) {
+    tiraFoto(b, b.turistas[b.fotos]); b.turistas[b.fotos].luz.material.opacity = 1; b.fotos++; b.espera = 0.6;
+    G.flash = Math.max(G.flash || 0, 0.85); // clarão na tela: atrapalha a visão por um instante
+    sfxNoise(0, 0.03, 0.3, 'highpass', 3000); sfxNoise(0.07, 0.04, 0.22, 'bandpass', 2000, 0, 2); // clique da câmera
+    msgOnce('turistas', 'Olha o flash! Os turistas querem foto', 8, 1.2);
+  }
+}
+// foto de verdade, do ponto de vista do turista: a cena é renderizada de cima do ônibus mirando no jet ski
+const FOTOS = []; // as duas mais recentes da partida: {cv, km}
+function tiraFoto(b, q) {
+  const S2 = 360, rt = new THREE.WebGLRenderTarget(S2, S2); rt.texture.colorSpace = THREE.SRGBColorSpace;
+  try {
+    b.g.updateMatrixWorld(); ski.updateMatrixWorld();
+    const de = q.t.localToWorld(new THREE.Vector3(0, 1.38, 0.7)), alvo = ski.getWorldPosition(new THREE.Vector3()); alvo.y += 1.2;
+    const fov = Math.max(10, Math.min(55, 2 * Math.atan(2.6 / de.distanceTo(alvo)) * 180 / Math.PI)); // zoom para a capivara encher a foto
+    const cam = new THREE.PerspectiveCamera(fov, 1, 0.3, 2600); cam.position.copy(de); cam.lookAt(alvo);
+    const antes = b.g.visible; b.g.visible = false; // o próprio ônibus não pode tampar a lente
+    renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, cam); b.g.visible = antes;
+    const px = new Uint8Array(S2 * S2 * 4); renderer.readRenderTargetPixels(rt, 0, 0, S2, S2, px);
+    const cv = document.createElement('canvas'); cv.width = cv.height = S2; const cx = cv.getContext('2d'), img = cx.createImageData(S2, S2);
+    for (let y = 0; y < S2; y++) img.data.set(px.subarray((S2 - 1 - y) * S2 * 4, (S2 - y) * S2 * 4), y * S2 * 4);
+    for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
+    cx.putImageData(img, 0, 0);
+    FOTOS.push({cv, km: G.s / 1000}); if (FOTOS.length > 2) FOTOS.shift();
+  } catch (e) { console.warn('foto', e); }
+  finally { renderer.setRenderTarget(null); rt.dispose(); }
+}
+function escolheFoto(i) {
+  if (i === fotoSel) return;
+  fotoSel = i; marcaFoto();
+  if (cardArgs) prepareCard(...cardArgs).catch(e => { $('shareBtn').disabled = false; console.warn('card', e); });
+}
+function marcaFoto() { [...$('polaroids').querySelectorAll('figure')].forEach((f, i) => f.setAttribute('aria-pressed', i === fotoSel)); }
+function mostraPolaroids() {
+  const caixa = $('polaroids'); caixa.textContent = ''; caixa.hidden = !FOTOS.length;
+  fotoSel = FOTOS.length - 1; $('fotoDica').hidden = FOTOS.length < 2; // começa com a mais recente; -1 = card padrão
+  FOTOS.forEach((f, i) => {
+    const fig = document.createElement('figure'), img = document.createElement('img'), leg = document.createElement('figcaption');
+    img.src = f.cv.toDataURL('image/jpeg', 0.9); img.alt = 'Foto sua tirada pelos turistas';
+    leg.textContent = legendaFoto(f);
+    fig.tabIndex = 0; fig.setAttribute('role', 'button'); fig.addEventListener('click', () => escolheFoto(i));
+    fig.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); escolheFoto(i); } });
+    fig.append(img, leg); caixa.append(fig);
+  });
+  marcaFoto();
+}
+function resetVida() { FOTOS.length = 0; fotoSel = -1; for (const b of BARCOS) scene.remove(b.g); BARCOS.length = 0; proxBarco = rnd(700, 1100); }
 // capivara de férias (card de quem passa dos 100 km): colete coral, chapéu de palha, óculos escuros e colar de flores
 function heroFerias(S = 640) {
   const capi = recolor(GEO.capivara, [[0xb5cc2e, 0xff8c3a]], true);
@@ -3784,7 +3937,7 @@ function heroFerias(S = 640) {
 
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
-  if (!G.paused) { uTime.value += dt; if (G.state === 'intro') runIntro(dt); else { step(dt); stepSpeedWind(dt); stepHail(dt); stepVida(dt); } }
+  if (!G.paused) { uTime.value += dt; if (G.state === 'intro') runIntro(dt); else { step(dt); stepSpeedWind(dt); stepVida(dt); } }
   stepHudKm(dt);
   if (G.state === 'intro') renderIntro(); else composer.render();
   // rede de segurança: se a placa de vídeo reclamar de algo nos primeiros quadros, desliga o reflexo em vez de deixar a tela preta
