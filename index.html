@@ -93,6 +93,7 @@ canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-a
 .grade .item b{font-size:14px}.grade .item small{font-size:12px;font-weight:700;opacity:.75}
 .grade .item.usa{border-color:var(--leaf);background:#f1f7df}.grade .item.caro{opacity:.55}
 .grade .sw{width:34px;height:34px;border-radius:50%;border:2px solid rgba(0,0,0,.15)}
+.nuvem{display:grid;gap:8px;border-top:2px dashed #dfe6cf;padding-top:12px}.nuvem b{font-family:var(--f-display);letter-spacing:.04em}button.sec.mini{padding:5px 12px;font-size:13px}
 .envio{display:flex;gap:8px;flex-wrap:wrap}.envio input{flex:1;min-width:140px;font:700 15px var(--f-display);padding:11px 14px;border-radius:999px;border:2px solid var(--leaf);color:var(--ink)}
 ol.placar{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:60vh;overflow:auto}
 ol.placar li{display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:8px 10px;border-radius:10px;background:#f4f7ea;font-family:var(--f-display);font-weight:800;color:var(--ink)}
@@ -222,6 +223,11 @@ button.go:hover,button.go:focus-visible,a.go[href]:hover,a.go:focus-visible{back
       <div class="lojatopo"><img id="lojaPrev" alt="Sua capivara com a roupa escolhida"><p class="moedas"><b id="lojaMoedas">0</b> pinhões<br><small>3 por km e 10 por pinhão pego</small></p></div>
       <div class="abas" id="lojaAbas" role="tablist"></div>
       <div class="grade" id="lojaGrade"></div>
+      <div class="nuvem" id="nuvem" hidden>
+        <p class="meta">Seu código de save: <b id="saveCod">—</b> <button class="sec mini" id="copiaCod">Copiar</button><br><small>Guarde para recuperar pinhões e roupas noutro aparelho.</small></p>
+        <div class="envio"><input id="codIn" maxlength="16" placeholder="Código de outro aparelho" autocomplete="off" aria-label="Código de save"><button class="sec" id="recBtn">Recuperar</button></div>
+        <p class="meta" id="nuvemMsg" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </div>
@@ -2745,7 +2751,9 @@ $('lojaBtn').addEventListener('click', abreLoja); $('lojaRes').addEventListener(
 $('lojaAbas').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { LOJA.aba = b.dataset.aba; lojaRender(); } });
 $('lojaGrade').addEventListener('click', e => { const b = e.target.closest('.item'); if (b) lojaClica(b.dataset.id); });
 $('placarBtn').addEventListener('click', abrePlacar); $('placarFecha').addEventListener('click', () => { $('placar').hidden = true; });
-$('enviaBtn').addEventListener('click', enviaPlacar); $('apelido').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') enviaPlacar(); }); $('resCard').addEventListener('click', () => { $('cardView').hidden = false; });
+$('enviaBtn').addEventListener('click', enviaPlacar);
+$('recBtn').addEventListener('click', recuperaNuvem); $('codIn').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') recuperaNuvem(); });
+$('copiaCod').addEventListener('click', async () => { try { await navigator.clipboard.writeText(fmtCod(SAVE_COD)); $('copiaCod').textContent = 'Copiado!'; } catch (e) {} }); $('apelido').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') enviaPlacar(); }); $('resCard').addEventListener('click', () => { $('cardView').hidden = false; });
 $('cardClose').addEventListener('click', () => { $('cardView').hidden = true; });
 $('copyLink').addEventListener('click', async () => { try { await navigator.clipboard.writeText(GAME_URL); $('copyLink').textContent = 'Link copiado!'; } catch (e) { $('copyLink').textContent = GAME_URL; } });
 $('hint').querySelector('span').textContent = matchMedia('(pointer:coarse)').matches ? 'Deslize para os lados para trocar de faixa' : 'Use ← → para trocar de faixa';
@@ -3375,7 +3383,7 @@ const LOJA_ITENS = {
 const LOJA_ABAS = [['colete', 'Coletes'], ['chapeu', 'Chapéus'], ['jet', 'Jet skis']];
 const LOJA = {moedas: 0, tem: ['colete:lima', 'chapeu:laranja', 'jet:classico'], usa: {colete: 'lima', chapeu: 'laranja', jet: 'classico'}, aba: 'colete'};
 try { const sv = JSON.parse(localStorage.getItem('jetski-cwb-loja') || 'null'); if (sv) Object.assign(LOJA, sv, {aba: 'colete'}); } catch (e) {}
-const salvaLoja = () => { try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {} };
+const salvaLoja = () => { try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {} salvaNuvem(); };
 const itemDe = (cat, id) => LOJA_ITENS[cat].find(i => i[0] === id) || LOJA_ITENS[cat][0];
 // troca cores de vértice (comparando na cor linear do glTF) e, se pedido, esconde a laranja da cabeça
 const ORANGE_HEAD = new THREE.Vector3(0, 2.3, -0.4);
@@ -3422,6 +3430,7 @@ function lojaRender() {
     return `<button class="item${usa ? ' usa' : ''}${!tem && preco > LOJA.moedas ? ' caro' : ''}" data-id="${id}"><span class="sw" style="background:linear-gradient(135deg,${hex(cor2)} 50%,${hex(cor)} 50%)"></span><b>${nome}</b><small>${acao}</small></button>`;
   }).join('');
   try { const c = heroShot(360); $('lojaPrev').src = c.toDataURL(); } catch (e) {}
+  $('nuvem').hidden = !placarOk(); if (placarOk() && !SAVE_COD) salvaNuvem(true); $('saveCod').textContent = fmtCod(SAVE_COD);
 }
 function lojaClica(id) {
   const cat = LOJA.aba, key = cat + ':' + id, it = itemDe(cat, id);
@@ -3464,6 +3473,46 @@ async function enviaPlacar() {
   $('enviaBtn').disabled = true; $('enviaBtn').textContent = 'Enviando…';
   try { await placarEnvia(nome, ULTIMA.km, ULTIMA.pontos); ULTIMA.enviada = true; $('enviaBtn').textContent = 'No placar!'; abrePlacar(); }
   catch (e) { $('enviaBtn').disabled = false; $('enviaBtn').textContent = 'Tentar de novo'; }
+}
+
+// ---------- progresso na nuvem: pinhões, roupas e recorde, guardados por um código de save ----------
+// cada aparelho ganha um código aleatório de 12 letras; quem digita o código noutro aparelho recupera tudo
+const ALFA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+let SAVE_COD = null; try { SAVE_COD = localStorage.getItem('jetski-cwb-codigo'); } catch (e) {}
+const fmtCod = c => c ? c.replace(/(.{4})(?=.)/g, '$1-') : '—';
+function novoCodigo() { const a = new Uint32Array(12); crypto.getRandomValues(a); return Array.from(a, n => ALFA[n % ALFA.length]).join(''); }
+async function rpc(fn, args) {
+  const r = await fetch(`${PLACAR.url}/rest/v1/rpc/${fn}`, {method: 'POST', headers: {apikey: PLACAR.key, 'Content-Type': 'application/json'}, body: JSON.stringify(args)});
+  if (!r.ok) throw new Error(fn + ' ' + r.status);
+  const t = await r.text(); return t ? JSON.parse(t) : null;
+}
+let nuvemT = 0;
+function salvaNuvem(ja) {
+  if (!placarOk()) return;
+  if (!SAVE_COD) { SAVE_COD = novoCodigo(); try { localStorage.setItem('jetski-cwb-codigo', SAVE_COD); } catch (e) {} }
+  clearTimeout(nuvemT);
+  const vai = () => { let nome = ''; try { nome = localStorage.getItem('jetski-cwb-nome') || ''; } catch (e) {}
+    return rpc('salvar_progresso', {p_codigo: SAVE_COD, p_dados: {v: 1, moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa, best: best || 0, nome}}).catch(e => console.warn('save', e)); };
+  if (ja) return vai(); nuvemT = setTimeout(vai, 800);
+}
+async function recuperaNuvem() {
+  const msg = t => { $('nuvemMsg').textContent = t; };
+  const c = $('codIn').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (c.length !== 12) { msg('O código tem 12 letras e números.'); return; }
+  msg('Procurando…');
+  try {
+    const d = await rpc('carregar_progresso', {p_codigo: c});
+    if (!d) { msg('Não achei esse código.'); return; }
+    const ok = k => { const [cat, id] = String(k).split(':'); return LOJA_ITENS[cat] && LOJA_ITENS[cat].some(i => i[0] === id); };
+    LOJA.moedas = Math.max(0, Math.min(1e6, Math.floor(Number(d.moedas) || 0)));
+    LOJA.tem = [...new Set(['colete:lima', 'chapeu:laranja', 'jet:classico', ...(Array.isArray(d.tem) ? d.tem.filter(ok) : [])])];
+    for (const cat of Object.keys(LOJA_ITENS)) { const id = d.usa && d.usa[cat]; LOJA.usa[cat] = LOJA.tem.includes(cat + ':' + id) ? id : LOJA_ITENS[cat][0][0]; }
+    if (d.best > (best || 0)) { best = Math.floor(d.best); try { localStorage.setItem('jetski-cwb-score', String(best)); } catch (e) {} }
+    if (d.nome) try { localStorage.setItem('jetski-cwb-nome', String(d.nome).slice(0, 16)); } catch (e) {}
+    SAVE_COD = c; try { localStorage.setItem('jetski-cwb-codigo', c); } catch (e) {}
+    try { localStorage.setItem('jetski-cwb-loja', JSON.stringify({moedas: LOJA.moedas, tem: LOJA.tem, usa: LOJA.usa})); } catch (e) {}
+    applySkin(); lojaRender(); msg('Progresso recuperado!'); $('codIn').value = ''; blip([660, 880, 1320], 0.07, 'square', 0.08);
+  } catch (e) { msg('Não deu para falar com o servidor agora.'); }
 }
 
 // ---------- sons: buzina do biarticulado chegando e a voz do Ligeirinho ----------
