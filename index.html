@@ -400,25 +400,20 @@ const FOG_NEAR = 120, FOG_FAR = 1100;
 const LIMIT = 1180;
 
 // ---------- dados ----------
+// os dois arquivos começam a baixar juntos (antes os modelos só começavam depois do mapa)
+const assetsReq = fetch('assets.glb').then(r => { if (!r.ok) throw new Error('assets.glb ' + r.status); return r.arrayBuffer(); });
+assetsReq.catch(() => {}); // o erro é tratado lá embaixo, no await
 let D;
 try { D = await (await fetch('curitiba.json')).json(); }
 catch (e) { clearInterval(window.__piadas); $('loading').textContent = 'Não consegui carregar o mapa (curitiba.json). Recarregue a página. ' + CTA; throw e; }
 // modelos low-poly feitos no Blender (blender/assets_ps2.py), com cor por vértice
 const GEO = {};
 try {
-  // assets.json é um glTF com o buffer em base64; remonto o GLB em memória para o loader não buscar data: URIs
-  const gj = await (await fetch('assets.json')).json();
-  const bin = Uint8Array.from(atob(gj.buffers[0].uri.split(',')[1]), c => c.charCodeAt(0));
-  delete gj.buffers[0].uri;
-  const js = new TextEncoder().encode(JSON.stringify(gj));
-  const jl = Math.ceil(js.length / 4) * 4, bl = Math.ceil(bin.length / 4) * 4;
-  const glb = new ArrayBuffer(12 + 8 + jl + 8 + bl), dv = new DataView(glb), u8 = new Uint8Array(glb);
-  dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, glb.byteLength, true);
-  dv.setUint32(12, jl, true); dv.setUint32(16, 0x4E4F534A, true); u8.fill(0x20, 20, 20 + jl); u8.set(js, 20);
-  dv.setUint32(20 + jl, bl, true); dv.setUint32(24 + jl, 0x004E4942, true); u8.set(bin, 28 + jl);
+  // assets.glb: modelos em binário, com normais e cores em 8 bits (gerado por blender/compacta_assets.py)
+  const glb = await assetsReq;
   const gltf = await new GLTFLoader().parseAsync(glb, '');
   gltf.scene.traverse(o => { if (o.isMesh) GEO[o.name] = o.geometry; });
-} catch (e) { clearInterval(window.__piadas); $('loading').textContent = 'Não consegui carregar os modelos 3D (assets.json). Recarregue a página. ' + CTA; throw e; }
+} catch (e) { clearInterval(window.__piadas); $('loading').textContent = 'Não consegui carregar os modelos 3D (assets.glb). Recarregue a página. ' + CTA; throw e; }
 const VC = new THREE.MeshLambertMaterial({vertexColors: true});
 // objetos com a base submersa: tom de água funda abaixo da linha d'água e uma faixa molhada logo acima
 VC.onBeforeCompile = sh => {
@@ -451,7 +446,9 @@ const stageEl = $('stage');
 const SW = () => stageEl.clientWidth || innerWidth, SH = () => stageEl.clientHeight || innerHeight;
 const renderer = new THREE.WebGLRenderer({canvas, antialias: false, powerPreference: 'high-performance'});
 const PS2_H = 560; // altura interna baixa, para o visual de PS2
-const ps2Ratio = () => Math.min(devicePixelRatio, 1.5); // sem o filtro PS2: resolução normal
+// QUAL é a escala de resolução adaptativa: cai quando o aparelho não segura o ritmo e volta quando sobra folga
+let QUAL = 1;
+const ps2Ratio = () => Math.min(devicePixelRatio, 1.5) * QUAL; // sem o filtro PS2: resolução normal
 renderer.setPixelRatio(ps2Ratio());
 renderer.setSize(SW(), SH());
 renderer.toneMapping = THREE.NoToneMapping;
@@ -494,8 +491,8 @@ void main(){
   vec3 n = normalize(vec3(sin(wp.x * 1.3 + uTime * 1.5) * .025 + sin((wp.x + wp.z) * 2.7 - uTime * 2.2) * .015, 1., sin(wp.z * 1.6 - uTime * 1.2) * .025));
   vec3 R = reflect(V, n);
   float dist = 0.35, lo = 0., hitT = -1.; vec2 huv = vec2(0.);
-  for(int i = 0; i < 24; i++){
-    lo = dist; dist *= 1.24;
+  for(int i = 0; i < 16; i++){
+    lo = dist; dist *= 1.38;
     vec4 vr = uView * vec4(wp + R * dist, 1.), cl = uProj * vr;
     if(cl.w <= 0.) break;
     vec2 uv = cl.xy / cl.w * .5 + .5;
@@ -505,7 +502,7 @@ void main(){
     if(diff > 0. && diff < 0.8 + dist * 0.15){
       // refina entre o passo anterior e este
       float a = lo, b = dist;
-      for(int k = 0; k < 5; k++){
+      for(int k = 0; k < 4; k++){
         float m = (a + b) * .5; vec4 v2 = uView * vec4(wp + R * m, 1.), c2 = uProj * v2; vec2 u2 = c2.xy / c2.w * .5 + .5;
         if(viewPos(u2, texture2D(tDepth, u2).r).z - v2.z > 0.) b = m; else a = m;
       }
@@ -585,7 +582,6 @@ const uTime = {value: 0};
 
 // ---------- água ----------
 {
-  const g = new THREE.PlaneGeometry(2900, 2900, 290, 290); g.rotateX(-Math.PI / 2);
   const m = new THREE.ShaderMaterial({
     uniforms: {uTime, ...fogUniforms},
     vertexShader: `uniform float uTime; uniform float uAmp; varying vec3 vW; varying float vD;
@@ -617,7 +613,15 @@ const uTime = {value: 0};
       }`
   });
   window.__waterMat = m;
-  scene.add(new THREE.Mesh(g, m));
+  // a mesma malha de 2900 m (vértice a cada 10 m), cortada em 10 x 10 blocos: a câmera só desenha os blocos
+  // que enxerga. A onda vem da posição no mundo, então as bordas de blocos vizinhos batem sem fresta.
+  const N = 10, T = 2900 / N;
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+    const g = new THREE.PlaneGeometry(T, T, 29, 29); g.rotateX(-Math.PI / 2);
+    g.translate(-1450 + T * (i + 0.5), 0, -1450 + T * (j + 0.5));
+    g.computeBoundingSphere(); g.boundingSphere.radius += 1; // folga para a altura da onda
+    scene.add(new THREE.Mesh(g, m));
+  }
 }
 
 // ---------- praças (nomes) e percurso ----------
@@ -737,9 +741,10 @@ function buildRoute() {
   for (let i = 0; i < n; i++) { const a = Math.max(0, i - 1), b = Math.min(n - 1, i + 1); let dx = X[b] - X[a], dz = Z[b] - Z[a]; const l = Math.hypot(dx, dz) || 1; DX[i] = dx / l; DZ[i] = dz / l; }
   // grade para saber a distância de qualquer ponto até o percurso
   const g = new Map(), C = 16;
-  for (let i = 0; i < n; i++) { const k = Math.floor(X[i] / C) + ',' + Math.floor(Z[i] / C); let a = g.get(k); if (!a) g.set(k, a = []); a.push(i); }
-  const near = (x, z) => { let b = 1e9; const cx = Math.floor(x / C), cz = Math.floor(z / C); for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const a = g.get((cx + i) + ',' + (cz + j)); if (a) for (const q of a) b = Math.min(b, Math.hypot(X[q] - x, Z[q] - z)); } return b; };
-  const nearestS = (x, z) => { let b = 1e9, bi = 0; const cx = Math.floor(x / C), cz = Math.floor(z / C); for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const a = g.get((cx + i) + ',' + (cz + j)); if (a) for (const q of a) { const d = Math.hypot(X[q] - x, Z[q] - z); if (d < b) { b = d; bi = q; } } } return [b, bi]; };
+  // chave numérica da célula (bem mais rápida que texto "cx,cz"; as células cabem com folga em ±32 mil)
+  for (let i = 0; i < n; i++) { const k = Math.floor(X[i] / C) * 65536 + Math.floor(Z[i] / C); let a = g.get(k); if (!a) g.set(k, a = []); a.push(i); }
+  const near = (x, z) => { let b = 1e18; const cx = Math.floor(x / C), cz = Math.floor(z / C); for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const a = g.get((cx + i) * 65536 + cz + j); if (a) for (const q of a) { const dx = X[q] - x, dz = Z[q] - z, d = dx * dx + dz * dz; if (d < b) b = d; } } return b < 1e18 ? Math.sqrt(b) : 1e9; };
+  const nearestS = (x, z) => { let b = 1e18, bi = 0; const cx = Math.floor(x / C), cz = Math.floor(z / C); for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const a = g.get((cx + i) * 65536 + cz + j); if (a) for (const q of a) { const dx = X[q] - x, dz = Z[q] - z, d = dx * dx + dz * dz; if (d < b) { b = d; bi = q; } } } return [b < 1e18 ? Math.sqrt(b) : 1e9, bi]; };
   // conta meias-voltas que sobraram (voltas em quarteirão muito estreito)
   let rev = 0; for (let q = 10; q < n - 10; q += 5) if (DX[q - 10] * DX[q + 10] + DZ[q - 10] * DZ[q + 10] < -0.5) rev++;
   return {rev, n, step: STEP, len: (n - 1) * STEP, X, Z, DX, DZ, near, nearest: nearestS, legs: legs.map(l => ({s: Math.min((n - 1) * STEP, cum[l.k]), name: l.name, kind: l.kind}))};
@@ -765,7 +770,7 @@ function paredeFina(q) {
   return w < 2.5;
 }
 const TRK_CELL = 12, TRK_GRID = new Map();
-for (let q = 0; q < TRK.n; q++) { const k = Math.floor(TRK.X[q] / TRK_CELL) + ',' + Math.floor(TRK.Z[q] / TRK_CELL); (TRK_GRID.get(k) || TRK_GRID.set(k, []).get(k)).push(q); }
+for (let q = 0; q < TRK.n; q++) { const k = Math.floor(TRK.X[q] / TRK_CELL) * 65536 + Math.floor(TRK.Z[q] / TRK_CELL); (TRK_GRID.get(k) || TRK_GRID.set(k, []).get(k)).push(q); }
 function carve(pts) {
   if (paredeFina(pts)) return null; // já vem como parede do mapa
   // prédio longe da pista: fica como está
@@ -775,7 +780,7 @@ function carve(pts) {
     let mnx = 1e9, mxx = -1e9, mnz = 1e9, mxz = -1e9;
     for (const p of pts) { mnx = Math.min(mnx, p[0]); mxx = Math.max(mxx, p[0]); mnz = Math.min(mnz, p[1]); mxz = Math.max(mxz, p[1]); }
     for (let cx = Math.floor((mnx - 10) / TRK_CELL); cx <= Math.floor((mxx + 10) / TRK_CELL) && !near; cx++)
-      for (let cz = Math.floor((mnz - 10) / TRK_CELL); cz <= Math.floor((mxz + 10) / TRK_CELL); cz++) if (TRK_GRID.has(cx + ',' + cz)) { near = true; break; }
+      for (let cz = Math.floor((mnz - 10) / TRK_CELL); cz <= Math.floor((mxz + 10) / TRK_CELL); cz++) if (TRK_GRID.has(cx * 65536 + cz)) { near = true; break; }
   }
   if (!near) return pts;
   // subdivide paredes longas (numa curva, uma parede reta podia atravessar a pista entre dois cantos)
@@ -793,17 +798,20 @@ function carve(pts) {
     out.push([TRK.X[i] + vx / l * CLEAR, TRK.Z[i] + vz / l * CLEAR]);
   }
   // se ainda sobrou prédio em cima da pista (atravessa o percurso), some com ele
+  // (vários pontos vizinhos caem no mesmo trecho da pista: junta os trechos antes, para testar cada um uma vez só)
+  const qs = new Set();
   for (const p of dense) {
     const [d, i] = TRK.nearest(p[0], p[1]); if (d > 40) continue;
-    for (let q = Math.max(0, i - 6); q <= Math.min(TRK.n - 1, i + 6); q += 2) for (const o of [-5.6, 0, 5.6]) if (pip(TRK.X[q] - TRK.DZ[q] * o, TRK.Z[q] + TRK.DX[q] * o, out)) return null;
+    for (let q = Math.max(0, i - 6); q <= Math.min(TRK.n - 1, i + 6); q += 2) qs.add(q);
   }
+  for (const q of qs) for (const o of [-5.6, 0, 5.6]) if (pip(TRK.X[q] - TRK.DZ[q] * o, TRK.Z[q] + TRK.DX[q] * o, out)) return null;
   // conferência final: nenhum ponto das 3 faixas, em nenhuma passagem do percurso, pode cair dentro do prédio
   {
     let mnx = 1e9, mxx = -1e9, mnz = 1e9, mxz = -1e9;
     for (const p of out) { mnx = Math.min(mnx, p[0]); mxx = Math.max(mxx, p[0]); mnz = Math.min(mnz, p[1]); mxz = Math.max(mxz, p[1]); }
     for (let cx = Math.floor((mnx - 6) / TRK_CELL); cx <= Math.floor((mxx + 6) / TRK_CELL); cx++)
       for (let cz = Math.floor((mnz - 6) / TRK_CELL); cz <= Math.floor((mxz + 6) / TRK_CELL); cz++) {
-        const arr = TRK_GRID.get(cx + ',' + cz); if (!arr) continue;
+        const arr = TRK_GRID.get(cx * 65536 + cz); if (!arr) continue;
         for (const q of arr) for (const o of [-5.4, -2.7, 0, 2.7, 5.4]) if (pip(TRK.X[q] - TRK.DZ[q] * o, TRK.Z[q] + TRK.DX[q] * o, out)) return null;
       }
     // e nenhuma parede (amostrada a cada 1 m) pode chegar a menos de 6,5 m do centro de qualquer passagem
@@ -812,7 +820,7 @@ function carve(pts) {
       const a = out[k], b = out[(k + 1) % out.length], L = Math.hypot(b[0] - a[0], b[1] - a[1]), ns = Math.max(1, Math.ceil(L));
       for (let t = 0; t < ns; t++) {
         const x = a[0] + (b[0] - a[0]) * t / ns, z = a[1] + (b[1] - a[1]) * t / ns, cx = Math.floor(x / TRK_CELL), cz = Math.floor(z / TRK_CELL);
-        for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const arr = TRK_GRID.get((cx + i) + ',' + (cz + j)); if (arr) for (const q of arr) if (Math.hypot(TRK.X[q] - x, TRK.Z[q] - z) < 6.5) return null; }
+        for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const arr = TRK_GRID.get((cx + i) * 65536 + cz + j); if (arr) for (const q of arr) { const dx = TRK.X[q] - x, dz = TRK.Z[q] - z; if (dx * dx + dz * dz < 42.25) return null; } }
       }
     }
   }
@@ -1029,7 +1037,10 @@ for (const l of LMK) { let last = -1e9; for (let i = 0; i < TRK.n; i += 5) { if 
 LM_PASS.sort((a, b) => a.s - b.s);
 // tira os prédios em cima do marco e entre ele e a pista, para o marco ficar à vista
 const segD = (px, pz, ax, az, bx, bz) => { const dx = bx - ax, dz = bz - az, L2 = dx * dx + dz * dz || 1; let t = ((px - ax) * dx + (pz - az) * dz) / L2; t = Math.max(0, Math.min(1, t)); return Math.hypot(px - ax - dx * t, pz - az - dz * t); };
-const LANDMARK_SKIP = pts => { const c = centroid(pts); return LMK.some(l => Math.hypot(c[0] - l.x, c[1] - l.z) < l.r || pip(l.x, l.z, pts) || pts.some(p => segD(p[0], p[1], l.ax, l.az, l.x, l.z) < l.r * 0.75)); };
+// filtro rápido (sem mudar o resultado): se o centro do prédio está a mais de "raio do prédio + raio do marco"
+// do segmento marco-pista, nenhum dos três testes abaixo pode dar verdadeiro
+const LANDMARK_SKIP = pts => { const c = centroid(pts); let rb = 0; for (const p of pts) rb = Math.max(rb, Math.hypot(p[0] - c[0], p[1] - c[1]));
+  return LMK.some(l => segD(c[0], c[1], l.ax, l.az, l.x, l.z) <= rb + l.r && (Math.hypot(c[0] - l.x, c[1] - l.z) < l.r || pip(l.x, l.z, pts) || pts.some(p => segD(p[0], p[1], l.ax, l.az, l.x, l.z) < l.r * 0.75))); };
 const nearLandmark = (x, z, pad = 2) => LMK.some(l => Math.hypot(x - l.x, z - l.z) < l.r + pad);
 
 // ---------- prédios ----------
@@ -1037,11 +1048,17 @@ const nearLandmark = (x, z, pad = 2) => LMK.some(l => Math.hypot(x - l.x, z - l.
 const NEON = [[.95, .6, .17], [.85, .23, .23], [.58, .45, .72], [.71, .8, .18], [.33, .47, .74]];
 const colliders = []; // {pts, minx,maxx,minz,maxz}
 {
-  const pos = [], nor = [], inf = [], neo = [];
+  // prédios agrupados em blocos de 160 m: a câmera só desenha os blocos que enxerga e o three.js
+  // desenha os blocos da frente para trás, então o shader pesado das fachadas roda menos vezes por pixel
+  const TILE = 160, TILES = new Map();
+  let pos, nor, inf, neo;
   D.b.forEach((b, i) => {
     let pts = carve(b[1]);
     if (!pts || pts.length < 3) return;
     if (LANDMARK_SKIP(pts)) return;
+    { const c = centroid(pts), key = Math.floor(c[0] / TILE) + ',' + Math.floor(c[1] / TILE);
+      let t = TILES.get(key); if (!t) TILES.set(key, t = {pos: [], nor: [], inf: [], neo: []});
+      ({pos, nor, inf, neo} = t); }
     const A = signedArea(pts);
     const area = Math.abs(A);
     if (area < 12) return;
@@ -1082,11 +1099,6 @@ const colliders = []; // {pts, minx,maxx,minz,maxz}
     for (const p of pts) { minx = Math.min(minx, p[0]); maxx = Math.max(maxx, p[0]); minz = Math.min(minz, p[1]); maxz = Math.max(maxz, p[1]); }
     colliders.push({pts, minx, maxx, minz, maxz});
   });
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
-  g.setAttribute('aInfo', new THREE.Float32BufferAttribute(inf, 4));
-  g.setAttribute('aNeon', new THREE.Float32BufferAttribute(neo, 4));
   const m = new THREE.ShaderMaterial({
     side: THREE.DoubleSide,
     uniforms: {uTime, ...fogUniforms},
@@ -1162,7 +1174,16 @@ const colliders = []; // {pts, minx,maxx,minz,maxz}
         gl_FragColor = vec4(mix(c,uFogColor,fg),1.);
       }`
   });
-  scene.add(new THREE.Mesh(g, m));
+  for (const t of TILES.values()) {
+    if (!t.pos.length) continue;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(t.pos, 3));
+    g.setAttribute('normal', new THREE.Float32BufferAttribute(t.nor, 3));
+    g.setAttribute('aInfo', new THREE.Float32BufferAttribute(t.inf, 4));
+    g.setAttribute('aNeon', new THREE.Float32BufferAttribute(t.neo, 4));
+    g.computeBoundingSphere();
+    scene.add(new THREE.Mesh(g, m));
+  }
 }
 
 // ---------- praças e araucárias ----------
@@ -3935,7 +3956,27 @@ function heroFerias(S = 640) {
   try { return heroShot(S, capi, {hat: GEO.chapeu_palha, extras: [GEO.oculos, GEO.colar_flores]}); } finally { capi.dispose(); }
 }
 
+// resolução adaptativa: mede o tempo real entre quadros durante a corrida; se passar de ~20 ms (abaixo de 50 fps)
+// por 1 s, baixa a resolução interna um degrau (até 60%); se ficar abaixo de ~15 ms por 5 s, sobe um degrau
+const RES = {acc: 0, n: 0, good: 0, last: 0};
+function stepRes() {
+  const now = performance.now(), ft = now - RES.last; RES.last = now;
+  if (G.state !== 'race' || G.paused || ft > 250) { RES.acc = RES.n = 0; return; } // aba escondida ou pausa não contam
+  RES.acc += ft; RES.n++;
+  if (RES.acc < 1000) return;
+  const avg = RES.acc / RES.n; RES.acc = RES.n = 0;
+  let q = QUAL;
+  if (avg > 20) { q = Math.max(0.6, QUAL - 0.1); RES.good = 0; }
+  else if (avg < 15 && QUAL < 1) { if (++RES.good >= 5) { q = Math.min(1, QUAL + 0.1); RES.good = 0; } }
+  else RES.good = 0;
+  if (q !== QUAL) { QUAL = +q.toFixed(2); aplicaRes(); }
+}
+function aplicaRes() {
+  renderer.setPixelRatio(ps2Ratio()); composer.setPixelRatio(ps2Ratio());
+  renderer.setSize(SW(), SH()); composer.setSize(SW(), SH()); syncPs2();
+}
 function frame() {
+  stepRes();
   const dt = Math.min(0.05, clock.getDelta());
   if (!G.paused) { uTime.value += dt; if (G.state === 'intro') runIntro(dt); else { step(dt); stepSpeedWind(dt); stepVida(dt); } }
   stepHudKm(dt);
@@ -3945,12 +3986,23 @@ function frame() {
   requestAnimationFrame(frame);
 }
 addEventListener('resize', () => {
-  renderer.setPixelRatio(ps2Ratio()); composer.setPixelRatio(ps2Ratio());
-  renderer.setSize(SW(), SH()); composer.setSize(SW(), SH()); syncPs2();
+  aplicaRes();
   camera.aspect = SW() / SH(); camera.updateProjectionMatrix();
   iCam.aspect = SW() / SH(); iCam.updateProjectionMatrix();
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden && G.state === 'race') setPaused(true); });
+// pré-compila os shaders da cena enquanto o menu está aberto: sem isso, a largada e o primeiro redemoinho,
+// cratera ou sombra de galho compilavam shader no meio da corrida (no celular, um tranco visível a cada um).
+// Os materiais que só aparecem depois (obstáculos, power-ups, guarda-chuva) entram num grupo-fantasma, que sai da cena em seguida.
+{
+  const fantasma = new THREE.Group(); fantasma.visible = false;
+  const temp = [new THREE.MeshBasicMaterial({transparent: true, depthWrite: false}), new THREE.MeshLambertMaterial({vertexColors: true})];
+  for (const m of [swirlMat, holeMat, METAL_MAT, ...temp]) fantasma.add(new THREE.Mesh(shadowG, m));
+  scene.add(fantasma);
+  const fim = () => { scene.remove(fantasma); temp.forEach(m => m.dispose()); };
+  try { (renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve(renderer.compile(scene, camera))).then(fim, fim); }
+  catch (e) { fim(); console.warn('pré-compilação', e); }
+}
 frame();
 </script>
 

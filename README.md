@@ -32,8 +32,10 @@ Depois abra http://localhost:8000.
 
 - `index.html`: o jogo inteiro (three.js carregado do jsDelivr).
 - `curitiba.json`: prédios, ruas, praças e rios do centro de Curitiba, exportados do OpenStreetMap e convertidos para metros.
-- `assets.json`: modelos 3D low-poly (glTF com o buffer embutido), gerados pelo script do Blender.
+- `assets.glb`: modelos 3D low-poly que o jogo carrega (binário, com normais e cores em 8 bits).
+- `assets.json`: saída do script do Blender (glTF com o buffer embutido), de onde sai o `assets.glb`.
 - `blender/assets_ps2.py`: gera todos os modelos, com cor por vértice.
+- `blender/compacta_assets.py`: converte o `assets.json` no `assets.glb`.
 - `supabase/`: SQL do servidor (Supabase):
   - `servidor.sql`: pinhões, loja, partidas e placar validados no servidor.
   - `placar.sql`: tabela do placar.
@@ -44,6 +46,7 @@ Para gerar os modelos de novo:
 
 ```
 blender -b -P blender/assets_ps2.py -- . --preview
+python3 blender/compacta_assets.py
 ```
 
 ## Servidor
