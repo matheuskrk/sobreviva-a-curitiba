@@ -1431,7 +1431,7 @@ const SETA_G = new THREE.PlaneGeometry(2.4, 2.4), POSTE_SETA_G = new THREE.Cylin
 // ---------- o mundo do percurso é montado em trechos de 200 m, só perto da capivara ----------
 const CHUNK = 200;
 const chunks = new Map();
-// postes da Copel em fila (a cada 52 m, de cada lado) com fios; os que caem como obstáculo são os mesmos da fila
+// postes de energia em fila (a cada 52 m, de cada lado) com fios; os que caem como obstáculo são os mesmos da fila
 const FALLERS = new Set(), POLE_MESH = new Map();
 // Vãos de fio pendurados em cada poste. O poste que vira obstáculo é escondido durante a partida, mas o fio
 // dele já está montado na geometria do pedaço (os pedaços são montados 700 m à frente e o poste só é sorteado
@@ -1501,7 +1501,7 @@ function buildChunk(k) {
     const tm = new THREE.Mesh(GEO.tubo, VC); placeOnTrack(tm, tb.s, tb.side * 7.0, -0.95); keep(tm);
     const tg = new THREE.Mesh(GEO.tubo_vidro, TUBE_GLASS); placeOnTrack(tg, tb.s, tb.side * 7.0, -0.95); tg.renderOrder = 1; keep(tg);
   }
-  // postes da Copel e fios pendurados entre eles
+  // postes de energia e fios pendurados entre eles
   {
     const WP = [], POLE_Y = 9.6, vaos = [];
     const polePos = m => { const s = 26 * m + 23, sd = m % 2 ? 1 : -1, [x, z] = trackAt(s, sd * 7.6); return {s, sd, ok: !(insideAny(x, z, 0.6) || nearLandmark(x, z) || routeNear(x, z) < VIA_LIVRE)}; };
@@ -2320,7 +2320,7 @@ const TRASH_COLORS = [0xd93a3a, 0x3a6fd9, 0x3f8a46, 0xf2c230, 0x8a5a2b];
 const OBS = [];
 const HIT_MSG = {
   galho: 'Galho na cabeça!', cratera: 'Caiu na cratera!', cones: 'Atropelou os cones!', tapume: 'Bateu na obra da prefeitura!',
-  poste: 'Tomou choque dos fios da Copel!', bueiro: 'Bueiro entupido! Rodou', onibus: 'O biarticulado te pegou!',
+  poste: 'Tomou choque dos fios do poste!', bueiro: 'Bueiro entupido! Rodou', onibus: 'O biarticulado te pegou!',
 };
 const laneOff = l => l * LANE;
 function mk(geo, mat = VC) { return new THREE.Mesh(geo, mat); }
@@ -2990,7 +2990,7 @@ $('hint').querySelector('span').textContent = matchMedia('(pointer:coarse)').mat
 {
   const POWER = [
     ['pinhao', 'Pinhão', '5 s invencível e bem mais rápido, atravessando tudo.'],
-    ['guarda_chuva', 'Guarda-chuva', 'Aparece antes de uma chuva de galhos: por 8 s, galho e fio da Copel não te pegam.'],
+    ['guarda_chuva', 'Guarda-chuva', 'Aparece antes de uma chuva de galhos: por 8 s, galho e fio de poste não te pegam.'],
     ['ligeirinho', 'Ligeirinho', '4 s de carona em cima do ônibus: mais rápido, sem batida, desvia sozinho.'],
   ];
   // miniaturas desenhadas pelo próprio renderizador do jogo num alvo fora da tela (sem criar um segundo contexto WebGL,
@@ -3260,7 +3260,7 @@ function hit(o) {
   if (G.inv > 0) return;
   o.done = true;
   G.inv = 1.2; G.slow = 1; G.boost = 0; S.shake = 1; G.speed *= 0.55; G.lastHit = HIT_MSG[o.type === 'galho_cai' ? 'galho' : o.type];
-  if (o.type === 'poste') { G.zap = 1.1; setZapLook(true); shockSound(); G.flash = 1; G.slow = 1.3; } // levou choque do fio da Copel
+  if (o.type === 'poste') { G.zap = 1.1; setZapLook(true); shockSound(); G.flash = 1; G.slow = 1.3; } // levou choque do fio do poste
   else if (o.type === 'tapume') hitTapume();
   else if (o.type === 'cones') hitCone();
   else if (o.type === 'onibus') hitBus();
@@ -3295,7 +3295,7 @@ function step(dt) {
   if (G.star > 0) { target *= 1.45; G.star -= dt; starMat.emissive.setHSL((t * 1.5) % 1, 1, 0.35); if (G.star <= 0) { setStarLook(false); toast('Acabou o pinhão', 0.8); } }
   else if (G.ride > 0) { target *= 1.35; }
   else if (G.boost > 0) { target *= 1.22; G.boost -= dt; }
-  if (G.ride > 0) { G.ride -= dt; if (G.ride <= 0) { rideBus.visible = false; toast('Acabaram os créditos do cartão da URBS', 1.2); } }
+  if (G.ride > 0) { G.ride -= dt; if (G.ride <= 0) { rideBus.visible = false; toast('Acabaram os créditos do cartão de ônibus', 1.2); } }
   if (G.umb > 0) { G.umb -= dt; if (G.umb <= 0) { umbOnSki.visible = false; toast('Guardou o guarda-chuva', 0.8); } }
   if (G.slow > 0) { target *= 1 - G.slow * 0.45; G.slow = Math.max(0, G.slow - dt * 1.1); }
   // Rio Belém: a correnteza pega o jetski e empurra; a arrancada entra rápido e vai baixando depois que ele sai

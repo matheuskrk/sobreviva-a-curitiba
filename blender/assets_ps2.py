@@ -172,7 +172,7 @@ for name, cols in [('arvore_verde', (FOLHA, FOLHA_ESC)), ('ipe_amarelo', (AMAREL
     p.append(ico(cols[0], (-1.2, -0.6, 7.3), 1.9))
     asset(name, p)
 
-# ---------------- poste da Copel (origem na base; travessa no eixo X) ----------------
+# ---------------- poste de energia (origem na base; travessa no eixo X) ----------------
 p = [cyl(CINZA, (0, 0, 5), 0.22, 10, 8, r2=0.14)]
 p.append(box(CINZA_ESC, (0, 0, 9.3), (2.3, 0.15, 0.15)))
 for x in (-0.95, 0, 0.95): p.append(cyl(BRANCO, (x, 0, 9.48), 0.06, 0.2, 6))
@@ -302,7 +302,7 @@ for s in (-1, 1): p.append(box(CINZA, (0, s * 7.0, 0.35), (1.6, 1.8, 0.3)))
 asset('tubo', p)
 asset('tubo_vidro', [cyl(0xbfe3ef, (0, 0, 2.2), 1.6, 12, 12, rot=(math.pi / 2, 0, 0))])
 
-# ---------------- lancha da Copel (frente +Y) ----------------
+# ---------------- lancha da companhia de energia (frente +Y) ----------------
 BOAT = [(0, 4.2), (1.0, 3.0), (1.55, 1.2), (1.6, -3.6), (1.3, -4.0), (-1.3, -4.0), (-1.6, -3.6), (-1.55, 1.2), (-1.0, 3.0)]
 p = [loft([[(x * 0.7, y * 0.9, 0) for x, y in BOAT], [(x, y, 0.7) for x, y in BOAT]], BRANCO, cap_top=False)]
 p.append(loft([[(x, y, 0.7) for x, y in BOAT], [(x * 1.02, y * 1.01, 1.0) for x, y in BOAT]], LARANJA, cap_bot=False))
@@ -314,7 +314,7 @@ p.append(between(LARANJA, (0, 2.6, 4.2), (0, 3.6, 3.4), 0.12, 6))
 BOLT = [(-0.15, 0.55), (0.25, 0.55), (0.05, 0.1), (0.3, 0.1), (-0.2, -0.6), (-0.02, -0.08), (-0.28, -0.08)]
 for s in (-1, 1):
     p.append(box(AMARELO, (s * 1.24, -1.4, 1.5), (0.04, 0.9, 0.6)))
-asset('lancha_copel', p)
+asset('lancha_energia', p)
 
 # ---------------- fusível (caixa amarela com raio) ----------------
 p = [box(AMARELO, (0, 0, 0), (1.4, 1.4, 1.4), bevel=0.08)]
@@ -1195,6 +1195,6 @@ if '--preview' in sys.argv:
     render(os.path.join(OUT, 'preview_pinhao.png'), ['pinhao'], {'pinhao': 0}, (2.2, -3.2, 1.2), (0, 0, 0), 3.2, target=(0, 0, 0))
     render(os.path.join(OUT, 'preview_cenario.png'), ['pato', 'boia', 'banco', 'lixeiras', 'placa', 'tapume', 'capivara_enfeite', 'canoa', 'banca', 'luminaria', 'chafariz', 'obelisco', 'colunata', 'portal'],
            {'pato': 2, 'boia': 2.5, 'banco': 3.5, 'lixeiras': 3.5, 'placa': 3.5, 'tapume': 4.5, 'capivara_enfeite': 3, 'canoa': 3, 'banca': 4.5, 'luminaria': 6, 'chafariz': 8, 'obelisco': 7, 'colunata': 17, 'portal': 10}, (0, -70, 8), (math.radians(84), 0, 0), 80)
-    render(os.path.join(OUT, 'preview_props.png'), ['equipe_poda', 'pinhao', 'lixo', 'cone', 'fusivel', 'galho', 'poste', 'arvore_verde', 'ipe_amarelo', 'ipe_roxo', 'araucaria', 'bi_frente', 'tubo', 'lancha_copel'],
-           {'equipe_poda': 12, 'pinhao': 2.5, 'lixo': 2.5, 'cone': 3, 'fusivel': 6, 'galho': 8, 'poste': 7, 'arvore_verde': 8, 'ipe_amarelo': 8, 'ipe_roxo': 9, 'araucaria': 10, 'bi_frente': 7, 'tubo': 8, 'lancha_copel': 4},
+    render(os.path.join(OUT, 'preview_props.png'), ['equipe_poda', 'pinhao', 'lixo', 'cone', 'fusivel', 'galho', 'poste', 'arvore_verde', 'ipe_amarelo', 'ipe_roxo', 'araucaria', 'bi_frente', 'tubo', 'lancha_energia'],
+           {'equipe_poda': 12, 'pinhao': 2.5, 'lixo': 2.5, 'cone': 3, 'fusivel': 6, 'galho': 8, 'poste': 7, 'arvore_verde': 8, 'ipe_amarelo': 8, 'ipe_roxo': 9, 'araucaria': 10, 'bi_frente': 7, 'tubo': 8, 'lancha_energia': 4},
            (0, -60, 14), (math.radians(80), 0, 0), 90)

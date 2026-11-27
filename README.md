@@ -11,7 +11,7 @@ Corrida infinita em 3 faixas, feita para o celular (tela em pé, 9:16): deslize 
 - **Abertura:** o parque de diversões do Barigui afundando e a rajada de vento que joga a capivara no jet ski.
 - **Power-ups:**
   - **Pinhão:** 5 s invencível e mais rápido.
-  - **Guarda-chuva:** 8 s sem galhos nem fios da Copel.
+  - **Guarda-chuva:** 8 s sem galhos nem fios dos postes.
   - **Ligeirinho:** 4 s de carona no ônibus.
 - **Cidade:** clima que muda (sol, garoa, temporal e neblina), dia e noite com apagões, correnteza do Rio Belém, pontos turísticos sem nome para quem conhece reconhecer, placas de curva, moradores nas boias e a equipe da poda.
 - **Lojinha:** coletes, chapéus e jet skis pagos com pinhões (3 por km e 10 por pinhão pego), com prévia antes de comprar.
